@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="ch-Bau - Die kostenlose Bau-App für alle Gewerke. Offline-fähig, 11 Fachbereiche, Berechnungen & Normen.">
+  <title>ch-Bau - Dein Bau-Nachschlagewerk</title>
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+      color: white;
+      padding: 60px 20px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    
+    .hero-content {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .hero-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    }
+    
+    .hero h1 {
+      font-size: 2.5em;
+      font-weight: 800;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero .tagline {
+      font-size: 1.2em;
+      opacity: 0.95;
+      margin-bottom: 30px;
+    }
+    
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .badge {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+    
+    .cta-btn {
+      display: inline-block;
+      background: white;
+      color: var(--primary);
+      padding: 16px 40px;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* Features Grid */
+    .features {
+      padding: 60px 20px;
+      background: white;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 1.8em;
+      font-weight: 700;
+      margin-bottom: 40px;
+      color: var(--text);
+    }
+    
+    .gewerke-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .gewerk-card {
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 20px 15px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .gewerk-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .gewerk-icon {
+      font-size: 2em;
+      margin-bottom: 8px;
+    }
+    
+    .gewerk-name {
+      font-weight: 600;
+      font-size: 0.9em;
+      color: var(--text);
+    }
+    
+    /* USP Section */
+    .usp-section {
+      padding: 60px 20px;
+      background: var(--bg);
+    }
+    
+    .usp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .usp-item {
+      text-align: center;
+      padding: 25px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .usp-icon {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+    }
+    
+    .usp-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      margin-bottom: 8px;
+    }
+    
+    .usp-desc {
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+    
+    /* Key Facts / Comparison */
+    .keyfacts-section {
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    }
+    
+    .comparison-table {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .compare-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .compare-row:last-child {
+      border-bottom: none;
+    }
+    
+    .compare-row.header {
+      background: #059669;
+      color: white;
+      font-weight: 700;
+    }
+    
+    .compare-row.header .compare-cell {
+      background: #059669 !important;
+    }
+    
+    .compare-cell {
+      padding: 14px 12px;
+      text-align: center;
+      font-size: 0.95em;
+    }
+    
+    .compare-cell.feature {
+      text-align: left;
+      font-weight: 600;
+      background: #f8fafc;
+    }
+    
+    .compare-row.header .compare-cell.feature {
+      background: #047857;
+    }
+    
+    .compare-cell.chbau {
+      background: #ecfdf5;
+    }
+    
+    .compare-cell.chbau.highlight {
+      color: #059669;
+      font-weight: 600;
+    }
+    
+    .compare-cell.others {
+      color: var(--text-muted);
+    }
+    
+    .keyfacts-note {
+      max-width: 600px;
+      margin: 25px auto 0;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .keyfacts-note p {
+      color: var(--text);
+      font-size: 0.95em;
+    }
+    
+    /* Installation Section */
+    .install-section {
+      padding: 60px 20px;
+      background: white;
+    }
+    
+    .install-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    
+    .install-tab {
+      padding: 12px 30px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .install-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    
+    .install-tab:not(.active):hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .install-content {
+      display: none;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .install-content.active {
+      display: block;
+    }
+    
+    .install-step {
+      display: flex;
+      gap: 15px;
+      padding: 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+    
+    .step-number {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    
+    .step-content h4 {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 0.95em;
+    }
+    
+    .step-icon {
+      display: inline-block;
+      background: white;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    /* Screenshot */
+    .screenshot-hint {
+      text-align: center;
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #dbeafe, #ede9fe);
+      border-radius: 12px;
+    }
+    
+    .screenshot-hint p {
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+    
+    /* Disclaimer */
+    .disclaimer-section {
+      padding: 40px 20px;
+      background: #fef3c7;
+      border-top: 3px solid #f59e0b;
+    }
+    
+    .disclaimer-box {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .disclaimer-box h3 {
+      color: #92400e;
+      margin-bottom: 10px;
+    }
+    
+    .disclaimer-box p {
+      color: #78350f;
+      font-size: 0.95em;
+    }
+    
+    /* Support Section */
+    .support-section {
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      text-align: center;
+    }
+    
+    .support-section h2 {
+      font-size: 1.8em;
+      margin-bottom: 15px;
+    }
+    
+    .support-section p {
+      opacity: 0.9;
+      margin-bottom: 25px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .coffee-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffdd00;
+      color: #000;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+    
+    .coffee-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .coffee-icon {
+      font-size: 1.4em;
+    }
+    
+    /* Footer */
+    footer {
+      padding: 30px 20px;
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    
+    footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+    
+    footer .version {
+      margin-top: 10px;
+      font-size: 0.85em;
+      opacity: 0.7;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 2em; }
+      .hero-icon { font-size: 48px; }
+      .install-tabs { flex-direction: column; }
+      .install-tab { justify-content: center; }
+      .gewerke-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .gewerk-card { padding: 15px 10px; }
+      .gewerk-icon { font-size: 1.5em; }
+      .gewerk-name { font-size: 0.8em; }
+      .compare-cell { padding: 10px 6px; font-size: 0.85em; }
+      .compare-cell.feature { font-size: 0.8em; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-icon">🏗️</div>
+      <h1>ch-Bau</h1>
+      <p class="tagline">Das kostenlose Nachschlagewerk für alle Bau-Gewerke</p>
+      
+      <div class="hero-badges">
+        <span class="badge">✅ 11 Gewerke</span>
+        <span class="badge">📵 Offline-fähig</span>
+        <span class="badge">💰 Kostenlos</span>
+        <span class="badge">🔒 Keine Anmeldung</span>
+      </div>
+      
+      <a href="./elektro.html" class="cta-btn">🚀 App starten</a>
+    </div>
+  </section>
+
+  <!-- Gewerke -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">11 Fachbereiche in einer App</h2>
+      
+      <div class="gewerke-grid">
+        <div class="gewerk-card">
+          <div class="gewerk-icon">⚡</div>
+          <div class="gewerk-name">Elektro</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🔧</div>
+          <div class="gewerk-name">HLSK</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🏗️</div>
+          <div class="gewerk-name">Statik</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🔥</div>
+          <div class="gewerk-name">Brandschutz</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">⚠️</div>
+          <div class="gewerk-name">Arbeitsschutz</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">📋</div>
+          <div class="gewerk-name">Baurecht</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🌱</div>
+          <div class="gewerk-name">GEG/Energie</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">☀️</div>
+          <div class="gewerk-name">PV/Solar</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🔊</div>
+          <div class="gewerk-name">Schallschutz</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🏠</div>
+          <div class="gewerk-name">KNX</div>
+        </div>
+        <div class="gewerk-card">
+          <div class="gewerk-icon">🚧</div>
+          <div class="gewerk-name">Tiefbau</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USPs -->
+  <section class="usp-section">
+    <div class="container">
+      <h2 class="section-title">Warum ch-Bau?</h2>
+      
+      <div class="usp-grid">
+        <div class="usp-item">
+          <div class="usp-icon">📵</div>
+          <div class="usp-title">100% Offline</div>
+          <div class="usp-desc">Funktioniert ohne Internet auf der Baustelle</div>
+        </div>
+        <div class="usp-item">
+          <div class="usp-icon">🧮</div>
+          <div class="usp-title">Berechnungen</div>
+          <div class="usp-desc">Querschnitte, U-Werte, Statik und mehr</div>
+        </div>
+        <div class="usp-item">
+          <div class="usp-icon">📚</div>
+          <div class="usp-title">Normen-Wissen</div>
+          <div class="usp-desc">DIN, VDE, VOB - alles griffbereit</div>
+        </div>
+        <div class="usp-item">
+          <div class="usp-icon">🔓</div>
+          <div class="usp-title">Kein Account</div>
+          <div class="usp-desc">Keine Anmeldung, keine Cloud, keine Daten</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Facts / Vergleich -->
+  <section class="keyfacts-section">
+    <div class="container">
+      <h2 class="section-title">📊 Das gibt's sonst nirgends</h2>
+      
+      <div class="comparison-table">
+        <div class="compare-row header">
+          <div class="compare-cell feature">Feature</div>
+          <div class="compare-cell chbau">ch-Bau</div>
+          <div class="compare-cell others">Andere Apps</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">Gewerke</div>
+          <div class="compare-cell chbau highlight">11 Fachbereiche</div>
+          <div class="compare-cell others">1-2 max</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">Preis</div>
+          <div class="compare-cell chbau highlight">Kostenlos</div>
+          <div class="compare-cell others">69-306€/Jahr</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">Offline</div>
+          <div class="compare-cell chbau highlight">✅ 100%</div>
+          <div class="compare-cell others">⚠️ Teilweise</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">Account nötig</div>
+          <div class="compare-cell chbau highlight">❌ Nein</div>
+          <div class="compare-cell others">✅ Ja</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">Berechnungen</div>
+          <div class="compare-cell chbau highlight">✅ 30+</div>
+          <div class="compare-cell others">⚠️ Wenige</div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-cell feature">App Store nötig</div>
+          <div class="compare-cell chbau highlight">❌ Nein (PWA)</div>
+          <div class="compare-cell others">✅ Ja</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation -->
+  <section class="install-section">
+    <div class="container">
+      <h2 class="section-title">📲 So installierst du ch-Bau</h2>
+      
+      <div class="install-tabs">
+        <button class="install-tab active" onclick="showInstall('ios')">
+          🍎 iPhone / iPad
+        </button>
+        <button class="install-tab" onclick="showInstall('android')">
+          🤖 Android
+        </button>
+      </div>
+      
+      <!-- iOS Instructions -->
+      <div id="ios-content" class="install-content active">
+        <div class="install-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Safari öffnen</h4>
+            <p>Öffne diese Seite in <strong>Safari</strong> (nicht Chrome oder Firefox)</p>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Teilen-Button antippen</h4>
+            <p>Tippe unten auf das Teilen-Symbol</p>
+            <span class="step-icon">⬆️ (Quadrat mit Pfeil)</span>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>"Zum Home-Bildschirm" wählen</h4>
+            <p>Scrolle und tippe auf <strong>"Zum Home-Bildschirm"</strong></p>
+            <span class="step-icon">➕ Zum Home-Bildschirm</span>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Hinzufügen bestätigen</h4>
+            <p>Tippe oben rechts auf <strong>"Hinzufügen"</strong> - fertig!</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Android Instructions -->
+      <div id="android-content" class="install-content">
+        <div class="install-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Chrome öffnen</h4>
+            <p>Öffne diese Seite in <strong>Google Chrome</strong></p>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Menü öffnen</h4>
+            <p>Tippe oben rechts auf die <strong>drei Punkte</strong></p>
+            <span class="step-icon">⋮ Menü</span>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>"App installieren" oder "Zum Startbildschirm"</h4>
+            <p>Wähle <strong>"App installieren"</strong> oder <strong>"Zum Startbildschirm hinzufügen"</strong></p>
+          </div>
+        </div>
+        
+        <div class="install-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Installation bestätigen</h4>
+            <p>Tippe auf <strong>"Installieren"</strong> - fertig!</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="screenshot-hint">
+        <p>💡 <strong>Tipp:</strong> Nach der Installation funktioniert die App auch ohne Internetverbindung!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section class="disclaimer-section">
+    <div class="disclaimer-box">
+      <h3>⚠️ Wichtiger Hinweis</h3>
+      <p>Diese App dient als <strong>Entscheidungshilfe</strong>. Alle Angaben müssen eigenverantwortlich geprüft und mit den aktuell gültigen Normen abgeglichen werden. Keine Gewähr für Richtigkeit.</p>
+    </div>
+  </section>
+
+  <!-- Support / Buy me a coffee -->
+  <section class="support-section">
+    <h2>☕ Gefällt dir ch-Bau?</h2>
+    <p>Diese App ist kostenlos und wird ständig erweitert. Wenn sie dir hilft, freue ich mich über einen Kaffee!</p>
+    
+    <a href="https://www.paypal.me/chh2107" target="_blank" rel="noopener" class="coffee-btn">
+      <span class="coffee-icon">☕</span>
+      Buy me a Coffee
+    </a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2024-2025 Christoph Hoher · <a href="./impressum.html">Impressum</a></p>
+    <p class="version">ch-Bau v3.5.5 · Made with ❤️ für das Handwerk</p>
+  </footer>
+
+  <script>
+    function showInstall(platform) {
+      // Update tabs
+      document.querySelectorAll('.install-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Update content
+      document.querySelectorAll('.install-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(platform + '-content').classList.add('active');
+    }
+  </script>
+</body>
+</html>

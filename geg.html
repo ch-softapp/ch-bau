@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#059669">
+  <title>ch-Bau - GEG/Energie</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #059669; --primary-dark: #047857; }
+    .app-header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
+  </style>
+</head>
+<body class="gewerk-geg">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg" selected>🌱 GEG/Energie</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🌱 GEG / Energie</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Gebäudeenergiegesetz · U-Werte · Dämmung · Energieausweis</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'uwert')">U-Wert</button>
+        <button class="tab" onclick="switchTab(this, 'daemmung')">Dämmung</button>
+        <button class="tab" onclick="switchTab(this, 'anforderungen')">GEG</button>
+        <button class="tab" onclick="switchTab(this, 'heizung')">Heizung</button>
+        <button class="tab" onclick="switchTab(this, 'lueftung')">Lüftung</button>
+        <button class="tab" onclick="switchTab(this, 'hydraulik')">Hydraulik</button>
+        <button class="tab" onclick="switchTab(this, 'foerderung')">Förderung</button>
+        <button class="tab" onclick="switchTab(this, 'energieausweis')">Ausweis</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- U-WERT RECHNER -->
+      <div id="uwert" class="tab-content active">
+        <h2>🧮 U-Wert Berechnung</h2>
+        
+        <h3>Einfache U-Wert Berechnung</h3>
+        <div class="form-group">
+          <label>Dämmstoff</label>
+          <select id="u-daemmstoff">
+            <option value="0.035">Mineralwolle WLG 035</option>
+            <option value="0.032">Mineralwolle WLG 032</option>
+            <option value="0.040">EPS/Styropor WLG 040</option>
+            <option value="0.035">EPS WLG 035</option>
+            <option value="0.032">XPS WLG 032</option>
+            <option value="0.024">PUR/PIR WLG 024</option>
+            <option value="0.022">Vakuumdämmung WLG 022</option>
+            <option value="0.040">Holzfaser WLG 040</option>
+            <option value="0.045">Zellulose WLG 045</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dämmstärke (cm)</label>
+          <input type="number" id="u-dicke" placeholder="z.B. 16" step="1">
+        </div>
+        <button class="btn" onclick="calcUWert()">Berechnen</button>
+        <div id="u-result"></div>
+        
+        <h3 style="margin-top:25px">U-Werte typischer Bauteile</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>Bestand</th><th>GEG 2024</th></tr></thead>
+          <tbody>
+            <tr><td>Außenwand</td><td>1,0-2,0</td><td>≤ 0,24</td></tr>
+            <tr><td>Dach/OG-Decke</td><td>0,8-1,5</td><td>≤ 0,24</td></tr>
+            <tr><td>Kellerdecke</td><td>0,8-1,2</td><td>≤ 0,30</td></tr>
+            <tr><td>Fenster</td><td>2,5-3,5</td><td>≤ 1,30</td></tr>
+            <tr><td>Haustür</td><td>3,0-4,0</td><td>≤ 1,80</td></tr>
+            <tr><td>Flachdach</td><td>0,6-1,2</td><td>≤ 0,20</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:8px;font-size:12px;color:#6b7280;">U-Werte in W/(m²·K)</p>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 U-Wert Formel</h4>
+          <p><strong>U = 1 / (Rsi + Σ(d/λ) + Rse)</strong></p>
+          <p style="font-size:12px;margin-top:5px;">Vereinfacht für Dämmung: U ≈ λ / d</p>
+        </div>
+      </div>
+
+      <!-- DÄMMUNG -->
+      <div id="daemmung" class="tab-content">
+        <h2>🧱 Dämmstoffe</h2>
+        
+        <h3>Wärmeleitgruppen (WLG)</h3>
+        <table class="data-table">
+          <thead><tr><th>WLG</th><th>λ (W/mK)</th><th>Dämmstoffe</th></tr></thead>
+          <tbody>
+            <tr><td>020</td><td>≤ 0,020</td><td>Vakuumpaneele (VIP)</td></tr>
+            <tr><td>022</td><td>≤ 0,022</td><td>Resol-Hartschaum, Aerogel</td></tr>
+            <tr><td>024</td><td>≤ 0,024</td><td>PUR/PIR Hochleistung</td></tr>
+            <tr><td>032</td><td>≤ 0,032</td><td>EPS grau, XPS, Mineralwolle</td></tr>
+            <tr><td>035</td><td>≤ 0,035</td><td>EPS weiß, Mineralwolle Standard</td></tr>
+            <tr><td>040</td><td>≤ 0,040</td><td>EPS, Holzfaser, Schaumglas</td></tr>
+            <tr><td>045</td><td>≤ 0,045</td><td>Zellulose, Hanf, Schafwolle</td></tr>
+            <tr><td>050</td><td>≤ 0,050</td><td>Perlite, Blähton</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Dämmstärke für U = 0,24 W/(m²·K)</h3>
+        <table class="data-table">
+          <thead><tr><th>WLG</th><th>Dämmstärke ca.</th></tr></thead>
+          <tbody>
+            <tr><td>024</td><td>10 cm</td></tr>
+            <tr><td>032</td><td>13 cm</td></tr>
+            <tr><td>035</td><td>15 cm</td></tr>
+            <tr><td>040</td><td>17 cm</td></tr>
+            <tr><td>045</td><td>19 cm</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Dämmstärke berechnen</h3>
+        <div class="form-group">
+          <label>Gewünschter U-Wert (W/m²K)</label>
+          <select id="daemm-uwert">
+            <option value="0.24">0,24 - GEG Wand/Dach</option>
+            <option value="0.20">0,20 - KfW 55</option>
+            <option value="0.15">0,15 - KfW 40</option>
+            <option value="0.14">0,14 - Passivhaus</option>
+            <option value="0.30">0,30 - Kellerdecke</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dämmstoff WLG</label>
+          <select id="daemm-wlg">
+            <option value="0.024">024 - PUR/PIR</option>
+            <option value="0.032">032 - EPS grau</option>
+            <option value="0.035" selected>035 - Mineralwolle</option>
+            <option value="0.040">040 - EPS weiß</option>
+            <option value="0.045">045 - Zellulose</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcDaemmung()">Berechnen</button>
+        <div id="daemm-result"></div>
+      </div>
+
+      <!-- GEG ANFORDERUNGEN -->
+      <div id="anforderungen" class="tab-content">
+        <h2>📋 GEG 2024 Anforderungen</h2>
+        
+        <h3>U-Wert Anforderungen Neubau</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>max. U-Wert</th></tr></thead>
+          <tbody>
+            <tr><td>Außenwände</td><td>0,24 W/(m²·K)</td></tr>
+            <tr><td>Dach, oberste Geschossdecke</td><td>0,24 W/(m²·K)</td></tr>
+            <tr><td>Flachdach</td><td>0,20 W/(m²·K)</td></tr>
+            <tr><td>Wände gegen Erdreich</td><td>0,30 W/(m²·K)</td></tr>
+            <tr><td>Bodenplatte</td><td>0,30 W/(m²·K)</td></tr>
+            <tr><td>Fenster, Fenstertüren</td><td>1,30 W/(m²·K)</td></tr>
+            <tr><td>Dachflächenfenster</td><td>1,40 W/(m²·K)</td></tr>
+            <tr><td>Verglasungen</td><td>1,10 W/(m²·K)</td></tr>
+            <tr><td>Außentüren</td><td>1,80 W/(m²·K)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">65%-EE-Pflicht (ab 2024)</h3>
+        <div class="warning">
+          <p><strong>Neue Heizungen müssen zu 65% erneuerbare Energien nutzen!</strong></p>
+          <ul style="margin:10px 0 0 20px">
+            <li>Wärmepumpe</li>
+            <li>Fernwärme (wenn EE-basiert)</li>
+            <li>Holz-/Pelletheizung</li>
+            <li>Solarthermie + Spitzenlast</li>
+            <li>H2-ready Gasheizung (Übergang)</li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Primärenergiebedarf Neubau</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>GEG 2024 Standard</td><td>Qp ≤ 55% des Referenzgebäudes</td></tr>
+            <tr><td>EH 55</td><td>55 kWh/(m²·a)</td></tr>
+            <tr><td>EH 40</td><td>40 kWh/(m²·a)</td></tr>
+            <tr><td>Passivhaus</td><td>≤ 15 kWh/(m²·a) Heizwärme</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Nachrüstpflichten Bestand</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Oberste Geschossdecke</td><td>U ≤ 0,24 W/(m²·K)</td></tr>
+            <tr><td>Heizkessel >30 Jahre</td><td>Austauschpflicht (Ausnahmen)</td></tr>
+            <tr><td>Heizungs-/Warmwasserrohre</td><td>Dämmpflicht unbeheizter Bereich</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- HEIZUNG -->
+      <div id="heizung" class="tab-content">
+        <h2>🔥 Heizungstechnik</h2>
+        
+        <h3>Primärenergiefaktoren (GEG)</h3>
+        <table class="data-table">
+          <thead><tr><th>Energieträger</th><th>fp</th></tr></thead>
+          <tbody>
+            <tr><td>Heizöl EL</td><td>1,1</td></tr>
+            <tr><td>Erdgas H</td><td>1,1</td></tr>
+            <tr><td>Flüssiggas</td><td>1,1</td></tr>
+            <tr><td>Steinkohle</td><td>1,1</td></tr>
+            <tr><td>Braunkohle</td><td>1,2</td></tr>
+            <tr><td>Holz</td><td>0,2</td></tr>
+            <tr><td>Strom allgemein</td><td>1,8</td></tr>
+            <tr><td>Strom Wärmepumpe</td><td>1,8</td></tr>
+            <tr><td>Fernwärme fossil</td><td>0,7</td></tr>
+            <tr><td>Fernwärme KWK-EE</td><td>0,0</td></tr>
+            <tr><td>Solarenergie</td><td>0,0</td></tr>
+            <tr><td>Umweltwärme</td><td>0,0</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Jahresarbeitszahlen (JAZ) Wärmepumpen</h3>
+        <table class="data-table">
+          <thead><tr><th>Wärmequelle</th><th>JAZ typisch</th><th>Förderung min.</th></tr></thead>
+          <tbody>
+            <tr><td>Luft/Wasser</td><td>2,8 - 3,5</td><td>≥ 3,0</td></tr>
+            <tr><td>Sole/Wasser</td><td>4,0 - 4,5</td><td>≥ 3,8</td></tr>
+            <tr><td>Wasser/Wasser</td><td>4,5 - 5,5</td><td>≥ 3,8</td></tr>
+            <tr><td>Luft/Luft</td><td>2,5 - 3,0</td><td>—</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Heizkosten-Vergleich</h3>
+        <div class="form-group">
+          <label>Heizwärmebedarf (kWh/a)</label>
+          <input type="number" id="hz-bedarf" placeholder="z.B. 15000" value="15000">
+        </div>
+        <div class="form-group">
+          <label>Strompreis (ct/kWh)</label>
+          <input type="number" id="hz-strom" placeholder="z.B. 30" value="30" step="1">
+        </div>
+        <div class="form-group">
+          <label>Gaspreis (ct/kWh)</label>
+          <input type="number" id="hz-gas" placeholder="z.B. 12" value="12" step="1">
+        </div>
+        <button class="btn" onclick="calcHeizkosten()">Vergleichen</button>
+        <div id="hz-result"></div>
+      </div>
+
+      <!-- LÜFTUNG -->
+      <div id="lueftung" class="tab-content">
+        <h2>💨 Wohnraumlüftung</h2>
+        
+        <h3>Lüftungskonzept nach DIN 1946-6</h3>
+        <table class="data-table">
+          <thead><tr><th>Stufe</th><th>Bezeichnung</th><th>Faktor</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Lüftung zum Feuchteschutz (FL)</td><td>0,3</td></tr>
+            <tr><td>2</td><td>Reduzierte Lüftung (RL)</td><td>0,5</td></tr>
+            <tr><td>3</td><td>Nennlüftung (NL)</td><td>0,7</td></tr>
+            <tr><td>4</td><td>Intensivlüftung (IL)</td><td>1,0</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Lüftungssysteme</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Beschreibung</th><th>WRG</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Fensterlüftung</strong></td><td>Manuelle Lüftung über Fenster</td><td>Nein</td></tr>
+            <tr><td><strong>ALD</strong></td><td>Außenluftdurchlass (Fenster/Wand)</td><td>Nein</td></tr>
+            <tr><td><strong>Abluftanlage</strong></td><td>Zentrale Absaugung Bad/Küche</td><td>Nein</td></tr>
+            <tr><td><strong>Dezentral mit WRG</strong></td><td>Einzelraumgeräte</td><td>60-90%</td></tr>
+            <tr><td><strong>Zentral mit WRG</strong></td><td>Lüftungszentrale + Kanalnetz</td><td>80-95%</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Luftvolumenstrom</h3>
+        <div class="form-group">
+          <label>Wohnfläche (m²)</label>
+          <input type="number" id="lueft-flaeche" placeholder="z.B. 120" value="120">
+        </div>
+        <div class="form-group">
+          <label>Raumhöhe (m)</label>
+          <input type="number" id="lueft-hoehe" placeholder="z.B. 2.5" value="2.5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>Lüftungsstufe</label>
+          <select id="lueft-stufe">
+            <option value="0.3">Feuchteschutz (0,3/h)</option>
+            <option value="0.5">Reduziert (0,5/h)</option>
+            <option value="0.7" selected>Nennlüftung (0,7/h)</option>
+            <option value="1.0">Intensiv (1,0/h)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcLueftung()">Berechnen</button>
+        <div id="lueft-result"></div>
+        
+        <h3 style="margin-top:20px">Luftmengen pro Raum (Richtwerte)</h3>
+        <table class="data-table">
+          <thead><tr><th>Raum</th><th>Zuluft</th><th>Abluft</th></tr></thead>
+          <tbody>
+            <tr><td>Wohnzimmer</td><td>40-60 m³/h</td><td>-</td></tr>
+            <tr><td>Schlafzimmer</td><td>25-40 m³/h</td><td>-</td></tr>
+            <tr><td>Kinderzimmer</td><td>25-40 m³/h</td><td>-</td></tr>
+            <tr><td>Küche</td><td>-</td><td>60-90 m³/h</td></tr>
+            <tr><td>Bad</td><td>-</td><td>40-60 m³/h</td></tr>
+            <tr><td>WC</td><td>-</td><td>20-30 m³/h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- HYDRAULISCHER ABGLEICH -->
+      <div id="hydraulik" class="tab-content">
+        <h2>⚖️ Hydraulischer Abgleich</h2>
+        
+        <h3>Verfahren nach VdZ</h3>
+        <table class="data-table">
+          <thead><tr><th>Verfahren</th><th>Beschreibung</th><th>Genauigkeit</th></tr></thead>
+          <tbody>
+            <tr><td><strong>A</strong></td><td>Überschlägig nach Heizkörperleistung</td><td>Ausreichend</td></tr>
+            <tr><td><strong>B</strong></td><td>Raumweise Heizlastberechnung</td><td>Hoch</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Erforderliche Einstellungen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Thermostatventile</strong></td><td>Voreinstellung nach Berechnung</td></tr>
+            <tr><td><strong>Strangregulierventile</strong></td><td>Druckdifferenz einstellen</td></tr>
+            <tr><td><strong>Pumpe</strong></td><td>Förderhöhe anpassen</td></tr>
+            <tr><td><strong>Vorlauftemperatur</strong></td><td>Heizkurve optimieren</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Volumenstrom Heizkörper</h3>
+        <div class="form-group">
+          <label>Heizkörperleistung (W)</label>
+          <input type="number" id="hydr-leistung" placeholder="z.B. 1200" value="1200">
+        </div>
+        <div class="form-group">
+          <label>Spreizung (K)</label>
+          <select id="hydr-spreizung">
+            <option value="20">20 K (Altbau)</option>
+            <option value="15">15 K (Standard)</option>
+            <option value="10" selected>10 K (Niedertemperatur)</option>
+            <option value="7">7 K (Wärmepumpe)</option>
+            <option value="5">5 K (Fußbodenheizung)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcVolumenstromHK()">Berechnen</button>
+        <div id="hydr-result"></div>
+        
+        <h3 style="margin-top:20px">Spreizung Empfehlungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Heizungssystem</th><th>Spreizung</th><th>VL/RL</th></tr></thead>
+          <tbody>
+            <tr><td>Altbau unsaniert</td><td>20 K</td><td>70/50°C</td></tr>
+            <tr><td>Standard</td><td>15 K</td><td>55/40°C</td></tr>
+            <tr><td>Niedertemperatur</td><td>10 K</td><td>45/35°C</td></tr>
+            <tr><td>Wärmepumpe HK</td><td>7-10 K</td><td>40/33°C</td></tr>
+            <tr><td>Fußbodenheizung</td><td>5-7 K</td><td>35/28°C</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Voreinstellwerte (kv-Werte)</h3>
+        <table class="data-table">
+          <thead><tr><th>Volumenstrom</th><th>Δp 100 mbar</th><th>Δp 50 mbar</th></tr></thead>
+          <tbody>
+            <tr><td>20 l/h</td><td>kv 0,02</td><td>kv 0,03</td></tr>
+            <tr><td>40 l/h</td><td>kv 0,04</td><td>kv 0,06</td></tr>
+            <tr><td>60 l/h</td><td>kv 0,06</td><td>kv 0,08</td></tr>
+            <tr><td>80 l/h</td><td>kv 0,08</td><td>kv 0,11</td></tr>
+            <tr><td>100 l/h</td><td>kv 0,10</td><td>kv 0,14</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 GEG-Pflicht</h4>
+          <p>Seit 2024: Hydraulischer Abgleich bei Heizungsaustausch für Förderung (BEG) verpflichtend!</p>
+        </div>
+      </div>
+
+      <!-- FÖRDERUNG -->
+      <div id="foerderung" class="tab-content">
+        <h2>💶 Förderung (BEG 2024)</h2>
+        
+        <h3>Heizungstausch (BEG EM)</h3>
+        <table class="data-table">
+          <thead><tr><th>Förderung</th><th>Satz</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Grundförderung</strong></td><td>30%</td></tr>
+            <tr><td>+ Klimageschwindigkeitsbonus</td><td>+20%</td></tr>
+            <tr><td>+ Einkommensbonus (<40.000€)</td><td>+30%</td></tr>
+            <tr><td><strong>Maximum</strong></td><td><strong>70%</strong></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:#6b7280;">Max. förderfähige Kosten: 30.000 € (EFH)</p>
+        
+        <h3 style="margin-top:20px">Effizienzhaus (BEG WG)</h3>
+        <table class="data-table">
+          <thead><tr><th>Standard</th><th>Kredit max.</th><th>Tilgungszuschuss</th></tr></thead>
+          <tbody>
+            <tr><td>EH 85</td><td>120.000 €</td><td>5%</td></tr>
+            <tr><td>EH 70</td><td>120.000 €</td><td>10%</td></tr>
+            <tr><td>EH 55</td><td>120.000 €</td><td>15%</td></tr>
+            <tr><td>EH 40</td><td>150.000 €</td><td>20%</td></tr>
+            <tr><td>+ EE-Klasse</td><td>—</td><td>+5%</td></tr>
+            <tr><td>+ NH-Klasse</td><td>—</td><td>+5%</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Einzelmaßnahmen (BEG EM)</h3>
+        <table class="data-table">
+          <thead><tr><th>Maßnahme</th><th>Fördersatz</th></tr></thead>
+          <tbody>
+            <tr><td>Dämmung Außenwand</td><td>15%</td></tr>
+            <tr><td>Dämmung Dach</td><td>15%</td></tr>
+            <tr><td>Fenster/Türen</td><td>15%</td></tr>
+            <tr><td>Anlagentechnik (ohne Heizung)</td><td>15%</td></tr>
+            <tr><td>Heizungsoptimierung</td><td>15%</td></tr>
+            <tr><td>+ iSFP-Bonus</td><td>+5%</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:#6b7280;">iSFP = individueller Sanierungsfahrplan</p>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>💡 Wichtig</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Antrag VOR Maßnahmenbeginn</li>
+            <li>Energieberater oft Pflicht</li>
+            <li>Fachunternehmer erforderlich</li>
+            <li>Kombinierbar mit KfW-Kredit</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ENERGIEAUSWEIS -->
+      <div id="energieausweis" class="tab-content">
+        <h2>📊 Energieausweis</h2>
+        
+        <h3>Energieeffizienzklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>kWh/(m²·a)</th><th>Bewertung</th></tr></thead>
+          <tbody>
+            <tr style="background:#22c55e20"><td><strong>A+</strong></td><td>< 30</td><td>Passivhaus</td></tr>
+            <tr style="background:#22c55e15"><td><strong>A</strong></td><td>30 - 50</td><td>KfW 40</td></tr>
+            <tr style="background:#84cc1620"><td><strong>B</strong></td><td>50 - 75</td><td>KfW 55</td></tr>
+            <tr style="background:#eab30820"><td><strong>C</strong></td><td>75 - 100</td><td>Neubau GEG</td></tr>
+            <tr style="background:#f9731620"><td><strong>D</strong></td><td>100 - 130</td><td>Gut saniert</td></tr>
+            <tr style="background:#ef444420"><td><strong>E</strong></td><td>130 - 160</td><td>Teilsaniert</td></tr>
+            <tr style="background:#dc262620"><td><strong>F</strong></td><td>160 - 200</td><td>Wenig saniert</td></tr>
+            <tr style="background:#b9181820"><td><strong>G</strong></td><td>200 - 250</td><td>Unsanierter Altbau</td></tr>
+            <tr style="background:#7f1d1d20"><td><strong>H</strong></td><td>> 250</td><td>Energieschleuder</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Ausweisarten</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Basis</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Verbrauchsausweis</strong></td><td>Tatsächlicher Verbrauch (3 Jahre)</td><td>Bestand >5 WE</td></tr>
+            <tr><td><strong>Bedarfsausweis</strong></td><td>Berechneter Bedarf</td><td>Neubau, <5 WE vor 1977</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Pflicht zur Vorlage</h3>
+        <div class="info-box">
+          <ul style="margin:10px 0 0 20px">
+            <li>Bei <strong>Verkauf</strong> oder <strong>Vermietung</strong></li>
+            <li>In <strong>Inseraten</strong> (Energiekennwert angeben)</li>
+            <li>Bei <strong>Neubau</strong></li>
+            <li>Bei wesentlicher <strong>Sanierung</strong></li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Gültigkeit</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Gültigkeitsdauer</td><td>10 Jahre</td></tr>
+            <tr><td>Kosten Verbrauchsausweis</td><td>ca. 50-100 €</td></tr>
+            <tr><td>Kosten Bedarfsausweis</td><td>ca. 300-500 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Energie</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔢 Wichtige Formeln</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>U-Wert</strong></td><td>U = 1 / R<sub>T</sub> = 1 / (R<sub>si</sub> + Σd/λ + R<sub>se</sub>)</td></tr>
+              <tr><td><strong>Wärmestrom</strong></td><td>Q = U × A × ΔT × t</td></tr>
+              <tr><td><strong>Heizwärme</strong></td><td>Q<sub>H</sub> = H<sub>T</sub> × (θ<sub>i</sub> - θ<sub>e</sub>) × t</td></tr>
+              <tr><td><strong>JAZ</strong></td><td>JAZ = Q<sub>Heiz</sub> / W<sub>el</sub></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🌡️ Wärmeübergangswiderstände</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Lage</th><th>R (m²K/W)</th></tr></thead>
+              <tbody>
+                <tr><td>Innen (horizontal) R<sub>si</sub></td><td>0,13</td></tr>
+                <tr><td>Innen (aufwärts) R<sub>si</sub></td><td>0,10</td></tr>
+                <tr><td>Innen (abwärts) R<sub>si</sub></td><td>0,17</td></tr>
+                <tr><td>Außen R<sub>se</sub></td><td>0,04</td></tr>
+                <tr><td>Gegen Erdreich R<sub>se</sub></td><td>0,00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🧱 Wärmeleitfähigkeit λ</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Material</th><th>λ (W/mK)</th></tr></thead>
+              <tbody>
+                <tr><td>Stahlbeton</td><td>2,3</td></tr>
+                <tr><td>Vollziegel</td><td>0,5 - 0,8</td></tr>
+                <tr><td>Hochlochziegel</td><td>0,3 - 0,5</td></tr>
+                <tr><td>Porenbeton</td><td>0,11 - 0,21</td></tr>
+                <tr><td>Holz</td><td>0,13</td></tr>
+                <tr><td>Gipskarton</td><td>0,25</td></tr>
+                <tr><td>Estrich</td><td>1,4</td></tr>
+                <tr><td>Glas</td><td>0,8</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🏠 Gebäudestandards</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Effizienzhaus 40</strong></td><td>40% Primärenergie vom Referenz</td></tr>
+              <tr><td><strong>Effizienzhaus 55</strong></td><td>55% Primärenergie</td></tr>
+              <tr><td><strong>Effizienzhaus 70</strong></td><td>70% Primärenergie</td></tr>
+              <tr><td><strong>Passivhaus</strong></td><td>≤15 kWh/(m²a) Heizwärme</td></tr>
+              <tr><td><strong>Plusenergiehaus</strong></td><td>Erzeugt mehr als verbraucht</td></tr>
+              <tr><td><strong>KfW 40 Plus</strong></td><td>EH 40 + PV + Speicher</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Wichtige Normen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>GEG</strong></td><td>Gebäudeenergiegesetz</td></tr>
+              <tr><td><strong>DIN 4108</strong></td><td>Wärmeschutz im Hochbau</td></tr>
+              <tr><td><strong>DIN V 18599</strong></td><td>Energetische Bewertung</td></tr>
+              <tr><td><strong>DIN EN ISO 6946</strong></td><td>Wärmedurchlasswiderstand</td></tr>
+              <tr><td><strong>DIN EN 12831</strong></td><td>Heizlastberechnung</td></tr>
+              <tr><td><strong>DIN 4701-10</strong></td><td>Energetische Bewertung (veraltet, ersetzt durch DIN V 18599)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🌍 CO₂-Emissionen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Energieträger</th><th>g CO₂/kWh</th></tr></thead>
+              <tbody>
+                <tr><td>Erdgas</td><td>201</td></tr>
+                <tr><td>Heizöl</td><td>266</td></tr>
+                <tr><td>Strom (D-Mix)</td><td>366</td></tr>
+                <tr><td>Fernwärme</td><td>~180</td></tr>
+                <tr><td>Holzpellets</td><td>23</td></tr>
+                <tr><td>Wärmepumpe (JAZ 3)</td><td>~120</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'uwert')">
+      <span class="nav-icon">🧮</span><span class="nav-label">U-Wert</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'daemmung')">
+      <span class="nav-icon">🧱</span><span class="nav-label">Dämmung</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[2], 'anforderungen')">
+      <span class="nav-icon">📋</span><span class="nav-label">GEG</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[4], 'foerderung')">
+      <span class="nav-icon">💶</span><span class="nav-label">Förderung</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[6], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcUWert() {
+      const lambda = parseFloat(document.getElementById('u-daemmstoff').value);
+      const dicke = parseFloat(document.getElementById('u-dicke').value) / 100; // cm -> m
+      if (isNaN(dicke) || dicke <= 0) { 
+        document.getElementById('u-result').innerHTML = '<div class="danger">Bitte Dämmstärke eingeben</div>'; 
+        return; 
+      }
+      
+      const Rsi = 0.13, Rse = 0.04;
+      const Rdaemm = dicke / lambda;
+      const Rges = Rsi + Rdaemm + Rse;
+      const U = 1 / Rges;
+      
+      // Bewertung
+      let bewertung, farbe;
+      if (U <= 0.15) { bewertung = '🏆 Passivhaus-Niveau'; farbe = '#22c55e'; }
+      else if (U <= 0.20) { bewertung = '✅ KfW 40 / Sehr gut'; farbe = '#22c55e'; }
+      else if (U <= 0.24) { bewertung = '✅ GEG erfüllt'; farbe = '#84cc16'; }
+      else if (U <= 0.30) { bewertung = '⚠️ Knapp über GEG'; farbe = '#eab308'; }
+      else { bewertung = '❌ GEG nicht erfüllt'; farbe = '#ef4444'; }
+      
+      document.getElementById('u-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Dämmstärke:</span><span>${(dicke*100).toFixed(0)} cm</span></div>
+          <div class="result-item"><span>λ:</span><span>${lambda} W/(m·K)</span></div>
+          <div class="result-item"><span>R<sub>Dämmung</sub>:</span><span>${Rdaemm.toFixed(2)} m²K/W</span></div>
+          <div class="result-item"><span>U-Wert:</span><span style="color:${farbe}"><strong>${U.toFixed(3)} W/(m²·K)</strong></span></div>
+          <div class="result-item"><span>Bewertung:</span><span>${bewertung}</span></div>
+        </div>`;
+    }
+    
+    function calcDaemmung() {
+      const Uziel = parseFloat(document.getElementById('daemm-uwert').value);
+      const lambda = parseFloat(document.getElementById('daemm-wlg').value);
+      
+      const Rsi = 0.13, Rse = 0.04;
+      const Rziel = 1 / Uziel;
+      const Rdaemm = Rziel - Rsi - Rse;
+      const dicke = Rdaemm * lambda;
+      
+      const dickeGerundet = Math.ceil(dicke * 100 / 2) * 2; // auf 2cm aufrunden
+      
+      document.getElementById('daemm-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Ziel U-Wert:</span><span>${Uziel} W/(m²·K)</span></div>
+          <div class="result-item"><span>WLG:</span><span>${(lambda*1000).toFixed(0)}</span></div>
+          <div class="result-item"><span>Erf. R<sub>Dämmung</sub>:</span><span>${Rdaemm.toFixed(2)} m²K/W</span></div>
+          <div class="result-item"><span>Min. Dämmstärke:</span><span><strong>${(dicke*100).toFixed(1)} cm</strong></span></div>
+          <div class="result-item"><span>Empfehlung:</span><span><strong>${dickeGerundet} cm</strong></span></div>
+        </div>`;
+    }
+    
+    function calcHeizkosten() {
+      const bedarf = parseFloat(document.getElementById('hz-bedarf').value);
+      const strompreis = parseFloat(document.getElementById('hz-strom').value) / 100;
+      const gaspreis = parseFloat(document.getElementById('hz-gas').value) / 100;
+      
+      if (isNaN(bedarf)) {
+        document.getElementById('hz-result').innerHTML = '<div class="danger">Bitte Heizwärmebedarf eingeben</div>';
+        return;
+      }
+      
+      // Berechnungen
+      const gasVerbrauch = bedarf / 0.9; // 90% Wirkungsgrad
+      const gasKosten = gasVerbrauch * gaspreis;
+      
+      const wpJAZ = 3.5;
+      const wpVerbrauch = bedarf / wpJAZ;
+      const wpKosten = wpVerbrauch * strompreis;
+      
+      const pelletVerbrauch = bedarf / 0.85 / 5; // kg bei 5 kWh/kg
+      const pelletKosten = pelletVerbrauch * 0.30; // ca. 30ct/kg
+      
+      const oelVerbrauch = bedarf / 0.9 / 10; // Liter bei 10 kWh/L
+      const oelKosten = oelVerbrauch * 1.0; // ca. 1€/L
+      
+      // Sortieren
+      const systeme = [
+        {name: 'Wärmepumpe (JAZ 3,5)', kosten: wpKosten, verbrauch: `${wpVerbrauch.toFixed(0)} kWh Strom`},
+        {name: 'Gasheizung', kosten: gasKosten, verbrauch: `${gasVerbrauch.toFixed(0)} kWh Gas`},
+        {name: 'Pelletheizung', kosten: pelletKosten, verbrauch: `${pelletVerbrauch.toFixed(0)} kg Pellets`},
+        {name: 'Ölheizung', kosten: oelKosten, verbrauch: `${oelVerbrauch.toFixed(0)} L Heizöl`}
+      ].sort((a,b) => a.kosten - b.kosten);
+      
+      let html = '<div class="result"><h3>Jährliche Heizkosten</h3>';
+      systeme.forEach((s, i) => {
+        const icon = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : ''));
+        html += `<div class="result-item"><span>${icon} ${s.name}:</span><span><strong>${s.kosten.toFixed(0)} €</strong><br><small>${s.verbrauch}</small></span></div>`;
+      });
+      html += '</div>';
+      
+      document.getElementById('hz-result').innerHTML = html;
+    }
+    
+    function calcLueftung() {
+      const flaeche = parseFloat(document.getElementById('lueft-flaeche').value);
+      const hoehe = parseFloat(document.getElementById('lueft-hoehe').value);
+      const stufe = parseFloat(document.getElementById('lueft-stufe').value);
+      
+      if (isNaN(flaeche) || isNaN(hoehe)) {
+        document.getElementById('lueft-result').innerHTML = '<div class="danger">Bitte alle Werte eingeben</div>';
+        return;
+      }
+      
+      const volumen = flaeche * hoehe;
+      const luftwechsel = volumen * stufe;
+      
+      document.getElementById('lueft-result').innerHTML = `
+        <div class="result">
+          <h3>Lüftungsberechnung</h3>
+          <div class="result-item"><span>Raumvolumen:</span><span>${volumen.toFixed(0)} m³</span></div>
+          <div class="result-item"><span>Luftwechselrate:</span><span>${stufe}/h</span></div>
+          <div class="result-item"><span>Volumenstrom:</span><span><strong>${luftwechsel.toFixed(0)} m³/h</strong></span></div>
+        </div>`;
+    }
+    
+    function calcVolumenstromHK() {
+      const leistung = parseFloat(document.getElementById('hydr-leistung').value);
+      const spreizung = parseFloat(document.getElementById('hydr-spreizung').value);
+      
+      if (isNaN(leistung)) {
+        document.getElementById('hydr-result').innerHTML = '<div class="danger">Bitte Leistung eingeben</div>';
+        return;
+      }
+      
+      // V = Q / (ρ × c × ΔT) → vereinfacht: V[l/h] = Q[W] / (1,163 × ΔT[K])
+      const volumenstrom = leistung / (1.163 * spreizung);
+      const kv = volumenstrom / 1000 * Math.sqrt(0.1); // bei 100 mbar
+      
+      document.getElementById('hydr-result').innerHTML = `
+        <div class="result">
+          <h3>Volumenstrom Heizkörper</h3>
+          <div class="result-item"><span>Heizleistung:</span><span>${leistung} W</span></div>
+          <div class="result-item"><span>Spreizung:</span><span>${spreizung} K</span></div>
+          <div class="result-item"><span>Volumenstrom:</span><span><strong>${volumenstrom.toFixed(1)} l/h</strong></span></div>
+          <div class="result-item"><span>kv-Wert (bei 100 mbar):</span><span>ca. ${kv.toFixed(2)}</span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

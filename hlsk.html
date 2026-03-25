@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0891b2">
+  <title>ch-Bau - HLSK</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #0891b2; --primary-dark: #0e7490; }
+    .app-header { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
+  </style>
+</head>
+<body class="gewerk-hlsk">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk" selected>🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🔧 HLSK</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Heizung · Lüftung · Sanitär · Klima</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'heizlast')">Heizlast</button>
+        <button class="tab" onclick="switchTab(this, 'rohr')">Rohre</button>
+        <button class="tab" onclick="switchTab(this, 'fbh')">FBH</button>
+        <button class="tab" onclick="switchTab(this, 'mag')">MAG</button>
+        <button class="tab" onclick="switchTab(this, 'hydraulik')">Hydraulik</button>
+        <button class="tab" onclick="switchTab(this, 'lueftung')">Lüftung</button>
+        <button class="tab" onclick="switchTab(this, 'sanitaer')">Sanitär</button>
+        <button class="tab" onclick="switchTab(this, 'trinkwasser')">TWW</button>
+        <button class="tab" onclick="switchTab(this, 'kaelte')">Kälte</button>
+        <button class="tab" onclick="switchTab(this, 'fehler')">Fehler</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- HEIZLAST -->
+      <div id="heizlast" class="tab-content active">
+        <h2>🌡️ Heizlastberechnung</h2>
+        <p style="margin-bottom:20px;color:#6b7280">Überschlägig nach DIN EN 12831</p>
+        
+        <div class="form-group">
+          <label>Gebäudetyp</label>
+          <select id="hz-gebaeude">
+            <option value="80">Altbau vor 1977 (80 W/m²)</option>
+            <option value="60">Altbau unsaniert (60 W/m²)</option>
+            <option value="45">Altbau teilsaniert (45 W/m²)</option>
+            <option value="35" selected>Altbau saniert (35 W/m²)</option>
+            <option value="25">Neubau EnEV/GEG (25 W/m²)</option>
+            <option value="15">Passivhaus (15 W/m²)</option>
+            <option value="10">Plusenergiehaus (10 W/m²)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Wohnfläche (m²)</label>
+          <input type="number" id="hz-flaeche" placeholder="z.B. 120">
+        </div>
+        
+        <div class="form-group">
+          <label>Raumhöhe (m)</label>
+          <input type="number" id="hz-hoehe" value="2.5" step="0.1">
+        </div>
+        
+        <div class="form-group">
+          <label>Warmwasser-Zuschlag</label>
+          <select id="hz-ww">
+            <option value="0">Ohne (separate Bereitung)</option>
+            <option value="0.15" selected>Mit WW (+15%)</option>
+            <option value="0.25">Mit viel WW (+25%)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcHeizlast()">Berechnen</button>
+        <div id="hz-result"></div>
+        
+        <h3 style="margin-top:25px">Heizkörper-Richtwerte (Altbau unsaniert)</h3>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:10px;">Für Heizkörperdimensionierung, nicht Gebäudeheizlast!</p>
+        <table class="data-table">
+          <thead><tr><th>Raum</th><th>Temp.</th><th>W/m² (HK)</th></tr></thead>
+          <tbody>
+            <tr><td>Wohnzimmer</td><td>20°C</td><td>80-100</td></tr>
+            <tr><td>Schlafzimmer</td><td>18°C</td><td>60-80</td></tr>
+            <tr><td>Kinderzimmer</td><td>20°C</td><td>80-100</td></tr>
+            <tr><td>Bad</td><td>24°C</td><td>100-130</td></tr>
+            <tr><td>Küche</td><td>20°C</td><td>60-80</td></tr>
+            <tr><td>Flur/Diele</td><td>15°C</td><td>50-70</td></tr>
+            <tr><td>Keller</td><td>12°C</td><td>40-60</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ROHRDIMENSIONIERUNG -->
+      <div id="rohr" class="tab-content">
+        <h2>🔩 Rohrdimensionierung</h2>
+        
+        <div class="form-group">
+          <label>Heizleistung (kW)</label>
+          <input type="number" id="rohr-leistung" placeholder="z.B. 10">
+        </div>
+        
+        <div class="form-group">
+          <label>Spreizung ΔT (K)</label>
+          <select id="rohr-spreizung">
+            <option value="7">7 K (Fußbodenheizung)</option>
+            <option value="10">10 K (Niedertemperatur)</option>
+            <option value="15">15 K (Brennwert)</option>
+            <option value="20" selected>20 K (Standard)</option>
+            <option value="30">30 K (Hochtemperatur)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Max. Fließgeschwindigkeit</label>
+          <select id="rohr-geschw">
+            <option value="0.3">0,3 m/s (Wohnung leise)</option>
+            <option value="0.5">0,5 m/s (Wohnung)</option>
+            <option value="0.7" selected>0,7 m/s (Standard)</option>
+            <option value="1.0">1,0 m/s (Keller/Technik)</option>
+            <option value="1.5">1,5 m/s (Industrie)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcRohr()">Berechnen</button>
+        <div id="rohr-result"></div>
+        
+        <h3 style="margin-top:25px">Kupferrohr nach DIN EN 1057</h3>
+        <table class="data-table">
+          <thead><tr><th>Außen-Ø</th><th>Innen-Ø</th><th>~kW (20K)</th><th>~kW (10K)</th></tr></thead>
+          <tbody>
+            <tr><td>12×1</td><td>10 mm</td><td>3 kW</td><td>1,5 kW</td></tr>
+            <tr><td>15×1</td><td>13 mm</td><td>6 kW</td><td>3 kW</td></tr>
+            <tr><td>18×1</td><td>16 mm</td><td>10 kW</td><td>5 kW</td></tr>
+            <tr><td>22×1</td><td>20 mm</td><td>18 kW</td><td>9 kW</td></tr>
+            <tr><td>28×1,5</td><td>25 mm</td><td>30 kW</td><td>15 kW</td></tr>
+            <tr><td>35×1,5</td><td>32 mm</td><td>50 kW</td><td>25 kW</td></tr>
+            <tr><td>42×1,5</td><td>39 mm</td><td>75 kW</td><td>38 kW</td></tr>
+            <tr><td>54×2</td><td>50 mm</td><td>120 kW</td><td>60 kW</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Mehrschichtverbundrohr</h3>
+        <table class="data-table">
+          <thead><tr><th>Außen-Ø</th><th>Innen-Ø</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td>16×2</td><td>12 mm</td><td>FBH, Heizkörperanbindung</td></tr>
+            <tr><td>20×2</td><td>16 mm</td><td>Verteiler, Steigleitungen</td></tr>
+            <tr><td>26×3</td><td>20 mm</td><td>Steigleitungen</td></tr>
+            <tr><td>32×3</td><td>26 mm</td><td>Hauptleitungen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:25px">📐 Rohrinhalt berechnen</h3>
+        <div class="form-group">
+          <label>Innendurchmesser (mm)</label>
+          <select id="rohr-inhalt-dn">
+            <option value="10">10 mm (Cu 12×1)</option>
+            <option value="12">12 mm (MVR 16×2)</option>
+            <option value="13">13 mm (Cu 15×1)</option>
+            <option value="16" selected>16 mm (Cu 18×1, MVR 20×2)</option>
+            <option value="20">20 mm (Cu 22×1, MVR 26×3)</option>
+            <option value="25">25 mm (Cu 28×1,5)</option>
+            <option value="26">26 mm (MVR 32×3)</option>
+            <option value="32">32 mm (Cu 35×1,5)</option>
+            <option value="39">39 mm (Cu 42×1,5)</option>
+            <option value="50">50 mm (Cu 54×2)</option>
+            <option value="custom">Eigener Wert...</option>
+          </select>
+        </div>
+        <div class="form-group" id="rohr-inhalt-custom-group" style="display:none;">
+          <label>Eigener Innendurchmesser (mm)</label>
+          <input type="number" id="rohr-inhalt-custom" placeholder="z.B. 15" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>Rohrlänge (m)</label>
+          <input type="number" id="rohr-inhalt-laenge" placeholder="z.B. 50" value="10">
+        </div>
+        <button class="btn" onclick="calcRohrinhalt()">Berechnen</button>
+        <div id="rohr-inhalt-result"></div>
+        
+        <h3 style="margin-top:25px">📐 Längenausdehnung berechnen</h3>
+        <div class="form-group">
+          <label>Material</label>
+          <select id="rohr-dehn-material">
+            <option value="0.017">Kupfer (0,017 mm/mK)</option>
+            <option value="0.012">Stahl / C-Stahl (0,012 mm/mK)</option>
+            <option value="0.016">Edelstahl (0,016 mm/mK)</option>
+            <option value="0.025">Mehrschichtverbund (0,025 mm/mK)</option>
+            <option value="0.15">PP-R Polypropylen (0,15 mm/mK)</option>
+            <option value="0.14">PE-X vernetzt (0,14 mm/mK)</option>
+            <option value="0.13">PB Polybuten (0,13 mm/mK)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Rohrlänge (m)</label>
+          <input type="number" id="rohr-dehn-laenge" placeholder="z.B. 10" value="10">
+        </div>
+        <div class="form-group">
+          <label>Temperaturdifferenz ΔT (K)</label>
+          <input type="number" id="rohr-dehn-dt" placeholder="z.B. 50" value="50">
+        </div>
+        <button class="btn" onclick="calcRohrdehnung()">Berechnen</button>
+        <div id="rohr-dehn-result"></div>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Kunststoffrohre</h4>
+          <p>Hohe Ausdehnung! Dehnungsschenkel oder Kompensatoren einplanen. Fixpunkte und Gleitpunkte beachten.</p>
+        </div>
+      </div>
+
+      <!-- FUSSBODENHEIZUNG -->
+      <div id="fbh" class="tab-content">
+        <h2>🔥 Fußbodenheizung</h2>
+        
+        <div class="form-group">
+          <label>Raumfläche (m²)</label>
+          <input type="number" id="fbh-flaeche" placeholder="z.B. 25">
+        </div>
+        
+        <div class="form-group">
+          <label>Heizlast des Raumes (W/m²)</label>
+          <select id="fbh-heizlast">
+            <option value="40">40 W/m² (Neubau gut gedämmt)</option>
+            <option value="50" selected>50 W/m² (Standard)</option>
+            <option value="60">60 W/m² (Altbau saniert)</option>
+            <option value="80">80 W/m² (Bad)</option>
+            <option value="100">100 W/m² (Bad Altbau)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Verlegeabstand</label>
+          <select id="fbh-abstand">
+            <option value="0.10">10 cm (Bad, hohe Last)</option>
+            <option value="0.15" selected>15 cm (Standard)</option>
+            <option value="0.20">20 cm (geringe Last)</option>
+            <option value="0.25">25 cm (Randzone)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Bodenbelag</label>
+          <select id="fbh-belag">
+            <option value="0.02">Fliesen (0,02 m²K/W)</option>
+            <option value="0.05" selected>Estrich/PVC (0,05 m²K/W)</option>
+            <option value="0.10">Parkett dünn (0,10 m²K/W)</option>
+            <option value="0.15">Parkett/Laminat (0,15 m²K/W)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcFBH()">Berechnen</button>
+        <div id="fbh-result"></div>
+        
+        <h3 style="margin-top:25px">Systemtemperaturen</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Vorlauf</th><th>Rücklauf</th><th>ΔT</th></tr></thead>
+          <tbody>
+            <tr><td>FBH Standard</td><td>35°C</td><td>28°C</td><td>7 K</td></tr>
+            <tr><td>FBH Wärmepumpe</td><td>30°C</td><td>25°C</td><td>5 K</td></tr>
+            <tr><td>Wandheizung</td><td>35°C</td><td>28°C</td><td>7 K</td></tr>
+            <tr><td>Heizkörper NT</td><td>55°C</td><td>45°C</td><td>10 K</td></tr>
+            <tr><td>Heizkörper Standard</td><td>70°C</td><td>55°C</td><td>15 K</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Max. Oberflächentemperatur</h4>
+          <table class="data-table" style="margin-top:10px">
+            <tr><td>Aufenthaltsbereich</td><td>max. 29°C</td></tr>
+            <tr><td>Randzone (1m am Fenster)</td><td>max. 35°C</td></tr>
+            <tr><td>Bad</td><td>max. 33°C</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- MAG - AUSDEHNUNGSGEFÄSS -->
+      <div id="mag" class="tab-content">
+        <h2>🎈 Ausdehnungsgefäß (MAG)</h2>
+        
+        <h3>MAG berechnen</h3>
+        <div class="form-group">
+          <label>Anlagenvolumen (Liter)</label>
+          <input type="number" id="mag-volumen" placeholder="z.B. 150" value="150">
+        </div>
+        <div class="form-group">
+          <label>Max. Vorlauftemperatur</label>
+          <select id="mag-temp">
+            <option value="0.0313">50°C (n=3,13%)</option>
+            <option value="0.0359">60°C (n=3,59%)</option>
+            <option value="0.0396">70°C (n=3,96%)</option>
+            <option value="0.0424" selected>80°C (n=4,24%)</option>
+            <option value="0.0443">90°C (n=4,43%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Statische Höhe (m)</label>
+          <input type="number" id="mag-hoehe" placeholder="z.B. 8" value="8">
+        </div>
+        <div class="form-group">
+          <label>Vordruck p0 (bar)</label>
+          <input type="number" id="mag-vordruck" placeholder="auto" step="0.1">
+          <small style="color:#6b7280;">Leer = automatisch (Höhe/10 + 0,3)</small>
+        </div>
+        <button class="btn" onclick="calcMAG()">Berechnen</button>
+        <div id="mag-result"></div>
+        
+        <h3 style="margin-top:25px">Ausdehnungskoeffizienten n</h3>
+        <table class="data-table">
+          <thead><tr><th>Temp.</th><th>n (%)</th><th>Temp.</th><th>n (%)</th></tr></thead>
+          <tbody>
+            <tr><td>30°C</td><td>0,43</td><td>70°C</td><td>3,96</td></tr>
+            <tr><td>40°C</td><td>1,18</td><td>80°C</td><td>4,24</td></tr>
+            <tr><td>50°C</td><td>3,13</td><td>90°C</td><td>4,43</td></tr>
+            <tr><td>60°C</td><td>3,59</td><td>100°C</td><td>4,87</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Druckverhältnisse</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Vordruck p0</strong></td><td>Stat. Höhe/10 + 0,3 bar</td></tr>
+            <tr><td><strong>Anfangsdruck pa</strong></td><td>p0 + 0,3 bar (Mindestdruck)</td></tr>
+            <tr><td><strong>Enddruck pe</strong></td><td>SV-Ansprechdruck - 0,5 bar</td></tr>
+            <tr><td><strong>SV-Druck (SV 3 bar)</strong></td><td>pe = 2,5 bar</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>💡 Faustformel</h4>
+          <p>MAG-Volumen ≈ Anlagenvolumen × 0,1 (für Überschlag)</p>
+        </div>
+      </div>
+
+      <!-- HYDRAULIK -->
+      <div id="hydraulik" class="tab-content">
+        <h2>⚖️ Hydraulik & Pumpen</h2>
+        
+        <h3>Druckverlust Rohrleitung</h3>
+        <div class="form-group">
+          <label>Volumenstrom (l/h)</label>
+          <input type="number" id="hy-volumen" placeholder="z.B. 1000" value="1000">
+        </div>
+        <div class="form-group">
+          <label>Rohrdurchmesser DN (mm Innen)</label>
+          <select id="hy-dn">
+            <option value="13">DN 15 (di=13)</option>
+            <option value="16">DN 20 (di=16)</option>
+            <option value="21" selected>DN 25 (di=21)</option>
+            <option value="27">DN 32 (di=27)</option>
+            <option value="35">DN 40 (di=35)</option>
+            <option value="41">DN 50 (di=41)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Leitungslänge (m)</label>
+          <input type="number" id="hy-laenge" placeholder="z.B. 50" value="50">
+        </div>
+        <button class="btn" onclick="calcDruckverlust()">Berechnen</button>
+        <div id="hy-result"></div>
+        
+        <h3 style="margin-top:25px">Hydraulischer Abgleich</h3>
+        <table class="data-table">
+          <thead><tr><th>Verfahren</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Verfahren A</strong></td><td>Raumweise Heizlast, vollständige Berechnung</td></tr>
+            <tr><td><strong>Verfahren B</strong></td><td>Vereinfacht nach Heizkörperleistung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Volumenstrom berechnen</h3>
+        <div class="form-group">
+          <label>Heizleistung (W)</label>
+          <input type="number" id="ab-leistung" placeholder="z.B. 2000" value="2000">
+        </div>
+        <div class="form-group">
+          <label>Spreizung ΔT (K)</label>
+          <select id="ab-spreizung">
+            <option value="5">5 K (FBH)</option>
+            <option value="7">7 K (FBH)</option>
+            <option value="10" selected>10 K (Niedertemp.)</option>
+            <option value="15">15 K (Konv. Heizung)</option>
+            <option value="20">20 K (Altbau)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcVolumenstrom()">Berechnen</button>
+        <div id="ab-result"></div>
+        
+        <h3 style="margin-top:20px">Pumpenkennwerte</h3>
+        <table class="data-table">
+          <thead><tr><th>Anlage</th><th>Förderhöhe</th><th>Volumenstrom</th></tr></thead>
+          <tbody>
+            <tr><td>EFH Heizung</td><td>3-5 m</td><td>500-1500 l/h</td></tr>
+            <tr><td>MFH Heizung</td><td>5-8 m</td><td>2000-8000 l/h</td></tr>
+            <tr><td>FBH-Kreis</td><td>1-3 m</td><td>150-300 l/h</td></tr>
+            <tr><td>Solar</td><td>3-6 m</td><td>40-80 l/m² Kollektor</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Fließgeschwindigkeit</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Empfohlen Heizung</td><td>0,5 - 1,0 m/s</td></tr>
+            <tr><td>Max. Heizung</td><td>1,5 m/s (Geräusche!)</td></tr>
+            <tr><td>Trinkwasser kalt</td><td>max. 2,0 m/s</td></tr>
+            <tr><td>Trinkwasser warm</td><td>max. 2,0 m/s</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LÜFTUNG -->
+      <div id="lueftung" class="tab-content">
+        <h2>💨 Lüftungsberechnung</h2>
+        
+        <div class="form-group">
+          <label>Gebäudetyp</label>
+          <select id="lueft-gebaeude" onchange="toggleLueftGebaeude()">
+            <option value="wohnung">🏠 Wohngebäude / EFH / Wohnung</option>
+            <option value="gewerbe">🏢 Gewerbe / Büro / Industrie</option>
+          </select>
+        </div>
+        
+        <!-- WOHNGEBÄUDE -->
+        <div id="lueft-wohnung-bereich">
+          <div class="form-group">
+            <label>Berechnungsart</label>
+            <select id="lueft-wohn-art" onchange="toggleLueftWohnFields()">
+              <option value="din">DIN 1946-6 (nach Wohnfläche)</option>
+              <option value="raum">Nach Einzelräumen</option>
+            </select>
+          </div>
+          
+          <div id="lueft-din-fields">
+            <div class="form-group">
+              <label>Wohnfläche (m²)</label>
+              <input type="number" id="lueft-wfl" placeholder="z.B. 120">
+            </div>
+            <div class="form-group">
+              <label>Personenanzahl</label>
+              <input type="number" id="lueft-pers" placeholder="z.B. 4" value="4">
+            </div>
+            <div class="form-group">
+              <label>Lüftungsstufe</label>
+              <select id="lueft-stufe2">
+                <option value="0.3">Lüftung zum Feuchteschutz (FL)</option>
+                <option value="0.4">Reduzierte Lüftung (RL)</option>
+                <option value="0.5" selected>Nennlüftung (NL) - Standard</option>
+                <option value="0.7">Intensivlüftung (IL)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="lueft-raum-einzeln" style="display:none;">
+            <div class="form-group">
+              <label>Raumtyp</label>
+              <select id="lueft-raumtyp">
+                <option value="wohn">Wohnzimmer / Schlafzimmer</option>
+                <option value="kind">Kinderzimmer</option>
+                <option value="kueche">Küche (Abluft)</option>
+                <option value="bad">Bad/Dusche (Abluft)</option>
+                <option value="wc">WC (Abluft)</option>
+                <option value="hwr">HWR/Hauswirtschaft</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Raumgröße (m²)</label>
+              <input type="number" id="lueft-raumgroesse" placeholder="z.B. 20">
+            </div>
+            <div class="form-group">
+              <label>Raumhöhe (m)</label>
+              <input type="number" id="lueft-raumhoehe" value="2.5" step="0.1">
+            </div>
+          </div>
+        </div>
+        
+        <!-- GEWERBE/INDUSTRIE -->
+        <div id="lueft-gewerbe-bereich" style="display:none;">
+          <div class="form-group">
+            <label>Berechnungsart</label>
+            <select id="lueft-gew-art" onchange="toggleLueftGewFields()">
+              <option value="person">Nach Personenzahl</option>
+              <option value="volumen">Nach Raumvolumen (Luftwechsel)</option>
+            </select>
+          </div>
+          
+          <div id="lueft-gew-person">
+            <div class="form-group">
+              <label>Nutzung</label>
+              <select id="lueft-nutzung">
+                <option value="30">Büro Einzelzimmer (30 m³/h pro Pers.)</option>
+                <option value="40">Büro Großraum (40 m³/h pro Pers.)</option>
+                <option value="20">Verkauf (20 m³/h pro Pers.)</option>
+                <option value="30">Restaurant (30 m³/h pro Pers.)</option>
+                <option value="50">Schulungsraum (50 m³/h pro Pers.)</option>
+                <option value="60">Konferenzraum (60 m³/h pro Pers.)</option>
+                <option value="80">Fitnessstudio (80 m³/h pro Pers.)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Personenanzahl</label>
+              <input type="number" id="lueft-gew-pers" placeholder="z.B. 20">
+            </div>
+          </div>
+          
+          <div id="lueft-gew-volumen" style="display:none;">
+            <div class="form-group">
+              <label>Raumfläche (m²)</label>
+              <input type="number" id="lueft-gew-flaeche" placeholder="z.B. 200">
+            </div>
+            <div class="form-group">
+              <label>Raumhöhe (m)</label>
+              <input type="number" id="lueft-gew-hoehe" value="3.0" step="0.1">
+            </div>
+            <div class="form-group">
+              <label>Luftwechselrate (1/h)</label>
+              <select id="lueft-gew-lw">
+                <option value="2">2× - Büro, Verkauf</option>
+                <option value="4">4× - WC, Umkleide</option>
+                <option value="6">6× - Küche</option>
+                <option value="8">8× - Labor, Werkstatt</option>
+                <option value="10">10× - Großküche, Industrie</option>
+                <option value="15">15× - Reinraum</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Kanalgeschwindigkeit</label>
+            <select id="lueft-geschw">
+              <option value="3">3 m/s - Wohnung, leise</option>
+              <option value="4">4 m/s - Büro</option>
+              <option value="5" selected>5 m/s - Gewerbe Standard</option>
+              <option value="6">6 m/s - Industrie</option>
+              <option value="8">8 m/s - Industrie Hauptkanal</option>
+            </select>
+          </div>
+        </div>
+        
+        <button class="btn" onclick="calcLueftungNeu()">Berechnen</button>
+        <div id="lueft-result"></div>
+        
+        <h3 style="margin-top:25px">Lüftungsrohre Wohnbau</h3>
+        <table class="data-table">
+          <thead><tr><th>DN</th><th>Typ</th><th>m³/h @3m/s</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td>75</td><td>Flexrohr</td><td>48</td><td>Zuluft Einzelraum</td></tr>
+            <tr><td>90</td><td>Flexrohr</td><td>69</td><td>Zuluft größere Räume</td></tr>
+            <tr><td>100</td><td>Wickelfalz</td><td>85</td><td>Abluft Bad/WC</td></tr>
+            <tr><td>125</td><td>Wickelfalz</td><td>133</td><td>Sammelleitung</td></tr>
+            <tr><td>160</td><td>Wickelfalz</td><td>217</td><td>Hauptleitung EFH</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Kanäle Gewerbe/Industrie</h3>
+        <table class="data-table">
+          <thead><tr><th>Ø mm</th><th>m³/h @5m/s</th><th>m³/h @8m/s</th></tr></thead>
+          <tbody>
+            <tr><td>200</td><td>565</td><td>905</td></tr>
+            <tr><td>250</td><td>884</td><td>1414</td></tr>
+            <tr><td>315</td><td>1402</td><td>2244</td></tr>
+            <tr><td>400</td><td>2262</td><td>3619</td></tr>
+            <tr><td>500</td><td>3534</td><td>5655</td></tr>
+            <tr><td>630</td><td>5765</td><td>9224</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SANITÄR -->
+      <div id="sanitaer" class="tab-content">
+        <h2>🚿 Sanitärtechnik</h2>
+        
+        <h3>Anschlusswerte (DIN 1988-300)</h3>
+        <table class="data-table">
+          <thead><tr><th>Entnahmestelle</th><th>VR (l/s)</th><th>pmin</th></tr></thead>
+          <tbody>
+            <tr><td>Handwaschbecken</td><td>0,07</td><td>1,0 bar</td></tr>
+            <tr><td>Waschtisch</td><td>0,07</td><td>1,0 bar</td></tr>
+            <tr><td>Bidet</td><td>0,07</td><td>1,0 bar</td></tr>
+            <tr><td>WC-Spülkasten 6L</td><td>0,13</td><td>0,5 bar</td></tr>
+            <tr><td>WC-Druckspüler</td><td>1,00</td><td>1,2 bar</td></tr>
+            <tr><td>Urinal-Spülkasten</td><td>0,07</td><td>0,5 bar</td></tr>
+            <tr><td>Urinal-Druckspüler</td><td>0,30</td><td>1,0 bar</td></tr>
+            <tr><td>Dusche</td><td>0,15</td><td>1,0 bar</td></tr>
+            <tr><td>Badewanne</td><td>0,15</td><td>1,0 bar</td></tr>
+            <tr><td>Spültisch Küche</td><td>0,07</td><td>1,0 bar</td></tr>
+            <tr><td>Spülmaschine</td><td>0,15</td><td>0,5 bar</td></tr>
+            <tr><td>Waschmaschine</td><td>0,25</td><td>1,0 bar</td></tr>
+            <tr><td>Zapfhahn Garten</td><td>0,50</td><td>1,0 bar</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abwasser - Mindest-DN</h3>
+        <table class="data-table">
+          <thead><tr><th>Objekt</th><th>DN</th><th>Anschlusswert</th></tr></thead>
+          <tbody>
+            <tr><td>Handwaschbecken</td><td>DN 32</td><td>0,3 DU</td></tr>
+            <tr><td>Waschtisch</td><td>DN 40</td><td>0,5 DU</td></tr>
+            <tr><td>Bidet</td><td>DN 40</td><td>0,5 DU</td></tr>
+            <tr><td>Dusche</td><td>DN 50</td><td>0,6 DU</td></tr>
+            <tr><td>Badewanne</td><td>DN 50</td><td>0,8 DU</td></tr>
+            <tr><td>Spültisch</td><td>DN 50</td><td>0,8 DU</td></tr>
+            <tr><td>Waschmaschine</td><td>DN 50</td><td>0,8 DU</td></tr>
+            <tr><td>Spülmaschine</td><td>DN 50</td><td>0,8 DU</td></tr>
+            <tr><td>WC 6L</td><td>DN 100</td><td>2,0 DU</td></tr>
+            <tr><td>Urinal</td><td>DN 50</td><td>0,5 DU</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Gefälle</h3>
+        <table class="data-table">
+          <thead><tr><th>Leitung</th><th>Gefälle</th></tr></thead>
+          <tbody>
+            <tr><td>Einzelanschluss DN 50</td><td>1-2%</td></tr>
+            <tr><td>Sammelanschluss</td><td>0,5-1%</td></tr>
+            <tr><td>Grundleitung DN 100</td><td>min. 2% (1:50)</td></tr>
+            <tr><td>Grundleitung DN 150</td><td>min. 1% (1:100)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TRINKWASSERERWÄRMUNG -->
+      <div id="trinkwasser" class="tab-content">
+        <h2>🚰 Trinkwassererwärmung</h2>
+        
+        <div class="form-group">
+          <label>Personenanzahl</label>
+          <input type="number" id="tww-personen" placeholder="z.B. 4">
+        </div>
+        
+        <div class="form-group">
+          <label>Verbrauchsprofil</label>
+          <select id="tww-profil">
+            <option value="30">Sparsam (30 l/Pers./Tag)</option>
+            <option value="40" selected>Normal (40 l/Pers./Tag)</option>
+            <option value="50">Komfort (50 l/Pers./Tag)</option>
+            <option value="70">Hoher Bedarf (70 l/Pers./Tag)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcTWW()">Berechnen</button>
+        <div id="tww-result"></div>
+        
+        <h3 style="margin-top:25px">Speichergrößen</h3>
+        <table class="data-table">
+          <thead><tr><th>Personen</th><th>Speicher</th><th>Leistung</th></tr></thead>
+          <tbody>
+            <tr><td>1-2</td><td>80-120 L</td><td>2-3 kW</td></tr>
+            <tr><td>3-4</td><td>150-200 L</td><td>3-5 kW</td></tr>
+            <tr><td>5-6</td><td>200-300 L</td><td>5-8 kW</td></tr>
+            <tr><td>7-10</td><td>300-500 L</td><td>8-15 kW</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Legionellenprophylaxe</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Speichertemperatur</td><td>≥ 60°C</td></tr>
+            <tr><td>Zirkulation Rücklauf</td><td>≥ 55°C</td></tr>
+            <tr><td>Zapfstelle</td><td>max. 3 Liter bis 55°C</td></tr>
+            <tr><td>Thermische Desinfektion</td><td>70°C für 3 min</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Trinkwasserhygiene</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Stagnation vermeiden (max. 72h)</li>
+            <li>Warmwasser ≥ 55°C, Kaltwasser ≤ 25°C</li>
+            <li>Probenahme alle 1-3 Jahre (Großanlagen)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- KÄLTE -->
+      <div id="kaelte" class="tab-content">
+        <h2>❄️ Kältetechnik</h2>
+        
+        <h3>Kühllastüberschlag</h3>
+        <div class="form-group">
+          <label>Raumfläche (m²)</label>
+          <input type="number" id="kaelte-flaeche" placeholder="z.B. 50">
+        </div>
+        
+        <div class="form-group">
+          <label>Raumtyp / Nutzung</label>
+          <select id="kaelte-typ">
+            <option value="40">Wohnung (40 W/m²)</option>
+            <option value="50">Büro Standard (50 W/m²)</option>
+            <option value="80">Büro mit EDV (80 W/m²)</option>
+            <option value="100">Serverraum (100 W/m²)</option>
+            <option value="120">Konferenzraum (120 W/m²)</option>
+            <option value="150">Verkauf (150 W/m²)</option>
+            <option value="200">Restaurant (200 W/m²)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcKaelte()">Berechnen</button>
+        <div id="kaelte-result"></div>
+        
+        <h3 style="margin-top:25px">Kältemittel (F-Gase VO)</h3>
+        <table class="data-table">
+          <thead><tr><th>Kältemittel</th><th>GWP</th><th>Anwendung</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>R290 (Propan)</td><td>3</td><td>Kleine Geräte</td><td>✓ Zukunft</td></tr>
+            <tr><td>R32</td><td>675</td><td>Split-Klima</td><td>✓ Aktuell</td></tr>
+            <tr><td>R454B</td><td>466</td><td>Ersatz R410A</td><td>✓ Aktuell</td></tr>
+            <tr><td>R410A</td><td>2088</td><td>Klimaanlagen</td><td>⚠ Auslauf</td></tr>
+            <tr><td>R407C</td><td>1774</td><td>Altanlagen</td><td>⚠ Auslauf</td></tr>
+            <tr><td>R744 (CO2)</td><td>1</td><td>Supermarkt</td><td>✓ Zukunft</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Split-Klimageräte Größen</h3>
+        <table class="data-table">
+          <thead><tr><th>Kühllast</th><th>Gerätegröße</th><th>BTU/h</th></tr></thead>
+          <tbody>
+            <tr><td>bis 2,0 kW</td><td>2,0 - 2,5 kW</td><td>7.000</td></tr>
+            <tr><td>bis 3,5 kW</td><td>3,5 kW</td><td>12.000</td></tr>
+            <tr><td>bis 5,0 kW</td><td>5,0 kW</td><td>18.000</td></tr>
+            <tr><td>bis 7,0 kW</td><td>7,0 kW</td><td>24.000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FEHLERSUCHE -->
+      <div id="fehler" class="tab-content">
+        <h2>🔍 Fehlersuche HLSK</h2>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>🌡️ Heizung wird nicht warm</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Thermostatventil</strong> - Stift klemmt? Vorsichtig lösen</li>
+              <li><strong>Luft im System</strong> - Heizkörper entlüften</li>
+              <li><strong>Hydraulik</strong> - Hydraulischer Abgleich fehlt</li>
+              <li><strong>Pumpe</strong> - Läuft die Umwälzpumpe?</li>
+              <li><strong>Vorlauftemperatur</strong> - Heizkurve prüfen</li>
+              <li><strong>Ventil</strong> - Rücklaufverschraubung geschlossen?</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>🔊 Heizung gluckert</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Entlüften</strong> - Alle Heizkörper entlüften</li>
+              <li><strong>Anlagendruck</strong> - Wasser nachfüllen (1,5-2 bar)</li>
+              <li><strong>Ausdehnungsgefäß</strong> - Vordruck prüfen</li>
+              <li><strong>Schnellentlüfter</strong> - Am höchsten Punkt installiert?</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>💧 Druckverlust Heizung</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Leckage</strong> - Sichtprüfung aller Verbindungen</li>
+              <li><strong>Sicherheitsventil</strong> - Tropft es? Druck zu hoch?</li>
+              <li><strong>Ausdehnungsgefäß</strong> - Membran defekt?</li>
+              <li><strong>Automatik-Entlüfter</strong> - Undicht?</li>
+              <li><strong>Wärmetauscher</strong> - Interner Durchbruch zum TWW</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>🚿 Kein Warmwasser</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Speicher</strong> - Temperatur ausreichend?</li>
+              <li><strong>Ladepumpe</strong> - Läuft sie?</li>
+              <li><strong>Dreiwegeventil</strong> - Schaltet es auf WW?</li>
+              <li><strong>Fühler</strong> - Speicherfühler defekt?</li>
+              <li><strong>Zirkulation</strong> - Bei langen Leitungen nötig</li>
+              <li><strong>Mischer</strong> - Thermostatmischer prüfen</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>💨 Lüftung riecht muffig</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Filter</strong> - Verschmutzt? Wechseln!</li>
+              <li><strong>Wärmetauscher</strong> - Reinigen (alle 2 Jahre)</li>
+              <li><strong>Kondensat</strong> - Abfluss verstopft?</li>
+              <li><strong>Kanäle</strong> - Reinigung fällig?</li>
+              <li><strong>Feuchtigkeit</strong> - Schimmel im Gerät?</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="troubleshoot-card" onclick="this.classList.toggle('active')">
+          <div class="troubleshoot-header"><span>🚽 WC-Spülung schwach</span><span class="toggle-icon">▼</span></div>
+          <div class="troubleshoot-solutions">
+            <ul>
+              <li><strong>Füllventil</strong> - Öffnet vollständig?</li>
+              <li><strong>Schwimmer</strong> - Wasserstand zu niedrig?</li>
+              <li><strong>Heberglocke</strong> - Dichtung defekt?</li>
+              <li><strong>Kalk</strong> - Düsen verkalkt?</li>
+              <li><strong>Wasserdruck</strong> - Zu gering?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen HLSK</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🌡️ Heizkurve / Vorlauftemperatur</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Außentemp.</th><th>FBH 35/28</th><th>NT 55/45</th><th>Std 70/55</th></tr></thead>
+              <tbody>
+                <tr><td>+15°C</td><td>24°C</td><td>30°C</td><td>35°C</td></tr>
+                <tr><td>+5°C</td><td>28°C</td><td>40°C</td><td>50°C</td></tr>
+                <tr><td>0°C</td><td>30°C</td><td>45°C</td><td>57°C</td></tr>
+                <tr><td>-5°C</td><td>33°C</td><td>50°C</td><td>63°C</td></tr>
+                <tr><td>-10°C</td><td>35°C</td><td>55°C</td><td>70°C</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#6b7280;">Wärmepumpe: max. 55°C Vorlauf für guten COP</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔄 Umwälzpumpen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Heizung EFH</td><td>25-40 (4-6m)</td></tr>
+              <tr><td>Heizung MFH</td><td>32-60 (6-8m)</td></tr>
+              <tr><td>Solaranlage</td><td>25-40 (4-6m)</td></tr>
+              <tr><td>Trinkwasser-Zirkulation</td><td>15-20</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#6b7280;">Angaben: DN (Förderhöhe m) - Hocheffizienzpumpen Pflicht seit 2013</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🏷️ Energieeffizienzklassen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Heizkessel (alt)</h4>
+            <table class="data-table">
+              <tr><td>A+++</td><td>> 150% (Wärmepumpe)</td></tr>
+              <tr><td>A++</td><td>125-150%</td></tr>
+              <tr><td>A+</td><td>98-125%</td></tr>
+              <tr><td>A</td><td>90-98%</td></tr>
+            </table>
+            <h4 style="margin-top:15px;">Klimageräte SEER/SCOP</h4>
+            <table class="data-table">
+              <tr><td>A+++</td><td>SEER ≥ 8,5 / SCOP ≥ 5,1</td></tr>
+              <tr><td>A++</td><td>SEER ≥ 6,1 / SCOP ≥ 4,6</td></tr>
+              <tr><td>A+</td><td>SEER ≥ 5,6 / SCOP ≥ 4,0</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📏 Wichtige Maße & Abstände</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Heizkörper Fensterbr.</td><td>50-75% der Fensterbreite</td></tr>
+              <tr><td>Abstand HK-Boden</td><td>min. 10 cm</td></tr>
+              <tr><td>Abstand HK-Fensterbank</td><td>min. 10 cm</td></tr>
+              <tr><td>FBH Randzone</td><td>max. 1 m Breite</td></tr>
+              <tr><td>Lüftungskanal Mindestgefälle</td><td>1%</td></tr>
+              <tr><td>Abwasser Mindestgefälle</td><td>1-2%</td></tr>
+              <tr><td>Warmwasserleitung max.</td><td>3 Liter bis Zapfstelle</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>⚗️ Wasseraufbereitung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Heizungswasser (VDI 2035)</h4>
+            <table class="data-table">
+              <tr><td>pH-Wert</td><td>8,2 - 10,0</td></tr>
+              <tr><td>Leitfähigkeit</td><td>< 100 µS/cm (Alu: < 1500)</td></tr>
+              <tr><td>Härte (gesamt)</td><td>< 0,02 mol/m³ (enthärtet)</td></tr>
+              <tr><td>Sauerstoff</td><td>< 0,1 mg/l</td></tr>
+            </table>
+            <h4 style="margin-top:15px;">Trinkwasser</h4>
+            <table class="data-table">
+              <tr><td>Gesamthärte weich</td><td>< 8,4 °dH</td></tr>
+              <tr><td>Gesamthärte mittel</td><td>8,4 - 14 °dH</td></tr>
+              <tr><td>Gesamthärte hart</td><td>> 14 °dH</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔧 Wartungsintervalle</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Gasheizung</td><td>jährlich</td></tr>
+              <tr><td>Ölheizung</td><td>jährlich</td></tr>
+              <tr><td>Wärmepumpe</td><td>alle 1-2 Jahre</td></tr>
+              <tr><td>Lüftungsanlage Filter</td><td>alle 3-6 Monate</td></tr>
+              <tr><td>Lüftung Wärmetauscher</td><td>alle 2 Jahre</td></tr>
+              <tr><td>Klimaanlage</td><td>jährlich</td></tr>
+              <tr><td>Enthärtungsanlage</td><td>alle 6-12 Monate</td></tr>
+              <tr><td>Ausdehnungsgefäß</td><td>alle 2 Jahre</td></tr>
+              <tr><td>Sicherheitsventil</td><td>alle 5 Jahre ersetzen</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Wichtige Normen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>DIN EN 12831</strong></td><td>Heizlastberechnung</td></tr>
+              <tr><td><strong>DIN 1988</strong></td><td>Trinkwasser-Installation</td></tr>
+              <tr><td><strong>DIN EN 806</strong></td><td>Trinkwasser (EU)</td></tr>
+              <tr><td><strong>DIN 1946-6</strong></td><td>Wohnungslüftung</td></tr>
+              <tr><td><strong>DIN 4109</strong></td><td>Schallschutz</td></tr>
+              <tr><td><strong>DIN 4708</strong></td><td>Trinkwassererwärmung</td></tr>
+              <tr><td><strong>DIN 18380</strong></td><td>VOB/C Heizungsanlagen</td></tr>
+              <tr><td><strong>DIN 18381</strong></td><td>VOB/C Gas-/Wasseranlagen</td></tr>
+              <tr><td><strong>VDI 2035</strong></td><td>Heizwasser-Aufbereitung</td></tr>
+              <tr><td><strong>VDI 6023</strong></td><td>Trinkwasserhygiene</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'heizlast')">
+      <span class="nav-icon">🌡️</span><span class="nav-label">Heizlast</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'rohr')">
+      <span class="nav-icon">🔩</span><span class="nav-label">Rohre</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[3], 'lueftung')">
+      <span class="nav-icon">💨</span><span class="nav-label">Lüftung</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[4], 'sanitaer')">
+      <span class="nav-icon">🚿</span><span class="nav-label">Sanitär</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[6], 'kaelte')">
+      <span class="nav-icon">❄️</span><span class="nav-label">Kälte</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[8], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcHeizlast() {
+      const wattProM2 = parseFloat(document.getElementById('hz-gebaeude').value);
+      const flaeche = parseFloat(document.getElementById('hz-flaeche').value);
+      const hoehe = parseFloat(document.getElementById('hz-hoehe').value);
+      const wwZuschlag = parseFloat(document.getElementById('hz-ww').value);
+      if (isNaN(flaeche)) { document.getElementById('hz-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>'; return; }
+      const heizlast = flaeche * wattProM2;
+      const heizlastMitWW = heizlast * (1 + wwZuschlag);
+      const volumen = flaeche * hoehe;
+      document.getElementById('hz-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Heizlast (ohne WW):</span><span>${heizlast.toFixed(0)} W</span></div><div class="result-item"><span>Mit WW-Zuschlag:</span><span><strong>${heizlastMitWW.toFixed(0)} W</strong> (${(heizlastMitWW/1000).toFixed(1)} kW)</span></div><div class="result-item"><span>Raumvolumen:</span><span>${volumen.toFixed(1)} m³</span></div></div>`;
+    }
+    
+    function calcRohr() {
+      const leistung = parseFloat(document.getElementById('rohr-leistung').value);
+      const spreizung = parseFloat(document.getElementById('rohr-spreizung').value);
+      const maxGeschw = parseFloat(document.getElementById('rohr-geschw').value);
+      if (isNaN(leistung)) { document.getElementById('rohr-result').innerHTML = '<div class="danger">Bitte Leistung eingeben</div>'; return; }
+      const massenstrom = (leistung * 3600) / (4.186 * spreizung);
+      const volumenstrom = massenstrom / 1000;
+      const volumenstromLMin = volumenstrom * 1000 / 60;
+      const volLs = volumenstrom / 3600;
+      const flaeche = volLs / maxGeschw;
+      const durchmesser = Math.sqrt(4 * flaeche / Math.PI) * 1000;
+      const rohre = [{d:10,name:'12×1'},{d:13,name:'15×1'},{d:16,name:'18×1'},{d:20,name:'22×1'},{d:25,name:'28×1,5'},{d:32,name:'35×1,5'},{d:39,name:'42×1,5'},{d:50,name:'54×2'}];
+      const empf = rohre.find(r => r.d >= durchmesser) || rohre[rohre.length-1];
+      document.getElementById('rohr-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Massenstrom:</span><span>${massenstrom.toFixed(1)} kg/h</span></div><div class="result-item"><span>Volumenstrom:</span><span>${volumenstromLMin.toFixed(2)} l/min</span></div><div class="result-item"><span>Min. Innendurchmesser:</span><span>${durchmesser.toFixed(1)} mm</span></div><div class="result-item"><span>Empf. Kupferrohr:</span><span><strong>${empf.name}</strong></span></div></div>`;
+    }
+    
+    // Toggle für eigenen Durchmesser
+    document.addEventListener('DOMContentLoaded', function() {
+      const dnSelect = document.getElementById('rohr-inhalt-dn');
+      if (dnSelect) {
+        dnSelect.addEventListener('change', function() {
+          const customGroup = document.getElementById('rohr-inhalt-custom-group');
+          if (customGroup) {
+            customGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+          }
+        });
+      }
+    });
+    
+    function calcRohrinhalt() {
+      const dnSelect = document.getElementById('rohr-inhalt-dn').value;
+      let dn;
+      if (dnSelect === 'custom') {
+        dn = parseFloat(document.getElementById('rohr-inhalt-custom').value);
+      } else {
+        dn = parseFloat(dnSelect);
+      }
+      const laenge = parseFloat(document.getElementById('rohr-inhalt-laenge').value);
+      
+      if (isNaN(dn) || dn <= 0) {
+        document.getElementById('rohr-inhalt-result').innerHTML = '<div class="danger">Bitte Durchmesser eingeben</div>';
+        return;
+      }
+      if (isNaN(laenge) || laenge <= 0) {
+        document.getElementById('rohr-inhalt-result').innerHTML = '<div class="danger">Bitte Länge eingeben</div>';
+        return;
+      }
+      
+      // V = π × (d/2)² × L in Litern
+      const radius = (dn / 1000) / 2; // Radius in Metern
+      const volumenM3 = Math.PI * radius * radius * laenge;
+      const volumenLiter = volumenM3 * 1000;
+      const literProMeter = (Math.PI * radius * radius) * 1000;
+      
+      document.getElementById('rohr-inhalt-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Innendurchmesser:</span><span>${dn} mm</span></div>
+          <div class="result-item"><span>Rohrlänge:</span><span>${laenge} m</span></div>
+          <div class="result-item"><span>Inhalt pro Meter:</span><span><strong>${literProMeter.toFixed(3)} Liter/m</strong></span></div>
+          <div class="result-item"><span>Gesamtinhalt:</span><span><strong>${volumenLiter.toFixed(2)} Liter</strong></span></div>
+        </div>
+        <div class="info-box" style="margin-top:10px">
+          <p style="font-size:12px;color:#6b7280;">Formel: V = π × (d/2)² × L<br>
+          = π × (${(dn/1000/2).toFixed(4)} m)² × ${laenge} m = ${volumenM3.toFixed(6)} m³</p>
+        </div>`;
+    }
+    
+    function calcRohrdehnung() {
+      const alpha = parseFloat(document.getElementById('rohr-dehn-material').value);
+      const laenge = parseFloat(document.getElementById('rohr-dehn-laenge').value);
+      const deltaT = parseFloat(document.getElementById('rohr-dehn-dt').value);
+      
+      if (isNaN(laenge) || laenge <= 0) {
+        document.getElementById('rohr-dehn-result').innerHTML = '<div class="danger">Bitte Länge eingeben</div>';
+        return;
+      }
+      if (isNaN(deltaT)) {
+        document.getElementById('rohr-dehn-result').innerHTML = '<div class="danger">Bitte Temperaturdifferenz eingeben</div>';
+        return;
+      }
+      
+      // Δl = α × L × ΔT
+      const dehnung = alpha * laenge * deltaT;
+      const dehnungProMeter = alpha * deltaT;
+      
+      // Dehnungsschenkel-Länge (Faustregel für Kupfer: L = 20 × √(Δl × d))
+      // Vereinfacht: ca. 3 × √Δl für Metall
+      const schenkelMetall = 3 * Math.sqrt(dehnung);
+      const schenkelKunststoff = 20 * Math.sqrt(dehnung / 10); // höherer Faktor
+      
+      const materialName = document.getElementById('rohr-dehn-material').options[document.getElementById('rohr-dehn-material').selectedIndex].text;
+      const istKunststoff = alpha > 0.1;
+      
+      document.getElementById('rohr-dehn-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Material:</span><span>${materialName}</span></div>
+          <div class="result-item"><span>Rohrlänge:</span><span>${laenge} m</span></div>
+          <div class="result-item"><span>Temperaturdifferenz:</span><span>${deltaT} K</span></div>
+          <div class="result-item"><span>Ausdehnung pro Meter:</span><span>${dehnungProMeter.toFixed(2)} mm/m</span></div>
+          <div class="result-item"><span>Gesamtausdehnung:</span><span><strong>${dehnung.toFixed(1)} mm</strong></span></div>
+          ${istKunststoff ? `<div class="result-item" style="color:#dc2626;"><span>⚠️ Dehnungsschenkel ca.:</span><span><strong>${schenkelKunststoff.toFixed(0)} cm</strong></span></div>` : ''}
+        </div>
+        <div class="info-box" style="margin-top:10px">
+          <p style="font-size:12px;color:#6b7280;">Formel: Δl = α × L × ΔT<br>
+          = ${alpha} mm/mK × ${laenge} m × ${deltaT} K = <strong>${dehnung.toFixed(1)} mm</strong></p>
+        </div>`;
+    }
+    
+    function calcFBH() {
+      const flaeche = parseFloat(document.getElementById('fbh-flaeche').value);
+      const heizlast = parseFloat(document.getElementById('fbh-heizlast').value);
+      const abstand = parseFloat(document.getElementById('fbh-abstand').value);
+      const belag = parseFloat(document.getElementById('fbh-belag').value);
+      if (isNaN(flaeche)) { document.getElementById('fbh-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>'; return; }
+      const rohrlaenge = flaeche / abstand;
+      const gesamtLeistung = flaeche * heizlast;
+      const kreise = Math.ceil(rohrlaenge / 100);
+      document.getElementById('fbh-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Heizleistung Raum:</span><span><strong>${gesamtLeistung.toFixed(0)} W</strong></span></div><div class="result-item"><span>Rohrlänge ca.:</span><span>${rohrlaenge.toFixed(0)} m</span></div><div class="result-item"><span>Anzahl Heizkreise:</span><span>${kreise} (max. 100m/Kreis)</span></div><div class="result-item"><span>Wärmeleitwid. Belag:</span><span>${belag} m²K/W</span></div></div>`;
+    }
+    
+    function toggleLueftGebaeude() {
+      const geb = document.getElementById('lueft-gebaeude').value;
+      document.getElementById('lueft-wohnung-bereich').style.display = geb === 'wohnung' ? 'block' : 'none';
+      document.getElementById('lueft-gewerbe-bereich').style.display = geb === 'gewerbe' ? 'block' : 'none';
+    }
+    
+    function toggleLueftWohnFields() {
+      const art = document.getElementById('lueft-wohn-art').value;
+      document.getElementById('lueft-din-fields').style.display = art === 'din' ? 'block' : 'none';
+      document.getElementById('lueft-raum-einzeln').style.display = art === 'raum' ? 'block' : 'none';
+    }
+    
+    function toggleLueftGewFields() {
+      const art = document.getElementById('lueft-gew-art').value;
+      document.getElementById('lueft-gew-person').style.display = art === 'person' ? 'block' : 'none';
+      document.getElementById('lueft-gew-volumen').style.display = art === 'volumen' ? 'block' : 'none';
+    }
+    
+    function calcLueftungNeu() {
+      const gebaeude = document.getElementById('lueft-gebaeude').value;
+      let volumenstrom = 0;
+      let geschw = 3; // Default für Wohnbau
+      let typ = 'Rohr';
+      
+      if (gebaeude === 'wohnung') {
+        const art = document.getElementById('lueft-wohn-art').value;
+        if (art === 'din') {
+          const wfl = parseFloat(document.getElementById('lueft-wfl').value);
+          const pers = parseFloat(document.getElementById('lueft-pers').value) || 4;
+          const stufe = parseFloat(document.getElementById('lueft-stufe2').value);
+          if (isNaN(wfl)) { document.getElementById('lueft-result').innerHTML = '<div class="danger">Bitte Wohnfläche eingeben</div>'; return; }
+          // DIN 1946-6: Nennlüftung ca. 30 m³/h pro Person oder 0,5/h * Volumen
+          const volumen = wfl * 2.5;
+          const nachPers = pers * 30;
+          const nachVol = volumen * stufe;
+          volumenstrom = Math.max(nachPers, nachVol);
+        } else {
+          const raumtyp = document.getElementById('lueft-raumtyp').value;
+          const flaeche = parseFloat(document.getElementById('lueft-raumgroesse').value);
+          const hoehe = parseFloat(document.getElementById('lueft-raumhoehe').value) || 2.5;
+          if (isNaN(flaeche)) { document.getElementById('lueft-result').innerHTML = '<div class="danger">Bitte Raumgröße eingeben</div>'; return; }
+          const vol = flaeche * hoehe;
+          const lwRaten = {wohn: 0.5, kind: 0.5, kueche: 4, bad: 4, wc: 4, hwr: 2};
+          const minVol = {wohn: 0, kind: 0, kueche: 60, bad: 40, wc: 25, hwr: 20};
+          volumenstrom = Math.max(vol * lwRaten[raumtyp], minVol[raumtyp]);
+        }
+        geschw = 3;
+        typ = 'Rohr';
+      } else {
+        // Gewerbe
+        const art = document.getElementById('lueft-gew-art').value;
+        geschw = parseFloat(document.getElementById('lueft-geschw').value);
+        if (art === 'person') {
+          const nutzung = parseFloat(document.getElementById('lueft-nutzung').value);
+          const pers = parseFloat(document.getElementById('lueft-gew-pers').value);
+          if (isNaN(pers)) { document.getElementById('lueft-result').innerHTML = '<div class="danger">Bitte Personenzahl eingeben</div>'; return; }
+          volumenstrom = nutzung * pers;
+        } else {
+          const flaeche = parseFloat(document.getElementById('lueft-gew-flaeche').value);
+          const hoehe = parseFloat(document.getElementById('lueft-gew-hoehe').value) || 3;
+          const lw = parseFloat(document.getElementById('lueft-gew-lw').value);
+          if (isNaN(flaeche)) { document.getElementById('lueft-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>'; return; }
+          volumenstrom = flaeche * hoehe * lw;
+        }
+        typ = 'Kanal';
+      }
+      
+      // Durchmesser berechnen: V = A * v => A = V/v => d = sqrt(4A/π)
+      const volLs = volumenstrom / 3600; // m³/s
+      const flaeche = volLs / geschw; // m²
+      const durchmesser = Math.sqrt(4 * flaeche / Math.PI) * 1000; // mm
+      
+      // Empfohlener Durchmesser
+      let rohre, empf;
+      if (gebaeude === 'wohnung') {
+        rohre = [75, 90, 100, 125, 160, 200];
+        empf = rohre.find(r => r >= durchmesser) || 200;
+      } else {
+        rohre = [160, 200, 250, 315, 400, 500, 630, 800];
+        empf = rohre.find(r => r >= durchmesser) || 800;
+      }
+      
+      document.getElementById('lueft-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Volumenstrom:</span><span><strong>${volumenstrom.toFixed(0)} m³/h</strong></span></div>
+          <div class="result-item"><span>Bei ${geschw} m/s:</span><span>min. Ø ${durchmesser.toFixed(0)} mm</span></div>
+          <div class="result-item"><span>Empf. ${typ}:</span><span><strong>Ø ${empf} mm</strong></span></div>
+          ${gebaeude === 'wohnung' ? `<div class="result-item"><span>Flexrohr/Wickelfalz</span><span></span></div>` : ''}
+        </div>`;
+    }
+    
+    function calcTWW() {
+      const personen = parseFloat(document.getElementById('tww-personen').value);
+      const profil = parseFloat(document.getElementById('tww-profil').value);
+      if (isNaN(personen)) { document.getElementById('tww-result').innerHTML = '<div class="danger">Bitte Personenzahl eingeben</div>'; return; }
+      const tagesbedarf = personen * profil;
+      const speicher = Math.ceil(tagesbedarf * 1.5 / 50) * 50;
+      const leistung = tagesbedarf * 4.186 * 45 / 3600 / 2;
+      document.getElementById('tww-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Tagesbedarf 60°C:</span><span>${tagesbedarf.toFixed(0)} Liter</span></div><div class="result-item"><span>Empf. Speicher:</span><span><strong>${speicher} Liter</strong></span></div><div class="result-item"><span>Empf. Heizleistung:</span><span>${leistung.toFixed(1)} kW</span></div></div>`;
+    }
+    
+    function calcKaelte() {
+      const flaeche = parseFloat(document.getElementById('kaelte-flaeche').value);
+      const wattProM2 = parseFloat(document.getElementById('kaelte-typ').value);
+      if (isNaN(flaeche)) { document.getElementById('kaelte-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>'; return; }
+      const kuehllast = flaeche * wattProM2;
+      const btu = kuehllast * 3.412;
+      let empf = '2,5 kW';
+      if (kuehllast > 2500) empf = '3,5 kW';
+      if (kuehllast > 4000) empf = '5,0 kW';
+      if (kuehllast > 6000) empf = '7,0 kW';
+      if (kuehllast > 8000) empf = 'Multi-Split';
+      document.getElementById('kaelte-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Kühllast:</span><span><strong>${kuehllast.toFixed(0)} W</strong> (${(kuehllast/1000).toFixed(2)} kW)</span></div><div class="result-item"><span>In BTU/h:</span><span>${btu.toFixed(0)}</span></div><div class="result-item"><span>Empf. Gerät:</span><span><strong>${empf}</strong></span></div></div>`;
+    }
+  </script>
+  <style>
+    .troubleshoot-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .troubleshoot-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .troubleshoot-solutions { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .troubleshoot-card.active .troubleshoot-solutions { display: block; }
+    .troubleshoot-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+  </style>
+</body>
+</html>

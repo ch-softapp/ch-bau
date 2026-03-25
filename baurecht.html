@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0891b2">
+  <title>ch-Bau - Baurecht/VOB</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #0891b2; --primary-dark: #0e7490; }
+    .app-header { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
+  </style>
+</head>
+<body class="gewerk-baurecht">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht" selected>📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>📋 Baurecht / VOB</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Fristen · Abnahme · Gewährleistung · Vergabe</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'fristen')">Fristen</button>
+        <button class="tab" onclick="switchTab(this, 'abnahme')">Abnahme</button>
+        <button class="tab" onclick="switchTab(this, 'maengel')">Mängel</button>
+        <button class="tab" onclick="switchTab(this, 'nachtraege')">Nachträge</button>
+        <button class="tab" onclick="switchTab(this, 'hoai')">HOAI</button>
+        <button class="tab" onclick="switchTab(this, 'vergabe')">Vergabe</button>
+        <button class="tab" onclick="switchTab(this, 'bauordnung')">LBO</button>
+        <button class="tab" onclick="switchTab(this, 'sicherheit')">Sicherheit</button>
+        <button class="tab" onclick="switchTab(this, 'rechner')">Rechner</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- FRISTEN -->
+      <div id="fristen" class="tab-content active">
+        <h2>⏱️ Wichtige Fristen</h2>
+        
+        <h3>VOB/B Fristen</h3>
+        <table class="data-table">
+          <thead><tr><th>Frist</th><th>Dauer</th><th>Fundstelle</th></tr></thead>
+          <tbody>
+            <tr><td>Angebotsbindefrist</td><td>30 Kalendertage</td><td>§ 10 VOB/A</td></tr>
+            <tr><td>Zuschlagsfrist</td><td>30 Kalendertage</td><td>§ 10 VOB/A</td></tr>
+            <tr><td>Ausführungsbeginn nach Aufforderung</td><td>12 Werktage</td><td>§ 5 Abs. 2 VOB/B</td></tr>
+            <tr><td>Behinderungsanzeige</td><td>Unverzüglich</td><td>§ 6 Abs. 1 VOB/B</td></tr>
+            <tr><td>Bedenkenanzeige</td><td>Unverzüglich</td><td>§ 4 Abs. 3 VOB/B</td></tr>
+            <tr><td>Abnahme nach Fertigstellungsanzeige</td><td>12 Werktage</td><td>§ 12 Abs. 1 VOB/B</td></tr>
+            <tr><td>Schlussrechnung nach Abnahme</td><td>Angemessen (2-3 Mon.)</td><td>§ 14 Abs. 3 VOB/B</td></tr>
+            <tr><td>Prüffrist Schlussrechnung</td><td>max. 2 Monate</td><td>§ 16 Abs. 3 VOB/B</td></tr>
+            <tr><td>Zahlung nach prüfbarer Rechnung</td><td>30 Tage</td><td>§ 16 Abs. 3 VOB/B</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Gewährleistungsfristen</h3>
+        <table class="data-table">
+          <thead><tr><th>Vertragsart</th><th>Bauwerk</th><th>Sonstiges</th></tr></thead>
+          <tbody>
+            <tr><td><strong>VOB/B</strong></td><td>4 Jahre</td><td>2 Jahre</td></tr>
+            <tr><td><strong>BGB Werkvertrag</strong></td><td>5 Jahre</td><td>2 Jahre</td></tr>
+            <tr><td><strong>BGB Kaufvertrag</strong></td><td>—</td><td>2 Jahre</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:#6b7280;">Beginn: Ab Abnahme (VOB) bzw. Übergabe (BGB)</p>
+        
+        <h3 style="margin-top:20px">Verjährung Mängelansprüche</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Arglistig verschwiegene Mängel</td><td>3 Jahre ab Kenntnis, max. 10 Jahre</td></tr>
+            <tr><td>Organisationsverschulden</td><td>5 Jahre (BGB)</td></tr>
+            <tr><td>Bauträgervertrag</td><td>5 Jahre (zwingend BGB)</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Achtung bei VOB-Vertrag</h4>
+          <p>VOB/B muss als Ganzes vereinbart werden! Einzelne Änderungen können zur Unwirksamkeit der VOB/B-Regelungen führen.</p>
+        </div>
+      </div>
+
+      <!-- ABNAHME -->
+      <div id="abnahme" class="tab-content">
+        <h2>✅ Abnahme</h2>
+        
+        <h3>Abnahmearten (§ 12 VOB/B)</h3>
+        <table class="data-table">
+          <thead><tr><th>Art</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Förmliche Abnahme</strong></td><td>Gemeinsame Begehung mit Protokoll</td></tr>
+            <tr><td><strong>Fiktive Abnahme</strong></td><td>12 Werktage nach Fertigstellungsanzeige ohne Reaktion</td></tr>
+            <tr><td><strong>Konkludente Abnahme</strong></td><td>Schlüssiges Verhalten (Bezug, Nutzung)</td></tr>
+            <tr><td><strong>Teilabnahme</strong></td><td>Für in sich abgeschlossene Teile</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Wirkungen der Abnahme</h3>
+        <div class="info-box">
+          <ul style="margin:10px 0 0 20px">
+            <li><strong>Gefahrübergang</strong> auf den AG</li>
+            <li><strong>Beweislastumkehr</strong> für Mängel</li>
+            <li>Beginn der <strong>Gewährleistungsfrist</strong></li>
+            <li>Beginn der <strong>Verjährungsfrist</strong></li>
+            <li><strong>Vergütungsanspruch</strong> wird fällig</li>
+            <li>Verlust von <strong>Vertragsstrafe</strong>-Ansprüchen (wenn nicht vorbehalten)</li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Abnahmeverweigerung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Wesentliche Mängel</td><td>Abnahme darf verweigert werden</td></tr>
+            <tr><td>Unwesentliche Mängel</td><td>Abnahme darf NICHT verweigert werden</td></tr>
+            <tr><td>Bekannte Mängel</td><td>Vorbehalt bei Abnahme erklären!</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="danger" style="margin-top:20px">
+          <h4>🚨 Wichtig: Vorbehalte</h4>
+          <p>Vorbehalte (Mängel, Vertragsstrafe) <strong>müssen bei Abnahme erklärt werden</strong>, sonst gehen Ansprüche verloren!</p>
+        </div>
+      </div>
+
+      <!-- MÄNGEL -->
+      <div id="maengel" class="tab-content">
+        <h2>🔧 Mängelrechte</h2>
+        
+        <h3>Mängelrechte Übersicht</h3>
+        <table class="data-table">
+          <thead><tr><th>Anspruch</th><th>VOB/B</th><th>BGB</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Nacherfüllung</strong></td><td>§ 13 Abs. 5</td><td>§ 635</td></tr>
+            <tr><td><strong>Selbstvornahme</strong></td><td>§ 13 Abs. 5 Nr. 2</td><td>§ 637</td></tr>
+            <tr><td><strong>Minderung</strong></td><td>§ 13 Abs. 6</td><td>§ 638</td></tr>
+            <tr><td><strong>Schadensersatz</strong></td><td>§ 13 Abs. 7</td><td>§ 634 Nr. 4</td></tr>
+            <tr><td><strong>Rücktritt</strong></td><td>—</td><td>§ 634 Nr. 3</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Mängelrüge (VOB/B)</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Form</td><td>Schriftlich empfohlen</td></tr>
+            <tr><td>Inhalt</td><td>Mangel konkret beschreiben</td></tr>
+            <tr><td>Fristsetzung</td><td>Angemessene Frist zur Beseitigung</td></tr>
+            <tr><td>Bei Verzug</td><td>Androhung Selbstvornahme/Ersatzvornahme</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Ablauf Mängelbeseitigung</h3>
+        <div class="info-box">
+          <ol style="margin:10px 0 0 20px">
+            <li><strong>Mängelrüge</strong> mit Fristsetzung</li>
+            <li>Frist abwarten (mind. 2-4 Wochen)</li>
+            <li>Bei Fristablauf: <strong>Nachfrist</strong> + Androhung</li>
+            <li>Selbstvornahme oder Minderung</li>
+            <li>Ggf. Schadensersatz</li>
+          </ol>
+        </div>
+        
+        <h3 style="margin-top:20px">Mängelarten</h3>
+        <table class="data-table">
+          <thead><tr><th>Art</th><th>Beispiel</th></tr></thead>
+          <tbody>
+            <tr><td>Offener Mangel</td><td>Bei Abnahme erkennbar</td></tr>
+            <tr><td>Versteckter Mangel</td><td>Erst später erkennbar</td></tr>
+            <tr><td>Arglistig verschwiegen</td><td>AN kennt Mangel, verschweigt</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- NACHTRÄGE -->
+      <div id="nachtraege" class="tab-content">
+        <h2>📝 Nachträge & Änderungen</h2>
+        
+        <h3>Nachtragsarten</h3>
+        <table class="data-table">
+          <thead><tr><th>Art</th><th>Beschreibung</th><th>Grundlage</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Geänderte Leistung</strong></td><td>AG ändert Ausführungsart</td><td>§ 2 Abs. 5 VOB/B</td></tr>
+            <tr><td><strong>Zusätzliche Leistung</strong></td><td>Neue, nicht beauftragte Leistung</td><td>§ 2 Abs. 6 VOB/B</td></tr>
+            <tr><td><strong>Mengenänderung > 10%</strong></td><td>Über-/Unterschreitung LV-Menge</td><td>§ 2 Abs. 3 VOB/B</td></tr>
+            <tr><td><strong>Anordnung AG</strong></td><td>Einseitige Anordnung</td><td>§ 1 Abs. 3, 4 VOB/B</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Nachtragsverfahren</h3>
+        <table class="data-table">
+          <thead><tr><th>Schritt</th><th>Aktion</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Ankündigung durch AN (unverzüglich)</td></tr>
+            <tr><td>2</td><td>Nachtragsangebot erstellen</td></tr>
+            <tr><td>3</td><td>Prüfung durch AG</td></tr>
+            <tr><td>4</td><td>Beauftragung/Ablehnung</td></tr>
+            <tr><td>5</td><td>Bei Ablehnung: Ausführung unter Vorbehalt</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Preisermittlung Nachtrag</h3>
+        <table class="data-table">
+          <thead><tr><th>Methode</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Vertragspreise</strong></td><td>Wenn vergleichbare Position im LV</td></tr>
+            <tr><td><strong>Neue Preise</strong></td><td>Auf Basis der Urkalkulation</td></tr>
+            <tr><td><strong>Ortsübliche Preise</strong></td><td>Wenn keine Urkalkulation</td></tr>
+            <tr><td><strong>Selbstkosten + Zuschläge</strong></td><td>Regiearbeiten</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Behinderung & Unterbrechung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Behinderungsanzeige</strong></td><td>Schriftlich, unverzüglich (§ 6 Abs. 1)</td></tr>
+            <tr><td><strong>Fristverlängerung</strong></td><td>Dauer der Behinderung + Anlaufzeit</td></tr>
+            <tr><td><strong>Mehrkosten</strong></td><td>Wenn AG Behinderung zu vertreten hat</td></tr>
+            <tr><td><strong>Unterbrechung > 3 Monate</strong></td><td>Kündigung möglich (§ 6 Abs. 7)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Nachtragskalkulation</h3>
+        <div class="form-group">
+          <label>Netto-Kosten (€)</label>
+          <input type="number" id="nt-kosten" placeholder="z.B. 5000" value="5000">
+        </div>
+        <div class="form-group">
+          <label>AGK-Zuschlag (%)</label>
+          <input type="number" id="nt-agk" placeholder="z.B. 12" value="12">
+        </div>
+        <div class="form-group">
+          <label>Wagnis & Gewinn (%)</label>
+          <input type="number" id="nt-wg" placeholder="z.B. 5" value="5">
+        </div>
+        <button class="btn" onclick="calcNachtrag()">Berechnen</button>
+        <div id="nt-result"></div>
+      </div>
+
+      <!-- VERGABE -->
+      <div id="vergabe" class="tab-content">
+        <h2>📑 Vergabe</h2>
+        
+        <h3>Schwellenwerte (Stand 2024)</h3>
+        <table class="data-table">
+          <thead><tr><th>Auftragsart</th><th>EU-Schwelle</th></tr></thead>
+          <tbody>
+            <tr><td>Bauaufträge</td><td>5.538.000 €</td></tr>
+            <tr><td>Liefer-/Dienstleistungen</td><td>221.000 €</td></tr>
+            <tr><td>Sektorenaufträge</td><td>443.000 €</td></tr>
+            <tr><td>Konzessionen</td><td>5.538.000 €</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px;font-size:12px;color:#6b7280;">Unterhalb: Nationale Vergabe nach VOB/A, UVgO</p>
+        
+        <h3 style="margin-top:20px">Vergabearten</h3>
+        <table class="data-table">
+          <thead><tr><th>Verfahren</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Öffentliche Ausschreibung</strong></td><td>Unbeschränkter Teilnehmerkreis</td></tr>
+            <tr><td><strong>Beschränkte Ausschreibung</strong></td><td>Mit/ohne Teilnahmewettbewerb</td></tr>
+            <tr><td><strong>Freihändige Vergabe</strong></td><td>Bis 10.000 € (Bau)</td></tr>
+            <tr><td><strong>Verhandlungsverfahren</strong></td><td>Bei komplexen Aufträgen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Wertungskriterien</h3>
+        <div class="info-box">
+          <p><strong>Wirtschaftlichstes Angebot</strong> (nicht billigstes!)</p>
+          <ul style="margin:10px 0 0 20px">
+            <li>Preis (50-70%)</li>
+            <li>Qualität, Technik</li>
+            <li>Termine, Bauzeit</li>
+            <li>Folgekosten, Lebenszykluskosten</li>
+            <li>Referenzen, Erfahrung</li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Angebotsausschluss</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Verspätet eingereicht</td><td>Zwingend</td></tr>
+            <tr><td>Nicht unterschrieben</td><td>Zwingend</td></tr>
+            <tr><td>Preise fehlen</td><td>Zwingend</td></tr>
+            <tr><td>Änderungen an Verdingungsunterlagen</td><td>Zwingend</td></tr>
+            <tr><td>Nebenangebote ohne Kennzeichnung</td><td>Zwingend</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- HOAI -->
+      <div id="hoai" class="tab-content">
+        <h2>📊 HOAI Honorarordnung</h2>
+        
+        <h3>Leistungsphasen nach § 34 HOAI</h3>
+        <table class="data-table">
+          <thead><tr><th>LP</th><th>Bezeichnung</th><th>%</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Grundlagenermittlung</td><td>2%</td></tr>
+            <tr><td>2</td><td>Vorplanung</td><td>7%</td></tr>
+            <tr><td>3</td><td>Entwurfsplanung</td><td>15%</td></tr>
+            <tr><td>4</td><td>Genehmigungsplanung</td><td>3%</td></tr>
+            <tr><td>5</td><td>Ausführungsplanung</td><td>25%</td></tr>
+            <tr><td>6</td><td>Vorbereitung der Vergabe</td><td>10%</td></tr>
+            <tr><td>7</td><td>Mitwirkung bei der Vergabe</td><td>4%</td></tr>
+            <tr><td>8</td><td>Objektüberwachung</td><td>32%</td></tr>
+            <tr><td>9</td><td>Objektbetreuung</td><td>2%</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Honorarzonen (Gebäude)</h3>
+        <table class="data-table">
+          <thead><tr><th>Zone</th><th>Anforderungen</th><th>Beispiele</th></tr></thead>
+          <tbody>
+            <tr><td>I</td><td>Sehr gering</td><td>Lager, Garagen</td></tr>
+            <tr><td>II</td><td>Gering</td><td>Wohnbauten einfach</td></tr>
+            <tr><td>III</td><td>Durchschnittlich</td><td>Wohnbauten gehoben, Büro</td></tr>
+            <tr><td>IV</td><td>Überdurchschnittlich</td><td>Krankenhäuser, Theater</td></tr>
+            <tr><td>V</td><td>Sehr hoch</td><td>Forschung, Hochsicherheit</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Anrechenbare Kosten</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Voll anrechenbar</strong></td><td>KG 300, 400</td></tr>
+            <tr><td><strong>Mitzuverarbeiten</strong></td><td>Vorhandene Bausubstanz</td></tr>
+            <tr><td><strong>Nicht anrechenbar</strong></td><td>KG 100, 200, 500, 600, 700</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Honorar überschlägig</h3>
+        <div class="form-group">
+          <label>Anrechenbare Kosten (€)</label>
+          <input type="number" id="hoai-kosten" placeholder="z.B. 500000" value="500000">
+        </div>
+        <div class="form-group">
+          <label>Honorarzone</label>
+          <select id="hoai-zone">
+            <option value="2">Zone II</option>
+            <option value="3" selected>Zone III</option>
+            <option value="4">Zone IV</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Leistungsphasen (%)</label>
+          <input type="number" id="hoai-lp" placeholder="z.B. 100" value="100">
+        </div>
+        <button class="btn" onclick="calcHoai()">Berechnen</button>
+        <div id="hoai-result"></div>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 HOAI 2021</h4>
+          <p>Seit 2021: Honorartafeln nur noch Orientierungswerte, keine verbindlichen Mindest-/Höchstsätze mehr!</p>
+        </div>
+      </div>
+
+      <!-- BAUORDNUNG -->
+      <div id="bauordnung" class="tab-content">
+        <h2>🏛️ Bauordnungsrecht</h2>
+        
+        <h3>Gebäudeklassen (MBO)</h3>
+        <table class="data-table">
+          <thead><tr><th>GK</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1a</strong></td><td>Freistehend, ≤7m, ≤2 NE, ≤400m²</td></tr>
+            <tr><td><strong>1b</strong></td><td>Freistehend, land-/forstwirtsch.</td></tr>
+            <tr><td><strong>2</strong></td><td>≤7m, ≤2 NE, ≤400m²</td></tr>
+            <tr><td><strong>3</strong></td><td>≤7m, sonstige</td></tr>
+            <tr><td><strong>4</strong></td><td>≤13m, ≤400m² je NE</td></tr>
+            <tr><td><strong>5</strong></td><td>>13m oder >400m² je NE</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sonderbauten (§ 2 Abs. 4 MBO)</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Hochhäuser</td><td>>22 m Höhe</td></tr>
+            <tr><td>Versammlungsstätten</td><td>>200 Personen</td></tr>
+            <tr><td>Verkaufsstätten</td><td>>800 m² Verkaufsfläche</td></tr>
+            <tr><td>Büro/Verwaltung</td><td>>400 m² oder GK 5</td></tr>
+            <tr><td>Beherbergung</td><td>>12 Betten</td></tr>
+            <tr><td>Krankenhäuser</td><td>Alle</td></tr>
+            <tr><td>Schulen</td><td>Alle</td></tr>
+            <tr><td>Garagen</td><td>>100 m² bzw. >1000 m² (Groß)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abstandsflächen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Tiefe</strong></td><td>0,4 × H (Kern) / 0,2 × H (Gewerbe)</td></tr>
+            <tr><td><strong>Minimum</strong></td><td>3 m</td></tr>
+            <tr><td><strong>An Grenze</strong></td><td>Grenzgaragen, Nebenanlagen</td></tr>
+            <tr><td><strong>Schmalseitenprivileg</strong></td><td>0,25 × H bei ≤16m Breite</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Stellplätze</h3>
+        <table class="data-table">
+          <thead><tr><th>Nutzung</th><th>Richtwert</th></tr></thead>
+          <tbody>
+            <tr><td>Wohnung</td><td>1-2 je WE</td></tr>
+            <tr><td>Büro</td><td>1 je 30-40 m² NF</td></tr>
+            <tr><td>Verkauf</td><td>1 je 30-50 m² VF</td></tr>
+            <tr><td>Restaurant</td><td>1 je 6-10 Sitzplätze</td></tr>
+            <tr><td>Hotel</td><td>1 je 2-4 Betten</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verfahrensarten</h3>
+        <table class="data-table">
+          <thead><tr><th>Verfahren</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Genehmigungsfrei</strong></td><td>Nebengebäude, kleine Vorhaben</td></tr>
+            <tr><td><strong>Freistellung</strong></td><td>GK 1-3 im B-Plan-Gebiet</td></tr>
+            <tr><td><strong>Vereinfacht</strong></td><td>GK 1-3 ohne Sonderbau</td></tr>
+            <tr><td><strong>Normal</strong></td><td>GK 4, 5, Sonderbauten</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SICHERHEITEN -->
+      <div id="sicherheit" class="tab-content">
+        <h2>💰 Sicherheiten</h2>
+        
+        <h3>Sicherheitsleistungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Art</th><th>Höhe</th><th>Zweck</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Vertragserfüllungsbürgschaft</strong></td><td>5-10%</td><td>Absicherung während Bauzeit</td></tr>
+            <tr><td><strong>Mängelansprüchebürgschaft</strong></td><td>3-5%</td><td>Absicherung Gewährleistung</td></tr>
+            <tr><td><strong>Vorauszahlungsbürgschaft</strong></td><td>100% der Vorauszahlung</td><td>Absicherung von Vorschüssen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sicherungseinbehalt</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Höhe üblich</td><td>5% der Schlussrechnung</td></tr>
+            <tr><td>Ablösung durch Bürgschaft</td><td>Muss ermöglicht werden</td></tr>
+            <tr><td>Verzinsung</td><td>Nach BGH: Ja, angemessen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Bauhandwerkersicherung (§ 650f BGB)</h3>
+        <div class="info-box">
+          <p><strong>Anspruch auf Sicherheit</strong> für Vergütung</p>
+          <ul style="margin:10px 0 0 20px">
+            <li>Anspruch jederzeit möglich</li>
+            <li>Höhe: Vergütung inkl. Nachträge</li>
+            <li>Frist: Angemessen (ca. 14 Tage)</li>
+            <li>Bei Nichtleistung: Leistungsverweigerungsrecht</li>
+          </ul>
+        </div>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Gilt nicht bei:</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Öffentliche Auftraggeber</li>
+            <li>Verbraucher (Einfamilienhaus zur Eigennutzung)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RECHNER -->
+      <div id="rechner" class="tab-content">
+        <h2>🧮 Fristenrechner</h2>
+        
+        <h3>📐 Gewährleistungsende berechnen</h3>
+        <div class="form-group">
+          <label>Abnahmedatum</label>
+          <input type="date" id="frist-abnahme">
+        </div>
+        <div class="form-group">
+          <label>Vertragstyp</label>
+          <select id="frist-vertrag">
+            <option value="4">VOB/B Bauwerk (4 Jahre)</option>
+            <option value="2">VOB/B sonstige (2 Jahre)</option>
+            <option value="5">BGB Bauwerk (5 Jahre)</option>
+            <option value="2">BGB sonstige (2 Jahre)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcGewaehrleistung()">Berechnen</button>
+        <div id="frist-result"></div>
+        
+        <h3 style="margin-top:30px">📐 Skonto berechnen</h3>
+        <div class="form-group">
+          <label>Rechnungsbetrag (€)</label>
+          <input type="number" id="skonto-betrag" placeholder="z.B. 50000">
+        </div>
+        <div class="form-group">
+          <label>Skonto (%)</label>
+          <select id="skonto-prozent">
+            <option value="2">2%</option>
+            <option value="3" selected>3%</option>
+            <option value="5">5%</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcSkonto()">Berechnen</button>
+        <div id="skonto-result"></div>
+        
+        <h3 style="margin-top:30px">📐 Sicherheitseinbehalt</h3>
+        <div class="form-group">
+          <label>Schlussrechnungssumme (€)</label>
+          <input type="number" id="sicher-betrag" placeholder="z.B. 100000">
+        </div>
+        <div class="form-group">
+          <label>Einbehalt (%)</label>
+          <select id="sicher-prozent">
+            <option value="3">3%</option>
+            <option value="5" selected>5%</option>
+            <option value="10">10%</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcSicherheit()">Berechnen</button>
+        <div id="sicher-result"></div>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Baurecht</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📄 Vertragstypen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Einheitspreisvertrag</strong></td><td>Mengen nach Aufmaß, EP fest</td></tr>
+              <tr><td><strong>Pauschalvertrag</strong></td><td>Festpreis für definierte Leistung</td></tr>
+              <tr><td><strong>Stundenlohnvertrag</strong></td><td>Abrechnung nach Aufwand</td></tr>
+              <tr><td><strong>GMP-Vertrag</strong></td><td>Garantierter Maximalpreis</td></tr>
+              <tr><td><strong>Kostenerstattungsvertrag</strong></td><td>Kosten + Zuschlag</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔢 Abschlagszahlungen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Anspruch</td><td>Für erbrachte Leistungen (§ 632a BGB)</td></tr>
+              <tr><td>Höhe VOB</td><td>Bis 90% der erbrachten Leistung</td></tr>
+              <tr><td>Fälligkeit</td><td>21 Tage nach Zugang (VOB)</td></tr>
+              <tr><td>Nachweis</td><td>Aufstellung der erbrachten Leistungen</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📊 Nachträge</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Nachtragsarten:</h4>
+            <table class="data-table">
+              <tr><td>Geänderte Leistung</td><td>§ 2 Abs. 5 VOB/B</td></tr>
+              <tr><td>Zusätzliche Leistung</td><td>§ 2 Abs. 6 VOB/B</td></tr>
+              <tr><td>Mengenänderung >10%</td><td>§ 2 Abs. 3 VOB/B</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#dc2626;">Wichtig: Ankündigung VOR Ausführung!</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>⏸️ Behinderung & Unterbrechung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Behinderungsanzeige</strong></td><td>Unverzüglich, schriftlich</td></tr>
+              <tr><td><strong>Inhalt</strong></td><td>Art, Grund, voraussichtliche Dauer</td></tr>
+              <tr><td><strong>Folgen</strong></td><td>Fristverlängerung, ggf. Mehrkosten</td></tr>
+              <tr><td><strong>Unterbrechung >3 Monate</strong></td><td>Kündigungsrecht (§ 6 Abs. 7 VOB/B)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>❌ Kündigung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Kündigungsgründe AG:</h4>
+            <table class="data-table">
+              <tr><td>Freie Kündigung</td><td>§ 8 Abs. 1 VOB/B - jederzeit</td></tr>
+              <tr><td>Wichtiger Grund</td><td>§ 8 Abs. 2 VOB/B</td></tr>
+              <tr><td>Insolvenz AN</td><td>§ 8 Abs. 2 Nr. 1 VOB/B</td></tr>
+            </table>
+            <h4 style="margin-top:15px;">Kündigungsgründe AN:</h4>
+            <table class="data-table">
+              <tr><td>Zahlungsverzug</td><td>§ 9 Abs. 1 Nr. 1 VOB/B</td></tr>
+              <tr><td>Unterbrechung >3 Mon.</td><td>§ 6 Abs. 7 VOB/B</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Wichtige Vorschriften</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>VOB/A</strong></td><td>Vergabe- und Vertragsordnung (Vergabe)</td></tr>
+              <tr><td><strong>VOB/B</strong></td><td>Allg. Vertragsbedingungen</td></tr>
+              <tr><td><strong>VOB/C</strong></td><td>Allg. Techn. Vertragsbedingungen (ATV)</td></tr>
+              <tr><td><strong>BGB</strong></td><td>Werkvertragsrecht §§ 631 ff.</td></tr>
+              <tr><td><strong>HOAI</strong></td><td>Honorarordnung für Architekten</td></tr>
+              <tr><td><strong>VgV</strong></td><td>Vergabeverordnung</td></tr>
+              <tr><td><strong>GWB</strong></td><td>Gesetz gegen Wettbewerbsbeschränkungen</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'fristen')">
+      <span class="nav-icon">⏱️</span><span class="nav-label">Fristen</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'abnahme')">
+      <span class="nav-icon">✅</span><span class="nav-label">Abnahme</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[2], 'maengel')">
+      <span class="nav-icon">🔧</span><span class="nav-label">Mängel</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[5], 'rechner')">
+      <span class="nav-icon">🧮</span><span class="nav-label">Rechner</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[6], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcGewaehrleistung() {
+      const abnahme = document.getElementById('frist-abnahme').value;
+      const jahre = parseInt(document.getElementById('frist-vertrag').value);
+      if (!abnahme) { document.getElementById('frist-result').innerHTML = '<div class="danger">Bitte Datum eingeben</div>'; return; }
+      
+      const start = new Date(abnahme);
+      const ende = new Date(start);
+      ende.setFullYear(ende.getFullYear() + jahre);
+      
+      const heute = new Date();
+      const diffTime = ende - heute;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diffMonths = Math.floor(diffDays / 30);
+      
+      const status = diffDays > 0 ? 
+        `<span style="color:#16a34a">✅ Noch ${diffDays} Tage (${diffMonths} Monate)</span>` :
+        `<span style="color:#dc2626">❌ Abgelaufen seit ${Math.abs(diffDays)} Tagen</span>`;
+      
+      document.getElementById('frist-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Abnahme:</span><span>${start.toLocaleDateString('de-DE')}</span></div>
+          <div class="result-item"><span>Gewährleistung:</span><span>${jahre} Jahre</span></div>
+          <div class="result-item"><span>Ende:</span><span><strong>${ende.toLocaleDateString('de-DE')}</strong></span></div>
+          <div class="result-item"><span>Status:</span><span>${status}</span></div>
+        </div>`;
+    }
+    
+    function calcSkonto() {
+      const betrag = parseFloat(document.getElementById('skonto-betrag').value);
+      const prozent = parseFloat(document.getElementById('skonto-prozent').value);
+      if (isNaN(betrag)) { document.getElementById('skonto-result').innerHTML = '<div class="danger">Bitte Betrag eingeben</div>'; return; }
+      
+      const skonto = betrag * prozent / 100;
+      const netto = betrag - skonto;
+      
+      document.getElementById('skonto-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Rechnungsbetrag:</span><span>${betrag.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Skonto ${prozent}%:</span><span>- ${skonto.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Zahlbetrag:</span><span><strong>${netto.toLocaleString('de-DE')} €</strong></span></div>
+        </div>`;
+    }
+    
+    function calcSicherheit() {
+      const betrag = parseFloat(document.getElementById('sicher-betrag').value);
+      const prozent = parseFloat(document.getElementById('sicher-prozent').value);
+      if (isNaN(betrag)) { document.getElementById('sicher-result').innerHTML = '<div class="danger">Bitte Betrag eingeben</div>'; return; }
+      
+      const einbehalt = betrag * prozent / 100;
+      const auszahlung = betrag - einbehalt;
+      
+      document.getElementById('sicher-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Schlussrechnung:</span><span>${betrag.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Einbehalt ${prozent}%:</span><span>${einbehalt.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Auszahlung:</span><span><strong>${auszahlung.toLocaleString('de-DE')} €</strong></span></div>
+        </div>
+        <div class="info-box" style="margin-top:10px">
+          <p style="font-size:12px;">💡 Einbehalt kann durch Bürgschaft abgelöst werden</p>
+        </div>`;
+    }
+    
+    function calcNachtrag() {
+      const kosten = parseFloat(document.getElementById('nt-kosten').value);
+      const agk = parseFloat(document.getElementById('nt-agk').value);
+      const wg = parseFloat(document.getElementById('nt-wg').value);
+      
+      if (isNaN(kosten)) { document.getElementById('nt-result').innerHTML = '<div class="danger">Bitte Kosten eingeben</div>'; return; }
+      
+      const agkBetrag = kosten * agk / 100;
+      const zwischensumme = kosten + agkBetrag;
+      const wgBetrag = zwischensumme * wg / 100;
+      const netto = zwischensumme + wgBetrag;
+      const brutto = netto * 1.19;
+      
+      document.getElementById('nt-result').innerHTML = `
+        <div class="result">
+          <h3>Nachtragskalkulation</h3>
+          <div class="result-item"><span>Einzelkosten:</span><span>${kosten.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>+ AGK ${agk}%:</span><span>${agkBetrag.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>+ W&G ${wg}%:</span><span>${wgBetrag.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Angebotssumme netto:</span><span><strong>${netto.toLocaleString('de-DE')} €</strong></span></div>
+          <div class="result-item"><span>Brutto (19% MwSt):</span><span><strong>${brutto.toLocaleString('de-DE')} €</strong></span></div>
+        </div>`;
+    }
+    
+    function calcHoai() {
+      const kosten = parseFloat(document.getElementById('hoai-kosten').value);
+      const zone = parseInt(document.getElementById('hoai-zone').value);
+      const lp = parseFloat(document.getElementById('hoai-lp').value);
+      
+      if (isNaN(kosten)) { document.getElementById('hoai-result').innerHTML = '<div class="danger">Bitte Kosten eingeben</div>'; return; }
+      
+      // Vereinfachte Honorarermittlung (Orientierungswerte)
+      // Basierend auf HOAI 2021 Honorartafel Zone III Mitte
+      let faktor;
+      if (zone === 2) faktor = 0.10;
+      else if (zone === 3) faktor = 0.12;
+      else faktor = 0.14;
+      
+      // Degression bei hohen Kosten
+      let honorar;
+      if (kosten <= 500000) {
+        honorar = kosten * faktor;
+      } else if (kosten <= 2000000) {
+        honorar = kosten * faktor * 0.9;
+      } else {
+        honorar = kosten * faktor * 0.8;
+      }
+      
+      const anteil = honorar * lp / 100;
+      
+      document.getElementById('hoai-result').innerHTML = `
+        <div class="result">
+          <h3>Honorar (Orientierung)</h3>
+          <div class="result-item"><span>Anrechenbare Kosten:</span><span>${kosten.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Honorarzone:</span><span>${zone}</span></div>
+          <div class="result-item"><span>Honorar 100%:</span><span>${honorar.toLocaleString('de-DE')} €</span></div>
+          <div class="result-item"><span>Leistungsphasen ${lp}%:</span><span><strong>${anteil.toLocaleString('de-DE')} €</strong></span></div>
+        </div>
+        <div class="warning" style="margin-top:10px">
+          <p>⚠️ Überschlag! Genaue Ermittlung nach HOAI-Honorartafeln erforderlich.</p>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

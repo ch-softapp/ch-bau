@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#6b7280">
+  <title>ch-Bau - Impressum</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #6b7280; --primary-dark: #4b5563; }
+    .app-header { background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%); }
+    .impressum-section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .impressum-section h2 { color: var(--primary-dark); margin-bottom: 15px; font-size: 1.3em; }
+    .impressum-section h3 { color: #374151; margin: 20px 0 10px; font-size: 1.1em; }
+    .impressum-section p, .impressum-section li { color: #4b5563; line-height: 1.6; }
+    .impressum-section ul { margin: 10px 0 10px 20px; }
+    .contact-info { background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .contact-info p { margin: 5px 0; }
+    .disclaimer-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+    .disclaimer-box h4 { color: #92400e; margin-bottom: 10px; }
+    .support-box { background: #dbeafe; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0; }
+    .support-box h3 { color: #1e40af; margin-bottom: 15px; }
+    .support-btn { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 5px; }
+    .support-btn:hover { background: #2563eb; }
+    .support-btn.paypal { background: #0070ba; }
+    .support-btn.paypal:hover { background: #005ea6; }
+    .version-info { text-align: center; color: #9ca3af; font-size: 0.9em; margin-top: 30px; padding: 20px; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body class="gewerk-impressum">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum" selected>ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content" style="padding: 15px;">
+    <div class="welcome">
+      <h2>ℹ️ Impressum & Rechtliches</h2>
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="support-box">
+      <h3>☕ Unterstützung & Updates</h3>
+      <p style="margin-bottom:15px;">Diese App wird kontinuierlich gepflegt und erweitert.<br>Wenn sie dir hilft, freue ich mich über einen Kaffee!</p>
+      <a href="https://www.paypal.me/chh2107" target="_blank" rel="noopener" class="support-btn paypal">
+        💙 PayPal @chh2107
+      </a>
+    </div>
+
+    <!-- IMPRESSUM -->
+    <div class="impressum-section">
+      <h2>📋 Impressum</h2>
+      
+      <div class="contact-info">
+        <p><strong>Christoph Hoher</strong></p>
+        <p>Sederlitz 3</p>
+        <p>88213 Ravensburg</p>
+        <p>Deutschland</p>
+      </div>
+      
+      <h3>Kontakt</h3>
+      <p>Bei Fragen, Fehlern oder Verbesserungsvorschlägen freue ich mich über Feedback.</p>
+    </div>
+
+    <!-- HAFTUNGSAUSSCHLUSS -->
+    <div class="impressum-section">
+      <h2>⚠️ Haftungsausschluss</h2>
+      
+      <div class="disclaimer-box">
+        <h4>Wichtiger Hinweis</h4>
+        <p><strong>Diese App dient ausschließlich als Entscheidungshilfe und Nachschlagewerk.</strong></p>
+      </div>
+      
+      <h3>Keine Gewähr</h3>
+      <p>Die in dieser App enthaltenen Informationen, Tabellen, Formeln und Berechnungen wurden mit größter Sorgfalt zusammengestellt. Dennoch kann keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der Angaben übernommen werden.</p>
+      
+      <h3>Eigenverantwortliche Prüfung</h3>
+      <p>Der Nutzer ist verpflichtet, alle Angaben und Berechnungsergebnisse eigenverantwortlich zu prüfen und mit den aktuell gültigen Normen, Vorschriften und Regelwerken abzugleichen. Dies gilt insbesondere für:</p>
+      <ul>
+        <li>Technische Berechnungen (Querschnitte, Lasten, Dimensionierungen)</li>
+        <li>Normenwerte und -anforderungen</li>
+        <li>Gesetzliche Vorschriften und Grenzwerte</li>
+        <li>Sicherheitsrelevante Angaben</li>
+      </ul>
+      
+      <h3>Kein Ersatz für Fachplanung</h3>
+      <p>Diese App ersetzt in keinem Fall:</p>
+      <ul>
+        <li>Die Planung und Berechnung durch qualifizierte Fachleute</li>
+        <li>Die Prüfung durch Sachverständige</li>
+        <li>Die Einhaltung der anerkannten Regeln der Technik</li>
+        <li>Die Beachtung der jeweils aktuellen Normen und Vorschriften</li>
+      </ul>
+      
+      <h3>Haftungsbeschränkung</h3>
+      <p>Der Autor übernimmt keinerlei Haftung für Schäden, die durch die Nutzung oder Nichtnutzung der in dieser App bereitgestellten Informationen entstehen. Dies gilt auch für Schäden, die durch fehlerhafte oder unvollständige Angaben verursacht werden.</p>
+      
+      <h3>Aktualität</h3>
+      <p>Normen, Gesetze und technische Regelwerke unterliegen ständigen Änderungen. Der Nutzer ist selbst dafür verantwortlich, die Aktualität der verwendeten Angaben zu überprüfen.</p>
+    </div>
+
+    <!-- COPYRIGHT -->
+    <div class="impressum-section">
+      <h2>©️ Urheberrecht</h2>
+      <p><strong>© 2024-2025 Christoph Hoher</strong></p>
+      <p>Alle Rechte vorbehalten. Die Inhalte dieser App sind urheberrechtlich geschützt. Jede Verwertung außerhalb der engen Grenzen des Urheberrechtsgesetzes ist ohne Zustimmung des Autors unzulässig.</p>
+    </div>
+
+    <!-- VERSION -->
+    <div class="version-info">
+      <p><strong>ch-Bau</strong></p>
+      <p>Version 3.5.5</p>
+      <p>11 Gewerke · Offline-fähig · PWA</p>
+      <p style="margin-top:10px;">Made with ❤️ für das Handwerk</p>
+    </div>
+  </main>
+
+  <script src="./js/app.js"></script>
+</body>
+</html>

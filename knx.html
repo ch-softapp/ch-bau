@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#06b6d4">
+  <title>ch-Bau - KNX/Smart Home</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #06b6d4; --primary-dark: #0891b2; }
+    .app-header { background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%); }
+  </style>
+</head>
+<body class="gewerk-knx">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx" selected>🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🏠 KNX / Smart Home</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Gebäudeautomation · Bussysteme · Programmierung</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'grundlagen')">Grundlagen</button>
+        <button class="tab" onclick="switchTab(this, 'topologie')">Topologie</button>
+        <button class="tab" onclick="switchTab(this, 'adressen')">Adressen</button>
+        <button class="tab" onclick="switchTab(this, 'geraete')">Geräte</button>
+        <button class="tab" onclick="switchTab(this, 'installation')">Installation</button>
+        <button class="tab" onclick="switchTab(this, 'ets')">ETS</button>
+        <button class="tab" onclick="switchTab(this, 'diagnose')">Diagnose</button>
+        <button class="tab" onclick="switchTab(this, 'dali')">DALI</button>
+        <button class="tab" onclick="switchTab(this, 'funk')">Funk</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- GRUNDLAGEN -->
+      <div id="grundlagen" class="tab-content active">
+        <h2>📚 KNX Grundlagen</h2>
+        
+        <h3>Was ist KNX?</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Standard</strong></td><td>EN 50090, ISO/IEC 14543</td></tr>
+            <tr><td><strong>Medium</strong></td><td>TP (Twisted Pair), PL, RF, IP</td></tr>
+            <tr><td><strong>Spannung</strong></td><td>29 V DC (21-30 V)</td></tr>
+            <tr><td><strong>Datenrate</strong></td><td>9600 Bit/s (TP)</td></tr>
+            <tr><td><strong>Telegrammlänge</strong></td><td>max. 23 Bytes</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Bussysteme Vergleich</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Protokoll</th><th>Vorteile</th></tr></thead>
+          <tbody>
+            <tr><td><strong>KNX</strong></td><td>Offener Standard</td><td>Herstellerunabhängig, bewährt</td></tr>
+            <tr><td><strong>Loxone</strong></td><td>Proprietär</td><td>Einfache Konfiguration</td></tr>
+            <tr><td><strong>HomeMatic</strong></td><td>Proprietär</td><td>Günstig, Funk</td></tr>
+            <tr><td><strong>DALI</strong></td><td>IEC 62386</td><td>Speziell für Licht</td></tr>
+            <tr><td><strong>Modbus</strong></td><td>Offen</td><td>Industrie, HLSK</td></tr>
+            <tr><td><strong>BACnet</strong></td><td>ASHRAE 135</td><td>Gebäudeautomation</td></tr>
+            <tr><td><strong>EnOcean</strong></td><td>ISO/IEC 14543</td><td>Energieautark, Funk</td></tr>
+            <tr><td><strong>Zigbee</strong></td><td>IEEE 802.15.4</td><td>Mesh-Netzwerk</td></tr>
+            <tr><td><strong>Z-Wave</strong></td><td>Proprietär</td><td>Zuverlässig, Funk</td></tr>
+            <tr><td><strong>Matter</strong></td><td>Offen (neu)</td><td>Universell, IP-basiert</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">KNX Medien</h3>
+        <table class="data-table">
+          <thead><tr><th>Medium</th><th>Bezeichnung</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>TP</strong></td><td>Twisted Pair</td><td>Standard, Neubau</td></tr>
+            <tr><td><strong>PL</strong></td><td>Powerline</td><td>Bestand, über 230V</td></tr>
+            <tr><td><strong>RF</strong></td><td>Funk</td><td>Nachrüstung</td></tr>
+            <tr><td><strong>IP</strong></td><td>Ethernet</td><td>Backbone, Visualisierung</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TOPOLOGIE -->
+      <div id="topologie" class="tab-content">
+        <h2>🔗 Topologie</h2>
+        
+        <h3>KNX Struktur</h3>
+        <table class="data-table">
+          <thead><tr><th>Ebene</th><th>Anzahl</th><th>Komponente</th></tr></thead>
+          <tbody>
+            <tr><td>Bereich</td><td>max. 15</td><td>Bereichskoppler (BK)</td></tr>
+            <tr><td>Linie/Bereich</td><td>max. 15</td><td>Linienkoppler (LK)</td></tr>
+            <tr><td>Teilnehmer/Linie</td><td>max. 64</td><td>Mit Linienverstärker: 256</td></tr>
+            <tr><td colspan="3" style="background:#f3f4f6;"><strong>Gesamt: max. 57.600 Teilnehmer</strong></td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Linienkonfiguration</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Max. Linienlänge</td><td><strong>1000 m</strong></td></tr>
+            <tr><td>Max. Abstand Teilnehmer-Netzteil</td><td><strong>350 m</strong></td></tr>
+            <tr><td>Max. Abstand Teilnehmer-Teilnehmer</td><td><strong>700 m</strong></td></tr>
+            <tr><td>Min. Abstand Netzteile</td><td><strong>200 m</strong></td></tr>
+            <tr><td>Teilnehmer pro Netzteil (640 mA)</td><td>ca. 64 (à 10 mA)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Netzteildimensionierung</h3>
+        <div class="form-group">
+          <label>Anzahl Geräte</label>
+          <input type="number" id="knx-geraete" placeholder="z.B. 30" value="30">
+        </div>
+        <div class="form-group">
+          <label>Durchschn. Stromaufnahme (mA)</label>
+          <select id="knx-strom">
+            <option value="8">8 mA (einfache Aktoren)</option>
+            <option value="10" selected>10 mA (Standard)</option>
+            <option value="12">12 mA (komplexe Geräte)</option>
+            <option value="15">15 mA (Displays etc.)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcNetzteil()">Berechnen</button>
+        <div id="knx-result"></div>
+        
+        <h3 style="margin-top:20px">Netzteilgrößen</h3>
+        <table class="data-table">
+          <thead><tr><th>Leistung</th><th>Strom</th><th>Teilnehmer (à 10mA)</th></tr></thead>
+          <tbody>
+            <tr><td>160 mA</td><td>160 mA</td><td>~16</td></tr>
+            <tr><td>320 mA</td><td>320 mA</td><td>~32</td></tr>
+            <tr><td>640 mA</td><td>640 mA</td><td>~64</td></tr>
+            <tr><td>1280 mA</td><td>1280 mA</td><td>~128</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ADRESSEN -->
+      <div id="adressen" class="tab-content">
+        <h2>🏷️ Adressierung</h2>
+        
+        <h3>Physikalische Adresse</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Format</strong></td><td>B.L.T (Bereich.Linie.Teilnehmer)</td></tr>
+            <tr><td><strong>Bereich</strong></td><td>1-15 (0 = Backbone)</td></tr>
+            <tr><td><strong>Linie</strong></td><td>1-15 (0 = Hauptlinie)</td></tr>
+            <tr><td><strong>Teilnehmer</strong></td><td>1-255 (0 = Linienkoppler)</td></tr>
+            <tr><td><strong>Beispiel</strong></td><td>1.2.15 = Bereich 1, Linie 2, Gerät 15</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Gruppenadressen</h3>
+        <table class="data-table">
+          <thead><tr><th>Schema</th><th>Format</th><th>Bereich</th></tr></thead>
+          <tbody>
+            <tr><td>3-stufig</td><td>H/M/U</td><td>0-31 / 0-7 / 0-255</td></tr>
+            <tr><td>2-stufig</td><td>H/U</td><td>0-31 / 0-2047</td></tr>
+            <tr><td>Frei</td><td>1-65535</td><td>Beliebig</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Empfohlene GA-Struktur (3-stufig)</h3>
+        <table class="data-table">
+          <thead><tr><th>Haupt</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>Zentrale Funktionen</td></tr>
+            <tr><td>1</td><td>Beleuchtung</td></tr>
+            <tr><td>2</td><td>Jalousie / Beschattung</td></tr>
+            <tr><td>3</td><td>Heizung / Klima</td></tr>
+            <tr><td>4</td><td>Lüftung</td></tr>
+            <tr><td>5</td><td>Alarm / Sicherheit</td></tr>
+            <tr><td>6</td><td>Energie / Zähler</td></tr>
+            <tr><td>7</td><td>Außenbereich</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Beispiel Beleuchtung</h3>
+        <table class="data-table">
+          <thead><tr><th>GA</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td>1/0/1</td><td>Licht EG Wohnen Schalten</td></tr>
+            <tr><td>1/0/2</td><td>Licht EG Wohnen Dimmen</td></tr>
+            <tr><td>1/0/3</td><td>Licht EG Wohnen Dimmwert</td></tr>
+            <tr><td>1/0/4</td><td>Licht EG Wohnen Status</td></tr>
+            <tr><td>1/1/1</td><td>Licht EG Küche Schalten</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GERÄTE -->
+      <div id="geraete" class="tab-content">
+        <h2>🔌 Gerätetypen</h2>
+        
+        <h3>Systemkomponenten</h3>
+        <table class="data-table">
+          <thead><tr><th>Gerät</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Netzteil</strong></td><td>29V DC Spannungsversorgung + Drossel</td></tr>
+            <tr><td><strong>Linienkoppler</strong></td><td>Verbindet Linien, filtert Telegramme</td></tr>
+            <tr><td><strong>Bereichskoppler</strong></td><td>Verbindet Bereiche über Backbone</td></tr>
+            <tr><td><strong>USB-Schnittstelle</strong></td><td>Programmierung via ETS</td></tr>
+            <tr><td><strong>IP-Router</strong></td><td>KNX-IP Kopplung, Tunneling</td></tr>
+            <tr><td><strong>IP-Interface</strong></td><td>Programmierung über IP</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sensoren (Eingabe)</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td>Tastsensor</td><td>Schalten, Dimmen, Jalousie</td></tr>
+            <tr><td>Binäreingang</td><td>Potentialfreie Kontakte</td></tr>
+            <tr><td>Präsenzmelder</td><td>Bewegung, Helligkeit</td></tr>
+            <tr><td>Helligkeitssensor</td><td>Außen-/Innenlicht</td></tr>
+            <tr><td>Temperatursensor</td><td>Raumtemperatur</td></tr>
+            <tr><td>Wetterstation</td><td>Wind, Regen, Temperatur</td></tr>
+            <tr><td>Fensterkontakt</td><td>Offen/Geschlossen</td></tr>
+            <tr><td>CO₂-Sensor</td><td>Luftqualität</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Aktoren (Ausgabe)</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Kanäle</th><th>Last</th></tr></thead>
+          <tbody>
+            <tr><td>Schaltaktor</td><td>2-16</td><td>16A / Kanal</td></tr>
+            <tr><td>Dimmaktor Universal</td><td>1-4</td><td>250-500W / Kanal</td></tr>
+            <tr><td>Dimmaktor LED</td><td>1-4</td><td>DALI, 1-10V</td></tr>
+            <tr><td>Jalousieaktor</td><td>2-8</td><td>6A / Kanal (Motor)</td></tr>
+            <tr><td>Heizungsaktor</td><td>6-12</td><td>24V/230V Stellantrieb</td></tr>
+            <tr><td>Analogaktor</td><td>2-4</td><td>0-10V Ausgang</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Visualisierung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Touchpanel</td><td>Wandmontage, 4-10 Zoll</td></tr>
+            <tr><td>Server/Gateway</td><td>Gira X1, Loxone, ioBroker</td></tr>
+            <tr><td>App</td><td>KNX-Viewer, Home Assistant</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- INSTALLATION -->
+      <div id="installation" class="tab-content">
+        <h2>🔧 Installation</h2>
+        
+        <h3>Busleitung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Typ</strong></td><td>J-Y(St)Y 2×2×0,8 (grün)</td></tr>
+            <tr><td><strong>Adern</strong></td><td>Rot (+), Schwarz (-), Weiß/Gelb Reserve</td></tr>
+            <tr><td><strong>Verlegung</strong></td><td>Stern, Linie, Baum (KEIN Ring!)</td></tr>
+            <tr><td><strong>Abschirmung</strong></td><td>Einseitig erden (Verteiler)</td></tr>
+            <tr><td><strong>Mindestabstand</strong></td><td>4 cm zu 230V Leitungen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verdrahtung</h3>
+        <table class="data-table">
+          <thead><tr><th>Ader</th><th>Farbe</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td style="background:#dc2626;color:white;">+</td><td>Rot</td><td>Bus positiv (EIB+)</td></tr>
+            <tr><td style="background:#1f2937;color:white;">-</td><td>Schwarz</td><td>Bus negativ (EIB-)</td></tr>
+            <tr><td style="background:#fbbf24;">SELV+</td><td>Gelb</td><td>Reserve / Hilfsspannung</td></tr>
+            <tr><td style="background:#fff;border:1px solid #333;">SELV-</td><td>Weiß</td><td>Reserve / Hilfsspannung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Inbetriebnahme</h3>
+        <table class="data-table">
+          <thead><tr><th>Schritt</th><th>Aktion</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>ETS-Projekt anlegen</td></tr>
+            <tr><td>2</td><td>Topologie definieren</td></tr>
+            <tr><td>3</td><td>Geräte importieren (Produktdatenbank)</td></tr>
+            <tr><td>4</td><td>Physikalische Adressen vergeben</td></tr>
+            <tr><td>5</td><td>Gruppenadressen erstellen</td></tr>
+            <tr><td>6</td><td>Kommunikationsobjekte verknüpfen</td></tr>
+            <tr><td>7</td><td>Parameter einstellen</td></tr>
+            <tr><td>8</td><td>Applikation herunterladen</td></tr>
+            <tr><td>9</td><td>Funktion testen</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>💡 ETS (Engineering Tool Software)</h4>
+          <p>Offizielle KNX-Programmiersoftware. ETS6 aktuell, Lizenzmodelle von Demo bis Professional.</p>
+        </div>
+      </div>
+
+      <!-- ETS PROGRAMMIERUNG -->
+      <div id="ets" class="tab-content">
+        <h2>💻 ETS Programmierung</h2>
+        
+        <h3>ETS Versionen</h3>
+        <table class="data-table">
+          <thead><tr><th>Version</th><th>Status</th><th>Features</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ETS6</strong></td><td>Aktuell</td><td>Cloud, Workflows, neue UI</td></tr>
+            <tr><td><strong>ETS5</strong></td><td>Support</td><td>Stabil, weit verbreitet</td></tr>
+            <tr><td><strong>ETS4</strong></td><td>Auslaufend</td><td>Legacy-Projekte</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">ETS Lizenzmodelle</h3>
+        <table class="data-table">
+          <thead><tr><th>Lizenz</th><th>Geräte</th><th>Preis ca.</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Demo</strong></td><td>5</td><td>Kostenlos</td></tr>
+            <tr><td><strong>Lite</strong></td><td>20</td><td>200 €</td></tr>
+            <tr><td><strong>Home</strong></td><td>64</td><td>350 €</td></tr>
+            <tr><td><strong>Professional</strong></td><td>Unbegrenzt</td><td>1.000 €</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Projektstruktur</h3>
+        <table class="data-table">
+          <thead><tr><th>Element</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Backbone</strong></td><td>Hauptlinie (Bereich 0)</td></tr>
+            <tr><td><strong>Bereich</strong></td><td>Gebäudeabschnitt (1-15)</td></tr>
+            <tr><td><strong>Linie</strong></td><td>Stockwerk/Zone (1-15)</td></tr>
+            <tr><td><strong>Geräte</strong></td><td>Teilnehmer in Linie</td></tr>
+            <tr><td><strong>Gebäude</strong></td><td>Logische Struktur</td></tr>
+            <tr><td><strong>Gewerke</strong></td><td>Funktionale Struktur</td></tr>
+            <tr><td><strong>Gruppenadressen</strong></td><td>Kommunikation</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Programmierablauf</h3>
+        <table class="data-table">
+          <thead><tr><th>Schritt</th><th>Aktion</th><th>Hinweis</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Projekt anlegen</td><td>Sinnvolle Benennung</td></tr>
+            <tr><td>2</td><td>Gebäude erstellen</td><td>Räume, Etagen</td></tr>
+            <tr><td>3</td><td>Topologie anlegen</td><td>Bereiche, Linien</td></tr>
+            <tr><td>4</td><td>Geräte importieren</td><td>Aus Online-Katalog</td></tr>
+            <tr><td>5</td><td>Geräte einfügen</td><td>Physik. Adresse vergeben</td></tr>
+            <tr><td>6</td><td>Gruppenadressen</td><td>Schema festlegen</td></tr>
+            <tr><td>7</td><td>Verknüpfung</td><td>KO mit GA verbinden</td></tr>
+            <tr><td>8</td><td>Parameter</td><td>Geräteeinstellungen</td></tr>
+            <tr><td>9</td><td>Download</td><td>Auf Geräte übertragen</td></tr>
+            <tr><td>10</td><td>Test</td><td>Gruppenmonitor</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Wichtige Funktionen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Gruppenmonitor</strong></td><td>Telegramme live beobachten</td></tr>
+            <tr><td><strong>Busmonitor</strong></td><td>Alle Telegramme aufzeichnen</td></tr>
+            <tr><td><strong>Linien-Scan</strong></td><td>Geräte auf Bus finden</td></tr>
+            <tr><td><strong>Einzeldownload</strong></td><td>Nur ein Gerät programmieren</td></tr>
+            <tr><td><strong>Partielle Programmierung</strong></td><td>Nur geänderte Parameter</td></tr>
+            <tr><td><strong>Diagnose</strong></td><td>Gerätestatus prüfen</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DIAGNOSE -->
+      <div id="diagnose" class="tab-content">
+        <h2>🔧 Diagnose & Fehlersuche</h2>
+        
+        <h3>Häufige Fehler</h3>
+        <table class="data-table">
+          <thead><tr><th>Symptom</th><th>Ursache</th><th>Lösung</th></tr></thead>
+          <tbody>
+            <tr><td>Gerät nicht erreichbar</td><td>Falsche phys. Adresse</td><td>Adresse prüfen/neu vergeben</td></tr>
+            <tr><td>Keine Kommunikation</td><td>GA nicht verknüpft</td><td>Verknüpfung prüfen</td></tr>
+            <tr><td>Telegramm ohne Wirkung</td><td>Flags falsch</td><td>K, L, S, Ü prüfen</td></tr>
+            <tr><td>Bus-Fehler</td><td>Kurzschluss, Unterbrechung</td><td>Verkabelung prüfen</td></tr>
+            <tr><td>Gerät in Prog.-Modus</td><td>Taste gedrückt</td><td>Prog.-Taste erneut drücken</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Spannungsmessung</h3>
+        <table class="data-table">
+          <thead><tr><th>Messung</th><th>Sollwert</th><th>Toleranz</th></tr></thead>
+          <tbody>
+            <tr><td>Busspannung (Leerlauf)</td><td>29 V DC</td><td>21-30 V</td></tr>
+            <tr><td>Busspannung (Last)</td><td>27-28 V DC</td><td>min. 21 V</td></tr>
+            <tr><td>Ripple (Welligkeit)</td><td>< 0,5 Vpp</td><td>-</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Busbelastung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Max. Telegramme/s</td><td>ca. 50</td></tr>
+            <tr><td>Empfehlung</td><td>< 30 Telegramme/s</td></tr>
+            <tr><td>Warnung bei</td><td>> 50% Auslastung dauerhaft</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Stromverbrauch Linie</h3>
+        <div class="form-group">
+          <label>Anzahl Geräte</label>
+          <input type="number" id="diag-geraete" placeholder="z.B. 40" value="40">
+        </div>
+        <div class="form-group">
+          <label>Durchschn. Strom/Gerät (mA)</label>
+          <input type="number" id="diag-strom" placeholder="z.B. 10" value="10">
+        </div>
+        <div class="form-group">
+          <label>Netzteilgröße (mA)</label>
+          <select id="diag-netzteil">
+            <option value="160">160 mA</option>
+            <option value="320">320 mA</option>
+            <option value="640" selected>640 mA</option>
+            <option value="1280">1280 mA (2×640)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcBusauslastung()">Prüfen</button>
+        <div id="diag-result"></div>
+        
+        <h3 style="margin-top:20px">Diagnose-Tools</h3>
+        <table class="data-table">
+          <thead><tr><th>Tool</th><th>Funktion</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ETS Diagnose</strong></td><td>Gerätestatus, Parameter lesen</td></tr>
+            <tr><td><strong>Gruppenmonitor</strong></td><td>Telegramme beobachten</td></tr>
+            <tr><td><strong>Busmonitor</strong></td><td>Alle Telegramme aufzeichnen</td></tr>
+            <tr><td><strong>Linien-Scan</strong></td><td>Geräte finden</td></tr>
+            <tr><td><strong>Multimeter</strong></td><td>Busspannung messen</td></tr>
+            <tr><td><strong>KNX-Tester</strong></td><td>Mobiles Diagnosegerät</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Telegramm-Analyse</h3>
+        <table class="data-table">
+          <thead><tr><th>Feld</th><th>Bedeutung</th></tr></thead>
+          <tbody>
+            <tr><td>Quelladresse</td><td>Absender (phys. Adresse)</td></tr>
+            <tr><td>Zieladresse</td><td>GA oder phys. Adresse</td></tr>
+            <tr><td>Priorität</td><td>System, Alarm, Hoch, Normal</td></tr>
+            <tr><td>Hop Count</td><td>Verbleibende Weiterleitungen</td></tr>
+            <tr><td>APCI</td><td>Befehlstyp (Read, Write, Response)</td></tr>
+            <tr><td>Daten</td><td>Nutzdaten (1-14 Bytes)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DALI -->
+      <div id="dali" class="tab-content">
+        <h2>💡 DALI Lichtsteuerung</h2>
+        
+        <h3>DALI Grundlagen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Standard</strong></td><td>IEC 62386 (DALI-2)</td></tr>
+            <tr><td><strong>Spannung</strong></td><td>16 V DC (9,5-22,5 V)</td></tr>
+            <tr><td><strong>Strom</strong></td><td>max. 250 mA</td></tr>
+            <tr><td><strong>Datenrate</strong></td><td>1200 Bit/s</td></tr>
+            <tr><td><strong>Teilnehmer</strong></td><td>max. 64 Einzeladressen</td></tr>
+            <tr><td><strong>Gruppen</strong></td><td>max. 16</td></tr>
+            <tr><td><strong>Szenen</strong></td><td>max. 16</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">DALI vs. DALI-2</h3>
+        <table class="data-table">
+          <thead><tr><th>Merkmal</th><th>DALI</th><th>DALI-2</th></tr></thead>
+          <tbody>
+            <tr><td>Standard</td><td>IEC 62386-1</td><td>IEC 62386-1xx</td></tr>
+            <tr><td>Sensoren</td><td>Nein</td><td>Ja (Input Devices)</td></tr>
+            <tr><td>Farbsteuerung</td><td>Nein</td><td>Ja (DT8)</td></tr>
+            <tr><td>Zertifizierung</td><td>Nein</td><td>Ja (Logo)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">KNX-DALI Gateway</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Funktion</td><td>Verbindet KNX mit DALI</td></tr>
+            <tr><td>Kanäle</td><td>1, 2 oder 4 DALI-Linien</td></tr>
+            <tr><td>Adressierung</td><td>Broadcast, Gruppe, Einzel</td></tr>
+            <tr><td>Tunable White</td><td>DT8 für CCT-Steuerung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">DALI Gerätetypen (DT)</h3>
+        <table class="data-table">
+          <thead><tr><th>DT</th><th>Bezeichnung</th></tr></thead>
+          <tbody>
+            <tr><td>DT0</td><td>Leuchtstofflampe</td></tr>
+            <tr><td>DT1</td><td>Notlicht</td></tr>
+            <tr><td>DT2</td><td>Entladungslampe</td></tr>
+            <tr><td>DT3</td><td>Niedervolt-Halogen</td></tr>
+            <tr><td>DT4</td><td>Dimmer mit Phasenanschnitt</td></tr>
+            <tr><td>DT5</td><td>Dimmer mit Phasenabschnitt</td></tr>
+            <tr><td>DT6</td><td>LED</td></tr>
+            <tr><td>DT7</td><td>Schaltaktor</td></tr>
+            <tr><td>DT8</td><td>Farbe (RGB, RGBW, Tunable White)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FUNK -->
+      <div id="funk" class="tab-content">
+        <h2>📡 Funksysteme</h2>
+        
+        <h3>KNX RF (Funk)</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Frequenz</strong></td><td>868 MHz (Europa)</td></tr>
+            <tr><td><strong>Reichweite</strong></td><td>30-100 m (Freifläche)</td></tr>
+            <tr><td><strong>Verschlüsselung</strong></td><td>AES-128 (KNX Secure)</td></tr>
+            <tr><td><strong>Anwendung</strong></td><td>Nachrüstung, Ergänzung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">EnOcean</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Frequenz</strong></td><td>868 MHz</td></tr>
+            <tr><td><strong>Besonderheit</strong></td><td>Energieautark (Energy Harvesting)</td></tr>
+            <tr><td><strong>Quellen</strong></td><td>Piezo (Taster), Solar, Peltier</td></tr>
+            <tr><td><strong>Gateway</strong></td><td>EnOcean-KNX Kopplung möglich</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Zigbee</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Frequenz</strong></td><td>2,4 GHz</td></tr>
+            <tr><td><strong>Topologie</strong></td><td>Mesh-Netzwerk</td></tr>
+            <tr><td><strong>Teilnehmer</strong></td><td>bis 65.000</td></tr>
+            <tr><td><strong>Profile</strong></td><td>ZHA, ZLL, Zigbee 3.0</td></tr>
+            <tr><td><strong>Produkte</strong></td><td>Philips Hue, IKEA Tradfri</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Z-Wave</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Frequenz</strong></td><td>868 MHz (EU)</td></tr>
+            <tr><td><strong>Topologie</strong></td><td>Mesh-Netzwerk</td></tr>
+            <tr><td><strong>Teilnehmer</strong></td><td>max. 232</td></tr>
+            <tr><td><strong>Reichweite</strong></td><td>30-100 m</td></tr>
+            <tr><td><strong>Verschlüsselung</strong></td><td>S2 Security (AES-128)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Matter</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Entwickler</strong></td><td>CSA (Apple, Google, Amazon...)</td></tr>
+            <tr><td><strong>Protokoll</strong></td><td>IP-basiert (Thread, WiFi)</td></tr>
+            <tr><td><strong>Sicherheit</strong></td><td>End-to-End verschlüsselt</td></tr>
+            <tr><td><strong>Ziel</strong></td><td>Universelle Interoperabilität</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen KNX</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📝 Datentypen (DPT)</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>DPT 1.xxx</strong></td><td>1 Bit (Schalten, Dimmen Richtung)</td></tr>
+              <tr><td><strong>DPT 2.xxx</strong></td><td>2 Bit (Priorität, Zwangsführung)</td></tr>
+              <tr><td><strong>DPT 3.xxx</strong></td><td>4 Bit (Dimmen relativ)</td></tr>
+              <tr><td><strong>DPT 5.xxx</strong></td><td>8 Bit (0-100%, 0-255)</td></tr>
+              <tr><td><strong>DPT 7.xxx</strong></td><td>16 Bit unsigned (Zähler)</td></tr>
+              <tr><td><strong>DPT 9.xxx</strong></td><td>16 Bit Float (Temperatur, Lux)</td></tr>
+              <tr><td><strong>DPT 10.xxx</strong></td><td>Zeit (hh:mm:ss)</td></tr>
+              <tr><td><strong>DPT 11.xxx</strong></td><td>Datum (tt.mm.jjjj)</td></tr>
+              <tr><td><strong>DPT 12.xxx</strong></td><td>32 Bit unsigned (Zähler)</td></tr>
+              <tr><td><strong>DPT 14.xxx</strong></td><td>32 Bit Float (IEEE)</td></tr>
+              <tr><td><strong>DPT 16.xxx</strong></td><td>14 Byte Text (ASCII)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔧 Flags</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>K</strong></td><td>Kommunikation (lesen/schreiben Bus)</td></tr>
+              <tr><td><strong>L</strong></td><td>Lesen (Objekt kann gelesen werden)</td></tr>
+              <tr><td><strong>S</strong></td><td>Schreiben (Objekt empfängt)</td></tr>
+              <tr><td><strong>Ü</strong></td><td>Übertragen (bei Änderung senden)</td></tr>
+              <tr><td><strong>A</strong></td><td>Aktualisieren (Update anfordern)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔐 KNX Secure</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>KNX IP Secure</strong></td><td>Verschlüsselung auf IP-Ebene</td></tr>
+              <tr><td><strong>KNX Data Secure</strong></td><td>Verschlüsselung auf Telegram-Ebene</td></tr>
+              <tr><td><strong>Algorithmus</strong></td><td>AES-128 CCM</td></tr>
+              <tr><td><strong>Authentifizierung</strong></td><td>FDSK (Factory Default Setup Key)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>💰 Kostenplanung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Netzteil + USB</td><td>400-600 €</td></tr>
+              <tr><td>Schaltaktor 8-fach</td><td>300-500 €</td></tr>
+              <tr><td>Dimmaktor 4-fach</td><td>400-700 €</td></tr>
+              <tr><td>Jalousieaktor 4-fach</td><td>350-500 €</td></tr>
+              <tr><td>Tastsensor 4-fach</td><td>150-350 €</td></tr>
+              <tr><td>Präsenzmelder</td><td>200-400 €</td></tr>
+              <tr><td>Wetterstation</td><td>500-1000 €</td></tr>
+              <tr><td>IP-Router</td><td>350-600 €</td></tr>
+              <tr><td>ETS-Lizenz</td><td>~1000 €</td></tr>
+            </table>
+            <p style="margin-top:10px;color:#6b7280;">Faustformel: 5-10% der Baukosten für Automation</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'grundlagen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Grund</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'topologie')">
+      <span class="nav-icon">🔗</span><span class="nav-label">Topologie</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[3], 'geraete')">
+      <span class="nav-icon">🔌</span><span class="nav-label">Geräte</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[5], 'dali')">
+      <span class="nav-icon">💡</span><span class="nav-label">DALI</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[7], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcNetzteil() {
+      const geraete = parseInt(document.getElementById('knx-geraete').value);
+      const strom = parseFloat(document.getElementById('knx-strom').value);
+      
+      if (isNaN(geraete) || geraete <= 0) {
+        document.getElementById('knx-result').innerHTML = '<div class="danger">Bitte Anzahl eingeben</div>';
+        return;
+      }
+      
+      const gesamtStrom = geraete * strom;
+      const reserve = gesamtStrom * 1.2; // 20% Reserve
+      
+      let empfehlung;
+      if (reserve <= 160) empfehlung = '160 mA';
+      else if (reserve <= 320) empfehlung = '320 mA';
+      else if (reserve <= 640) empfehlung = '640 mA';
+      else empfehlung = '2× 640 mA oder 1280 mA';
+      
+      document.getElementById('knx-result').innerHTML = `
+        <div class="result">
+          <h3>Netzteilberechnung</h3>
+          <div class="result-item"><span>Geräte:</span><span>${geraete}</span></div>
+          <div class="result-item"><span>Stromaufnahme:</span><span>${gesamtStrom} mA</span></div>
+          <div class="result-item"><span>Mit 20% Reserve:</span><span>${reserve.toFixed(0)} mA</span></div>
+          <div class="result-item"><span>Empfehlung:</span><span><strong>${empfehlung}</strong></span></div>
+        </div>`;
+    }
+    
+    function calcBusauslastung() {
+      const geraete = parseInt(document.getElementById('diag-geraete').value);
+      const strom = parseFloat(document.getElementById('diag-strom').value);
+      const netzteil = parseFloat(document.getElementById('diag-netzteil').value);
+      
+      if (isNaN(geraete) || geraete <= 0) {
+        document.getElementById('diag-result').innerHTML = '<div class="danger">Bitte Anzahl eingeben</div>';
+        return;
+      }
+      
+      const gesamtStrom = geraete * strom;
+      const auslastung = (gesamtStrom / netzteil) * 100;
+      const reserve = netzteil - gesamtStrom;
+      
+      let status, statusClass;
+      if (auslastung <= 70) {
+        status = '✅ OK - Ausreichend Reserve';
+        statusClass = 'info-box';
+      } else if (auslastung <= 90) {
+        status = '⚠️ Warnung - Reserve knapp';
+        statusClass = 'warning';
+      } else {
+        status = '❌ Kritisch - Netzteil unterdimensioniert!';
+        statusClass = 'danger';
+      }
+      
+      document.getElementById('diag-result').innerHTML = `
+        <div class="result">
+          <h3>Busauslastung</h3>
+          <div class="result-item"><span>Geräte:</span><span>${geraete}</span></div>
+          <div class="result-item"><span>Gesamtstrom:</span><span>${gesamtStrom} mA</span></div>
+          <div class="result-item"><span>Netzteil:</span><span>${netzteil} mA</span></div>
+          <div class="result-item"><span>Auslastung:</span><span><strong>${auslastung.toFixed(0)}%</strong></span></div>
+          <div class="result-item"><span>Reserve:</span><span>${reserve} mA</span></div>
+        </div>
+        <div class="${statusClass}" style="margin-top:10px">${status}</div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

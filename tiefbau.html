@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#78716c">
+  <title>ch-Bau - Tiefbau</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #78716c; --primary-dark: #57534e; }
+    .app-header { background: linear-gradient(135deg, #78716c 0%, #a8a29e 100%); }
+  </style>
+</head>
+<body class="gewerk-tiefbau">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau" selected>🚧 Tiefbau</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🚧 Tiefbau</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Erdarbeiten · Kanalbau · Leitungen · Straßenbau</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'erdarbeiten')">Erdarbeiten</button>
+        <button class="tab" onclick="switchTab(this, 'graeben')">Gräben</button>
+        <button class="tab" onclick="switchTab(this, 'leitungen')">Leitungen</button>
+        <button class="tab" onclick="switchTab(this, 'kanal')">Kanal</button>
+        <button class="tab" onclick="switchTab(this, 'entwaesserung')">Entwässerung</button>
+        <button class="tab" onclick="switchTab(this, 'strasse')">Straße</button>
+        <button class="tab" onclick="switchTab(this, 'verdichtung')">Verdichtung</button>
+        <button class="tab" onclick="switchTab(this, 'maschinen')">Maschinen</button>
+        <button class="tab" onclick="switchTab(this, 'normen')">Normen</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- ERDARBEITEN -->
+      <div id="erdarbeiten" class="tab-content active">
+        <h2>⛏️ Erdarbeiten</h2>
+        
+        <h3>Bodenklassen (DIN 18300 alt)</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>Bezeichnung</th><th>Beispiel</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Oberboden</td><td>Mutterboden</td></tr>
+            <tr><td>2</td><td>Fließende Bodenarten</td><td>Schlamm, Moor</td></tr>
+            <tr><td>3</td><td>Leicht lösbar</td><td>Sand, Kies locker</td></tr>
+            <tr><td>4</td><td>Mittelschwer lösbar</td><td>Lehm, Mergel</td></tr>
+            <tr><td>5</td><td>Schwer lösbar</td><td>Ton, fester Lehm</td></tr>
+            <tr><td>6</td><td>Leicht lösbarer Fels</td><td>Verwitterter Fels</td></tr>
+            <tr><td>7</td><td>Schwer lösbarer Fels</td><td>Granit, Basalt</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Homogenbereiche (DIN 18300 neu)</h3>
+        <table class="data-table">
+          <thead><tr><th>Kennwert</th><th>Beschreibung</th></tr></thead>
+          <tbody>
+            <tr><td>Ortsübliche Bezeichnung</td><td>z.B. "sandiger Kies"</td></tr>
+            <tr><td>Kornverteilung</td><td>Anteil Fein/Grob</td></tr>
+            <tr><td>Konsistenz</td><td>Weich, steif, halbfest, fest</td></tr>
+            <tr><td>Lagerungsdichte</td><td>Locker, mitteldicht, dicht</td></tr>
+            <tr><td>Wassergehalt</td><td>Trocken, feucht, nass</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Aushubvolumen berechnen</h3>
+        <div class="form-group">
+          <label>Länge (m)</label>
+          <input type="number" id="aus-laenge" placeholder="z.B. 20" value="20">
+        </div>
+        <div class="form-group">
+          <label>Breite (m)</label>
+          <input type="number" id="aus-breite" placeholder="z.B. 5" value="5">
+        </div>
+        <div class="form-group">
+          <label>Tiefe (m)</label>
+          <input type="number" id="aus-tiefe" placeholder="z.B. 1.5" value="1.5">
+        </div>
+        <div class="form-group">
+          <label>Auflockerungsfaktor</label>
+          <select id="aus-faktor">
+            <option value="1.0">Ohne Auflockerung (1,0)</option>
+            <option value="1.1">Sand, Kies (1,1)</option>
+            <option value="1.2" selected>Lehm, Ton (1,2)</option>
+            <option value="1.3">Fels (1,3)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcAushub()">Berechnen</button>
+        <div id="aus-result"></div>
+        
+        <h3 style="margin-top:20px">Auflockerungsfaktoren</h3>
+        <table class="data-table">
+          <thead><tr><th>Boden</th><th>Faktor</th></tr></thead>
+          <tbody>
+            <tr><td>Sand, Kies</td><td>1,05-1,15</td></tr>
+            <tr><td>Lehm, Ton</td><td>1,15-1,25</td></tr>
+            <tr><td>Mergel</td><td>1,20-1,30</td></tr>
+            <tr><td>Fels</td><td>1,30-1,60</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GRÄBEN -->
+      <div id="graeben" class="tab-content">
+        <h2>🕳️ Gräben & Baugruben</h2>
+        
+        <h3>Böschungswinkel (DIN 4124)</h3>
+        <table class="data-table">
+          <thead><tr><th>Bodenart</th><th>Max. Winkel</th><th>Verhältnis</th></tr></thead>
+          <tbody>
+            <tr><td>Nichtbindiger Boden (Sand)</td><td>45°</td><td>1:1</td></tr>
+            <tr><td>Bindiger Boden (Lehm)</td><td>60°</td><td>1:0,58</td></tr>
+            <tr><td>Fels</td><td>80°</td><td>1:0,18</td></tr>
+            <tr><td>Gewachsener Fels</td><td>90° (senkrecht)</td><td>-</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verbau</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Anwendung</th><th>Tiefe</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Grabenverbauboxen</strong></td><td>Schnell, Standard</td><td>bis 4 m</td></tr>
+            <tr><td><strong>Kanaldielen</strong></td><td>Enge Gräben</td><td>bis 3 m</td></tr>
+            <tr><td><strong>Spundwände</strong></td><td>Wasserhaltung, tief</td><td>bis 15 m</td></tr>
+            <tr><td><strong>Berliner Verbau</strong></td><td>Baugruben groß</td><td>bis 20 m</td></tr>
+            <tr><td><strong>Bohrpfahlwand</strong></td><td>Schwierige Böden</td><td>bis 30 m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Mindestgrabenbreiten</h3>
+        <table class="data-table">
+          <thead><tr><th>Rohr DN</th><th>Min. Breite</th></tr></thead>
+          <tbody>
+            <tr><td>bis DN 200</td><td>0,80 m</td></tr>
+            <tr><td>DN 200-400</td><td>0,90 m</td></tr>
+            <tr><td>DN 400-600</td><td>1,00 m</td></tr>
+            <tr><td>DN 600-800</td><td>1,10 m</td></tr>
+            <tr><td>DN 800-1000</td><td>1,20 m</td></tr>
+            <tr><td>ab DN 1000</td><td>DN + 0,40 m</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Arbeitsschutz</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Ab 1,25 m Tiefe: Verbau oder Böschung erforderlich</li>
+            <li>Ab 1,25 m Tiefe: Ausstieg alle 25 m</li>
+            <li>Sicherheitsabstand zur Böschungskante: 0,60 m</li>
+            <li>Fahrzeuge/Lasten: 1,00 m Abstand zur Kante</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- LEITUNGEN -->
+      <div id="leitungen" class="tab-content">
+        <h2>🔌 Leitungsverlegung</h2>
+        
+        <h3>Mindestüberdeckungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Leitung</th><th>Gehweg</th><th>Fahrbahn</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Strom NS</strong></td><td>0,60 m</td><td>0,80 m</td></tr>
+            <tr><td><strong>Strom MS</strong></td><td>0,80 m</td><td>1,00 m</td></tr>
+            <tr><td><strong>Strom HS</strong></td><td>1,00 m</td><td>1,20 m</td></tr>
+            <tr><td><strong>Gas ND</strong></td><td>0,60 m</td><td>0,80 m</td></tr>
+            <tr><td><strong>Gas HD</strong></td><td>0,80 m</td><td>1,00 m</td></tr>
+            <tr><td><strong>Wasser</strong></td><td>1,00-1,50 m</td><td>1,20-1,50 m</td></tr>
+            <tr><td><strong>Telekom/LWL</strong></td><td>0,60 m</td><td>0,80 m</td></tr>
+            <tr><td><strong>Abwasser</strong></td><td>Frostfrei</td><td>Frostfrei</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Mindestabstände parallel</h3>
+        <table class="data-table">
+          <thead><tr><th>Kombination</th><th>Abstand</th></tr></thead>
+          <tbody>
+            <tr><td>Strom - Gas</td><td>0,20 m</td></tr>
+            <tr><td>Strom - Wasser</td><td>0,20 m</td></tr>
+            <tr><td>Strom - Telekom</td><td>0,10 m</td></tr>
+            <tr><td>Gas - Wasser</td><td>0,20 m</td></tr>
+            <tr><td>Gas - Kanal</td><td>0,40 m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Kreuzungsabstände</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Strom - Gas</td><td>0,20 m</td></tr>
+            <tr><td>Strom - Wasser</td><td>0,20 m</td></tr>
+            <tr><td>Strom - Telekom</td><td>0,05 m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Warnbänder / Trassenbänder</h3>
+        <table class="data-table">
+          <thead><tr><th>Farbe</th><th>Leitung</th></tr></thead>
+          <tbody>
+            <tr><td style="background:#dc2626;color:white;">Rot</td><td>Strom</td></tr>
+            <tr><td style="background:#eab308;color:black;">Gelb</td><td>Gas</td></tr>
+            <tr><td style="background:#3b82f6;color:white;">Blau</td><td>Wasser</td></tr>
+            <tr><td style="background:#84cc16;color:black;">Grün</td><td>Telekom / LWL</td></tr>
+            <tr><td style="background:#92400e;color:white;">Braun</td><td>Kanal</td></tr>
+            <tr><td style="background:#8b5cf6;color:white;">Violett</td><td>Fernwärme</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Bettung</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li><strong>Sand:</strong> Körnung 0-4 mm</li>
+            <li><strong>Höhe unter Rohr:</strong> min. 10 cm</li>
+            <li><strong>Seitenverfüllung:</strong> lagenweise verdichten</li>
+            <li><strong>Warnband:</strong> ca. 30 cm über Leitung</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- KANAL -->
+      <div id="kanal" class="tab-content">
+        <h2>🚿 Kanalbau</h2>
+        
+        <h3>Gefälle Entwässerung</h3>
+        <table class="data-table">
+          <thead><tr><th>Rohr DN</th><th>Min. Gefälle</th><th>Selbstreinigung</th></tr></thead>
+          <tbody>
+            <tr><td>DN 100</td><td>1:50 (2,0%)</td><td>0,5 m/s</td></tr>
+            <tr><td>DN 125</td><td>1:67 (1,5%)</td><td>0,5 m/s</td></tr>
+            <tr><td>DN 150</td><td>1:100 (1,0%)</td><td>0,5 m/s</td></tr>
+            <tr><td>DN 200</td><td>1:125 (0,8%)</td><td>0,5 m/s</td></tr>
+            <tr><td>DN 300</td><td>1:150 (0,67%)</td><td>0,5 m/s</td></tr>
+            <tr><td>DN 400+</td><td>1:200 (0,5%)</td><td>0,5 m/s</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Gefälle berechnen</h3>
+        <div class="form-group">
+          <label>Länge (m)</label>
+          <input type="number" id="gef-laenge" placeholder="z.B. 30" value="30">
+        </div>
+        <div class="form-group">
+          <label>Gefälle (%)</label>
+          <input type="number" id="gef-prozent" placeholder="z.B. 1.5" value="1.5" step="0.1">
+        </div>
+        <button class="btn" onclick="calcGefaelle()">Höhendifferenz</button>
+        <div id="gef-result"></div>
+        
+        <h3 style="margin-top:20px">Rohrmaterialien</h3>
+        <table class="data-table">
+          <thead><tr><th>Material</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>PVC-U (KG)</strong></td><td>Standard Grundleitung</td></tr>
+            <tr><td><strong>PP</strong></td><td>Erhöhte Temperatur</td></tr>
+            <tr><td><strong>PE-HD</strong></td><td>Erdeinbau, flexibel</td></tr>
+            <tr><td><strong>Steinzeug</strong></td><td>Langlebig, chemikalienbeständig</td></tr>
+            <tr><td><strong>Beton</strong></td><td>Große DN, Schächte</td></tr>
+            <tr><td><strong>Guss</strong></td><td>Hochbelastbar, druckdicht</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Schachtabstände</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Max. Abstand Schacht-Schacht</td><td>50-80 m</td></tr>
+            <tr><td>Reinigungsöffnung (RÖ)</td><td>Alle 15 m bei DN 100</td></tr>
+            <tr><td>Richtungsänderung</td><td>Immer Schacht/Bogen</td></tr>
+            <tr><td>Schachtdurchmesser</td><td>min. DN 1000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ENTWÄSSERUNG -->
+      <div id="entwaesserung" class="tab-content">
+        <h2>🌧️ Regenwasser-Entwässerung</h2>
+        
+        <h3>Regenspende (DIN 1986-100)</h3>
+        <table class="data-table">
+          <thead><tr><th>Region</th><th>r(5,5)</th><th>r(5,2)</th></tr></thead>
+          <tbody>
+            <tr><td>Norddeutschland</td><td>200-250 l/(s·ha)</td><td>~300 l/(s·ha)</td></tr>
+            <tr><td>Mitteldeutschland</td><td>250-300 l/(s·ha)</td><td>~350 l/(s·ha)</td></tr>
+            <tr><td>Süddeutschland</td><td>300-350 l/(s·ha)</td><td>~400 l/(s·ha)</td></tr>
+            <tr><td>Alpenrand</td><td>350-450 l/(s·ha)</td><td>~500 l/(s·ha)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abflussbeiwerte (ψ)</h3>
+        <table class="data-table">
+          <thead><tr><th>Oberfläche</th><th>ψ</th></tr></thead>
+          <tbody>
+            <tr><td>Dachflächen</td><td>1,0</td></tr>
+            <tr><td>Asphalt / Beton</td><td>0,9</td></tr>
+            <tr><td>Pflaster (dicht)</td><td>0,75</td></tr>
+            <tr><td>Pflaster (Fugen)</td><td>0,5</td></tr>
+            <tr><td>Kiesflächen</td><td>0,3</td></tr>
+            <tr><td>Rasenflächen</td><td>0,0-0,1</td></tr>
+            <tr><td>Gründach extensiv</td><td>0,3-0,5</td></tr>
+            <tr><td>Gründach intensiv</td><td>0,1-0,3</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Regenwasserableitung</h3>
+        <div class="form-group">
+          <label>Angeschlossene Fläche (m²)</label>
+          <input type="number" id="rw-flaeche" placeholder="z.B. 500" value="500">
+        </div>
+        <div class="form-group">
+          <label>Abflussbeiwert ψ</label>
+          <select id="rw-psi">
+            <option value="1.0">Dach (1,0)</option>
+            <option value="0.9" selected>Asphalt (0,9)</option>
+            <option value="0.75">Pflaster dicht (0,75)</option>
+            <option value="0.5">Pflaster Fugen (0,5)</option>
+            <option value="0.3">Kies/Gründach (0,3)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Regenspende r (l/s·ha)</label>
+          <input type="number" id="rw-regen" placeholder="z.B. 300" value="300">
+        </div>
+        <button class="btn" onclick="calcRegenwasser()">Berechnen</button>
+        <div id="rw-result"></div>
+        
+        <h3 style="margin-top:20px">Versickerung</h3>
+        <table class="data-table">
+          <thead><tr><th>Anlage</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Mulde</strong></td><td>Oberflächennah, große Fläche</td></tr>
+            <tr><td><strong>Rigole</strong></td><td>Unterirdisch, begehbar</td></tr>
+            <tr><td><strong>Mulden-Rigole</strong></td><td>Kombination</td></tr>
+            <tr><td><strong>Schacht</strong></td><td>Punktuell, geringer Platz</td></tr>
+            <tr><td><strong>Rohr-Rigole</strong></td><td>Unterirdisch, linear</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Rückhaltung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Regenrückhaltebecken</strong></td><td>Offenes Becken, Drosselabfluss</td></tr>
+            <tr><td><strong>Stauraumkanal</strong></td><td>Überdimensionierter Kanal</td></tr>
+            <tr><td><strong>Zisterne</strong></td><td>Unterirdisch, Nutzung möglich</td></tr>
+            <tr><td><strong>Retentionsdach</strong></td><td>Dachfläche mit Aufstau</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STRASSE -->
+      <div id="strasse" class="tab-content">
+        <h2>🛣️ Straßenbau</h2>
+        
+        <h3>Oberbau-Aufbau (RStO 12)</h3>
+        <table class="data-table">
+          <thead><tr><th>Schicht</th><th>Material</th><th>Dicke</th></tr></thead>
+          <tbody>
+            <tr><td>Deckschicht</td><td>Asphalt AC</td><td>4 cm</td></tr>
+            <tr><td>Binderschicht</td><td>Asphalt AC B</td><td>8 cm</td></tr>
+            <tr><td>Tragschicht</td><td>Asphalt AC T</td><td>10 cm</td></tr>
+            <tr><td>Frostschutzschicht</td><td>FSS 0/45</td><td>30-50 cm</td></tr>
+            <tr><td>Planum</td><td>Verdichteter Boden</td><td>-</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Belastungsklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>Bk</th><th>Bemessungsverkehr</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td>Bk100</td><td>> 32 Mio. ÄA</td><td>Autobahn</td></tr>
+            <tr><td>Bk32</td><td>10-32 Mio. ÄA</td><td>Bundesstraße</td></tr>
+            <tr><td>Bk10</td><td>3-10 Mio. ÄA</td><td>Landesstraße</td></tr>
+            <tr><td>Bk3,2</td><td>1-3 Mio. ÄA</td><td>Kreisstraße</td></tr>
+            <tr><td>Bk1,0</td><td>0,3-1 Mio. ÄA</td><td>Gemeindestraße</td></tr>
+            <tr><td>Bk0,3</td><td>< 0,3 Mio. ÄA</td><td>Anliegerstraße</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Querneigung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Fahrbahn Asphalt</td><td>2,5%</td></tr>
+            <tr><td>Fahrbahn Beton</td><td>2,5%</td></tr>
+            <tr><td>Gehweg</td><td>2,0%</td></tr>
+            <tr><td>Parkplatz</td><td>2,5%</td></tr>
+            <tr><td>Rinne</td><td>0,5% Längsneigung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Pflasterbau</h3>
+        <table class="data-table">
+          <thead><tr><th>Belastung</th><th>Pflasterdicke</th><th>Bettung</th></tr></thead>
+          <tbody>
+            <tr><td>Fußgänger</td><td>6 cm</td><td>3-5 cm</td></tr>
+            <tr><td>PKW</td><td>8 cm</td><td>3-5 cm</td></tr>
+            <tr><td>LKW leicht</td><td>10 cm</td><td>4-5 cm</td></tr>
+            <tr><td>LKW schwer</td><td>12-14 cm</td><td>4-5 cm</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VERDICHTUNG -->
+      <div id="verdichtung" class="tab-content">
+        <h2>🔨 Verdichtung</h2>
+        
+        <h3>Verdichtungsanforderungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Bereich</th><th>DPr / Ev2</th></tr></thead>
+          <tbody>
+            <tr><td>Planum Straße</td><td>100% / 45 MN/m²</td></tr>
+            <tr><td>Frostschutzschicht</td><td>100% / 80 MN/m²</td></tr>
+            <tr><td>Schottertragschicht</td><td>103% / 120 MN/m²</td></tr>
+            <tr><td>Leitungszone</td><td>97% / -</td></tr>
+            <tr><td>Hinterfüllung Bauwerk</td><td>100% / -</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verdichtungsgeräte</h3>
+        <table class="data-table">
+          <thead><tr><th>Gerät</th><th>Anwendung</th><th>Schichtdicke</th></tr></thead>
+          <tbody>
+            <tr><td>Handstampfer</td><td>Engstellen</td><td>10-15 cm</td></tr>
+            <tr><td>Vibrationsplatte</td><td>Kleine Flächen</td><td>15-30 cm</td></tr>
+            <tr><td>Grabenwalze</td><td>Leitungsgräben</td><td>20-40 cm</td></tr>
+            <tr><td>Tandemwalze</td><td>Flächen</td><td>30-40 cm</td></tr>
+            <tr><td>Walzenzug</td><td>Große Flächen</td><td>30-50 cm</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Prüfverfahren</h3>
+        <table class="data-table">
+          <thead><tr><th>Verfahren</th><th>Messwert</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Proctorversuch</strong></td><td>DPr (Verdichtungsgrad)</td></tr>
+            <tr><td><strong>Plattendruckversuch</strong></td><td>Ev1, Ev2 (MN/m²)</td></tr>
+            <tr><td><strong>Leichtes Fallgewicht (LFG)</strong></td><td>Evd (MN/m²)</td></tr>
+            <tr><td><strong>Densitometer</strong></td><td>Dichte (kg/m³)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Korrelation Ev2 / Evd</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Ev2 ≈ 45 MN/m²</td><td>Evd ≥ 25 MN/m²</td></tr>
+            <tr><td>Ev2 ≈ 80 MN/m²</td><td>Evd ≥ 40 MN/m²</td></tr>
+            <tr><td>Ev2 ≈ 100 MN/m²</td><td>Evd ≥ 50 MN/m²</td></tr>
+            <tr><td>Ev2 ≈ 120 MN/m²</td><td>Evd ≥ 60 MN/m²</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Verhältnis Ev2/Ev1</h4>
+          <p>Sollte ≤ 2,5 sein (Prüfung auf Nachverdichtbarkeit)</p>
+        </div>
+      </div>
+
+      <!-- MASCHINEN -->
+      <div id="maschinen" class="tab-content">
+        <h2>🚜 Baumaschinen</h2>
+        
+        <h3>Bagger</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>Gewicht</th><th>Einsatz</th></tr></thead>
+          <tbody>
+            <tr><td>Minibagger</td><td>< 6 t</td><td>Hausanschlüsse, beengte Verhältnisse</td></tr>
+            <tr><td>Mobilbagger</td><td>6-25 t</td><td>Straßenbau, Leitungsbau</td></tr>
+            <tr><td>Kettenbagger</td><td>15-50 t</td><td>Erdbau, Kanalarbeiten</td></tr>
+            <tr><td>Großbagger</td><td>> 50 t</td><td>Tagebau, Großprojekte</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Radlader</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>Schaufelinhalt</th><th>Einsatz</th></tr></thead>
+          <tbody>
+            <tr><td>Kompaktlader</td><td>0,3-0,8 m³</td><td>Beengte Baustellen</td></tr>
+            <tr><td>Mittlerer Lader</td><td>1,0-2,5 m³</td><td>Standard Erdbau</td></tr>
+            <tr><td>Großlader</td><td>3,0-6,0 m³</td><td>Kieswerke, Tagebau</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verdichtungsgeräte</h3>
+        <table class="data-table">
+          <thead><tr><th>Gerät</th><th>Gewicht</th><th>Schicht</th><th>Einsatz</th></tr></thead>
+          <tbody>
+            <tr><td>Stampfer</td><td>50-100 kg</td><td>10-20 cm</td><td>Engstellen, Gräben</td></tr>
+            <tr><td>Rüttelplatte</td><td>50-500 kg</td><td>20-40 cm</td><td>Kleine Flächen</td></tr>
+            <tr><td>Grabenwalze</td><td>1-3 t</td><td>30-50 cm</td><td>Leitungsgräben</td></tr>
+            <tr><td>Tandemwalze</td><td>2-15 t</td><td>30-50 cm</td><td>Flächen, Asphalt</td></tr>
+            <tr><td>Walzenzug</td><td>8-25 t</td><td>40-60 cm</td><td>Großflächen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Asphaltfertiger</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Einbaubreite</th><th>Leistung</th></tr></thead>
+          <tbody>
+            <tr><td>Radfertiger</td><td>1,5-5 m</td><td>100-400 t/h</td></tr>
+            <tr><td>Kettenfertiger</td><td>2,5-12 m</td><td>200-800 t/h</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Transportfahrzeuge</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Nutzlast</th><th>Volumen</th></tr></thead>
+          <tbody>
+            <tr><td>3-Achs-Kipper</td><td>~14 t</td><td>~10 m³</td></tr>
+            <tr><td>4-Achs-Kipper</td><td>~18 t</td><td>~14 m³</td></tr>
+            <tr><td>Sattelkipper</td><td>~25 t</td><td>~20 m³</td></tr>
+            <tr><td>Dumper (Knicklenker)</td><td>15-40 t</td><td>10-25 m³</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Leistungsberechnung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>Bagger</strong></td><td>Q = V × n × f × 60 [m³/h]</td></tr>
+            <tr><td><strong>Radlader</strong></td><td>Q = V × n × f [m³/h]</td></tr>
+            <tr><td><strong>LKW-Kapazität</strong></td><td>Ladespiele = Entfernung / Geschwindigkeit</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:#6b7280;margin-top:10px;">V = Schaufelinhalt, n = Arbeitsspiele/h, f = Füllfaktor</p>
+      </div>
+
+      <!-- NORMEN -->
+      <div id="normen" class="tab-content">
+        <h2>📋 Normen Tiefbau</h2>
+        
+        <h3>VOB/C - ATV</h3>
+        <table class="data-table">
+          <thead><tr><th>ATV</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>DIN 18300</strong></td><td>Erdarbeiten</td></tr>
+            <tr><td><strong>DIN 18301</strong></td><td>Bohrarbeiten</td></tr>
+            <tr><td><strong>DIN 18302</strong></td><td>Arbeiten zum Ausbau von Bohrungen</td></tr>
+            <tr><td><strong>DIN 18303</strong></td><td>Verbauarbeiten</td></tr>
+            <tr><td><strong>DIN 18304</strong></td><td>Ramm-, Rüttel- und Pressarbeiten</td></tr>
+            <tr><td><strong>DIN 18305</strong></td><td>Wasserhaltungsarbeiten</td></tr>
+            <tr><td><strong>DIN 18306</strong></td><td>Entwässerungskanalarbeiten</td></tr>
+            <tr><td><strong>DIN 18311</strong></td><td>Nassbaggerarbeiten</td></tr>
+            <tr><td><strong>DIN 18312</strong></td><td>Untertagebauarbeiten</td></tr>
+            <tr><td><strong>DIN 18313</strong></td><td>Schlitzwandarbeiten</td></tr>
+            <tr><td><strong>DIN 18314</strong></td><td>Spritzbetonarbeiten</td></tr>
+            <tr><td><strong>DIN 18315</strong></td><td>Verkehrswegebauarbeiten Oberbau</td></tr>
+            <tr><td><strong>DIN 18316</strong></td><td>Verkehrswegebauarbeiten Pflaster</td></tr>
+            <tr><td><strong>DIN 18317</strong></td><td>Verkehrswegebauarbeiten Beton</td></tr>
+            <tr><td><strong>DIN 18318</strong></td><td>Verkehrswegebauarbeiten Tragschichten</td></tr>
+            <tr><td><strong>DIN 18319</strong></td><td>Rohrvortriebsarbeiten</td></tr>
+            <tr><td><strong>DIN 18320</strong></td><td>Landschaftsbauarbeiten</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Weitere Normen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>DIN 4124</strong></td><td>Baugruben und Gräben</td></tr>
+            <tr><td><strong>DIN EN 1610</strong></td><td>Verlegung Abwasserleitungen</td></tr>
+            <tr><td><strong>DIN EN 12889</strong></td><td>Grabenlose Verlegung</td></tr>
+            <tr><td><strong>RStO 12</strong></td><td>Standardisierung Oberbau</td></tr>
+            <tr><td><strong>ZTV E-StB</strong></td><td>Erdarbeiten Straßenbau</td></tr>
+            <tr><td><strong>ZTV SoB-StB</strong></td><td>Schichten ohne Bindemittel</td></tr>
+            <tr><td><strong>ZTV Asphalt-StB</strong></td><td>Asphaltarbeiten</td></tr>
+            <tr><td><strong>ZTV Beton-StB</strong></td><td>Betonarbeiten Straßen</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Tiefbau</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📝 Abkürzungen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>DPr</strong></td><td>Proctordichte</td></tr>
+              <tr><td><strong>Ev</strong></td><td>Verformungsmodul</td></tr>
+              <tr><td><strong>Evd</strong></td><td>Dyn. Verformungsmodul</td></tr>
+              <tr><td><strong>FSS</strong></td><td>Frostschutzschicht</td></tr>
+              <tr><td><strong>STS</strong></td><td>Schottertragschicht</td></tr>
+              <tr><td><strong>KG</strong></td><td>Kanalgrundrohr</td></tr>
+              <tr><td><strong>ÄA</strong></td><td>Äquivalente Achsübergänge</td></tr>
+              <tr><td><strong>AC</strong></td><td>Asphaltbeton</td></tr>
+              <tr><td><strong>SMA</strong></td><td>Splittmastixasphalt</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔢 Gewichte</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Sand trocken</td><td>1,5 t/m³</td></tr>
+              <tr><td>Sand nass</td><td>1,9 t/m³</td></tr>
+              <tr><td>Kies</td><td>1,8 t/m³</td></tr>
+              <tr><td>Schotter</td><td>1,7 t/m³</td></tr>
+              <tr><td>Lehm</td><td>1,8 t/m³</td></tr>
+              <tr><td>Ton</td><td>2,0 t/m³</td></tr>
+              <tr><td>Asphalt</td><td>2,4 t/m³</td></tr>
+              <tr><td>Beton</td><td>2,4 t/m³</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🌊 Wasserhaltung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Offene Wasserhaltung</strong></td><td>Pumpen aus Grube</td></tr>
+              <tr><td><strong>Schwerkraft</strong></td><td>Drainageleitungen</td></tr>
+              <tr><td><strong>Grundwasserabsenkung</strong></td><td>Brunnen, Wellpoint</td></tr>
+              <tr><td><strong>Spundwand</strong></td><td>Abdichtung der Grube</td></tr>
+            </table>
+            <p style="margin-top:10px;color:#dc2626;font-weight:bold">Einleitung nur mit wasserrechtlicher Genehmigung!</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Dokumentation</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <ul style="margin:10px 0 0 20px">
+              <li>Schichtenverzeichnis / Baugrundgutachten</li>
+              <li>Verdichtungsprotokolle</li>
+              <li>Druckprüfprotokolle Leitungen</li>
+              <li>Vermessungsprotokolle (Höhen, Lage)</li>
+              <li>TV-Befahrung Kanal</li>
+              <li>Bestandsplan / Leitungskataster</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'erdarbeiten')">
+      <span class="nav-icon">⛏️</span><span class="nav-label">Erde</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'graeben')">
+      <span class="nav-icon">🕳️</span><span class="nav-label">Gräben</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[2], 'leitungen')">
+      <span class="nav-icon">🔌</span><span class="nav-label">Leitungen</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[4], 'strasse')">
+      <span class="nav-icon">🛣️</span><span class="nav-label">Straße</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[7], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcAushub() {
+      const l = parseFloat(document.getElementById('aus-laenge').value);
+      const b = parseFloat(document.getElementById('aus-breite').value);
+      const t = parseFloat(document.getElementById('aus-tiefe').value);
+      const f = parseFloat(document.getElementById('aus-faktor').value);
+      
+      if (isNaN(l) || isNaN(b) || isNaN(t)) {
+        document.getElementById('aus-result').innerHTML = '<div class="danger">Bitte alle Werte eingeben</div>';
+        return;
+      }
+      
+      const volumen = l * b * t;
+      const aufgelockert = volumen * f;
+      const lkw = Math.ceil(aufgelockert / 10); // 10m³ pro LKW
+      
+      document.getElementById('aus-result').innerHTML = `
+        <div class="result">
+          <h3>Aushubvolumen</h3>
+          <div class="result-item"><span>Gewachsen:</span><span><strong>${volumen.toFixed(1)} m³</strong></span></div>
+          <div class="result-item"><span>Aufgelockert:</span><span><strong>${aufgelockert.toFixed(1)} m³</strong></span></div>
+          <div class="result-item"><span>LKW-Fuhren (à 10m³):</span><span>ca. ${lkw}</span></div>
+        </div>`;
+    }
+    
+    function calcGefaelle() {
+      const laenge = parseFloat(document.getElementById('gef-laenge').value);
+      const prozent = parseFloat(document.getElementById('gef-prozent').value);
+      
+      if (isNaN(laenge) || isNaN(prozent)) {
+        document.getElementById('gef-result').innerHTML = '<div class="danger">Bitte alle Werte eingeben</div>';
+        return;
+      }
+      
+      const diff = laenge * (prozent / 100);
+      const verhaeltnis = Math.round(100 / prozent);
+      
+      document.getElementById('gef-result').innerHTML = `
+        <div class="result">
+          <h3>Gefälle</h3>
+          <div class="result-item"><span>Länge:</span><span>${laenge} m</span></div>
+          <div class="result-item"><span>Gefälle:</span><span>${prozent}% = 1:${verhaeltnis}</span></div>
+          <div class="result-item"><span>Höhendifferenz:</span><span><strong>${(diff * 100).toFixed(1)} cm</strong></span></div>
+        </div>`;
+    }
+    
+    function calcRegenwasser() {
+      const flaeche = parseFloat(document.getElementById('rw-flaeche').value);
+      const psi = parseFloat(document.getElementById('rw-psi').value);
+      const regen = parseFloat(document.getElementById('rw-regen').value);
+      
+      if (isNaN(flaeche) || isNaN(regen)) {
+        document.getElementById('rw-result').innerHTML = '<div class="danger">Bitte alle Werte eingeben</div>';
+        return;
+      }
+      
+      // Q = ψ × r × A
+      // r in l/(s·ha), A in m² → Umrechnung: A/10000 = ha
+      const abfluss = psi * regen * (flaeche / 10000);
+      
+      // Rohr-DN ermitteln (vereinfacht bei 1% Gefälle)
+      let dn;
+      if (abfluss <= 3) dn = 'DN 100';
+      else if (abfluss <= 8) dn = 'DN 125';
+      else if (abfluss <= 15) dn = 'DN 150';
+      else if (abfluss <= 35) dn = 'DN 200';
+      else if (abfluss <= 80) dn = 'DN 250';
+      else if (abfluss <= 150) dn = 'DN 300';
+      else dn = 'DN 400+';
+      
+      document.getElementById('rw-result').innerHTML = `
+        <div class="result">
+          <h3>Regenwasserabfluss</h3>
+          <div class="result-item"><span>Fläche:</span><span>${flaeche} m² (${(flaeche/10000).toFixed(3)} ha)</span></div>
+          <div class="result-item"><span>Abflussbeiwert:</span><span>${psi}</span></div>
+          <div class="result-item"><span>Regenspende:</span><span>${regen} l/(s·ha)</span></div>
+          <div class="result-item"><span>Abflussmenge Q:</span><span><strong>${abfluss.toFixed(1)} l/s</strong></span></div>
+          <div class="result-item"><span>Rohrempfehlung (1%):</span><span><strong>${dn}</strong></span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

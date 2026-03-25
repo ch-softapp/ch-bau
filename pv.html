@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f59e0b">
+  <title>ch-Bau - PV/Solar</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #f59e0b; --primary-dark: #d97706; }
+    .app-header { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+  </style>
+</head>
+<body class="gewerk-pv">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv" selected>☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>☀️ PV / Solar</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Photovoltaik · Wechselrichter · Speicher · Ertrag</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'anlage')">Anlage</button>
+        <button class="tab" onclick="switchTab(this, 'module')">Module</button>
+        <button class="tab" onclick="switchTab(this, 'wechselrichter')">WR</button>
+        <button class="tab" onclick="switchTab(this, 'speicher')">Speicher</button>
+        <button class="tab" onclick="switchTab(this, 'montage')">Montage</button>
+        <button class="tab" onclick="switchTab(this, 'ertrag')">Ertrag</button>
+        <button class="tab" onclick="switchTab(this, 'normen')">Normen</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- ANLAGE BERECHNUNG -->
+      <div id="anlage" class="tab-content active">
+        <h2>📐 Anlagenauslegung</h2>
+        
+        <h3>PV-Anlage dimensionieren</h3>
+        <div class="form-group">
+          <label>Jahresstromverbrauch (kWh)</label>
+          <input type="number" id="pv-verbrauch" placeholder="z.B. 4500" value="4500">
+        </div>
+        <div class="form-group">
+          <label>Autarkieziel (%)</label>
+          <select id="pv-autarkie">
+            <option value="30">30% - Ohne Speicher</option>
+            <option value="50">50% - Kleiner Speicher</option>
+            <option value="70" selected>70% - Standard mit Speicher</option>
+            <option value="80">80% - Großer Speicher</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Standort</label>
+          <select id="pv-standort">
+            <option value="900">Norddeutschland (900 kWh/kWp)</option>
+            <option value="950" selected>Mitteldeutschland (950 kWh/kWp)</option>
+            <option value="1000">Süddeutschland (1000 kWh/kWp)</option>
+            <option value="1100">Alpenrand (1100 kWh/kWp)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dachausrichtung</label>
+          <select id="pv-ausrichtung">
+            <option value="1.0">Süd (100%)</option>
+            <option value="0.95">Südost/Südwest (95%)</option>
+            <option value="0.85">Ost/West (85%)</option>
+            <option value="0.90">Ost-West-Dach (90%)</option>
+            <option value="0.70">Nord (70%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Dachneigung</label>
+          <select id="pv-neigung">
+            <option value="0.93">0-10° Flachdach</option>
+            <option value="0.98">15-25°</option>
+            <option value="1.0" selected>30-35° optimal</option>
+            <option value="0.97">40-45°</option>
+            <option value="0.90">50-60°</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcPVAnlage()">Berechnen</button>
+        <div id="pv-result"></div>
+        
+        <h3 style="margin-top:25px">Faustformeln</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Anlagengröße</td><td>ca. 1 kWp pro 1.000 kWh Verbrauch</td></tr>
+            <tr><td>Modulfläche</td><td>ca. 5-6 m² pro kWp</td></tr>
+            <tr><td>Speichergröße</td><td>ca. 1 kWh pro kWp PV</td></tr>
+            <tr><td>Eigenverbrauch ohne Speicher</td><td>ca. 25-35%</td></tr>
+            <tr><td>Eigenverbrauch mit Speicher</td><td>ca. 60-80%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MODULE -->
+      <div id="module" class="tab-content">
+        <h2>🔲 PV-Module</h2>
+        
+        <h3>Modultypen</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Wirkungsgrad</th><th>Eigenschaften</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Monokristallin</strong></td><td>20-23%</td><td>Hoher Ertrag, schwarz, teurer</td></tr>
+            <tr><td><strong>PERC</strong></td><td>21-24%</td><td>Bessere Schwachlichtleistung</td></tr>
+            <tr><td><strong>TOPCon</strong></td><td>22-25%</td><td>Neueste Technologie, bifazial</td></tr>
+            <tr><td><strong>HJT</strong></td><td>22-26%</td><td>Heterojunction, sehr effizient</td></tr>
+            <tr><td><strong>Bifazial</strong></td><td>+5-15%</td><td>Beidseitig aktiv, Flachdach</td></tr>
+            <tr><td><strong>Dünnschicht</strong></td><td>10-13%</td><td>Flexibel, günstig, Großfläche</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Typische Moduldaten (2024)</h3>
+        <table class="data-table">
+          <thead><tr><th>Größe</th><th>Leistung</th><th>Maße (mm)</th><th>Gewicht</th></tr></thead>
+          <tbody>
+            <tr><td>Standard 60 Zellen</td><td>380-400 Wp</td><td>1755×1038</td><td>~20 kg</td></tr>
+            <tr><td>Standard 72 Zellen</td><td>450-500 Wp</td><td>2094×1038</td><td>~27 kg</td></tr>
+            <tr><td>Halbzellen 120</td><td>400-420 Wp</td><td>1722×1134</td><td>~21 kg</td></tr>
+            <tr><td>Halbzellen 144</td><td>540-580 Wp</td><td>2278×1134</td><td>~32 kg</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Stringberechnung</h3>
+        <div class="form-group">
+          <label>Modul-Leerlaufspannung Uoc (V)</label>
+          <input type="number" id="str-uoc" placeholder="z.B. 41.5" value="41.5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>Modul-MPP-Spannung Umpp (V)</label>
+          <input type="number" id="str-umpp" placeholder="z.B. 34.2" value="34.2" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>WR Min. MPP-Spannung (V)</label>
+          <input type="number" id="str-wr-min" placeholder="z.B. 150" value="150">
+        </div>
+        <div class="form-group">
+          <label>WR Max. MPP-Spannung (V)</label>
+          <input type="number" id="str-wr-max" placeholder="z.B. 800" value="800">
+        </div>
+        <div class="form-group">
+          <label>WR Max. Eingangsspannung (V)</label>
+          <input type="number" id="str-wr-umax" placeholder="z.B. 1000" value="1000">
+        </div>
+        <button class="btn" onclick="calcString()">Berechnen</button>
+        <div id="str-result"></div>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Temperaturkorrektur</h4>
+          <p>Uoc bei -10°C: Uoc × 1,14 (für 70°C Spreizung × -0,3%/K)</p>
+          <p>Umpp bei 70°C: Umpp × 0,84</p>
+        </div>
+      </div>
+
+      <!-- WECHSELRICHTER -->
+      <div id="wechselrichter" class="tab-content">
+        <h2>⚡ Wechselrichter</h2>
+        
+        <h3>WR-Typen</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Einsatz</th><th>Vorteile</th></tr></thead>
+          <tbody>
+            <tr><td><strong>String-WR</strong></td><td>Standard, Dach</td><td>Günstig, bewährt</td></tr>
+            <tr><td><strong>Multi-String</strong></td><td>Mehrere Ausrichtungen</td><td>Flexibel, 2-3 MPP-Tracker</td></tr>
+            <tr><td><strong>Hybrid-WR</strong></td><td>Mit Speicher</td><td>Alles in einem Gerät</td></tr>
+            <tr><td><strong>Mikro-WR</strong></td><td>Modul-einzeln</td><td>Keine Stringprobleme, teuer</td></tr>
+            <tr><td><strong>Leistungsoptimierer</strong></td><td>Teilverschattung</td><td>DC-DC am Modul + Zentral-WR</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Auslegung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Dimensionierung</td><td>70-100% der PV-Leistung</td></tr>
+            <tr><td>Unterdimensionierung</td><td>Bis 70% bei Ost-West möglich</td></tr>
+            <tr><td>DC/AC-Verhältnis</td><td>1,0 - 1,4 typisch</td></tr>
+            <tr><td>MPP-Bereich</td><td>String muss im Bereich liegen</td></tr>
+            <tr><td>Max. Strom/String</td><td>Beachten bei Parallelschaltung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 WR-Auswahl</h3>
+        <div class="form-group">
+          <label>PV-Leistung (kWp)</label>
+          <input type="number" id="wr-kwp" placeholder="z.B. 10" value="10" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Dachausrichtung</label>
+          <select id="wr-dach">
+            <option value="1.0">Süd (100%)</option>
+            <option value="0.9" selected>Ost-West (90%)</option>
+            <option value="0.95">Südost/Südwest (95%)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcWR()">Empfehlung</button>
+        <div id="wr-result"></div>
+        
+        <h3 style="margin-top:20px">Typische WR-Größen</h3>
+        <table class="data-table">
+          <thead><tr><th>AC-Leistung</th><th>PV-Bereich</th><th>Einsatz</th></tr></thead>
+          <tbody>
+            <tr><td>3-5 kW</td><td>3-7 kWp</td><td>Einfamilienhaus klein</td></tr>
+            <tr><td>5-8 kW</td><td>6-11 kWp</td><td>Einfamilienhaus Standard</td></tr>
+            <tr><td>8-12 kW</td><td>10-15 kWp</td><td>Einfamilienhaus groß</td></tr>
+            <tr><td>15-30 kW</td><td>15-40 kWp</td><td>Gewerbe klein</td></tr>
+            <tr><td>50-100 kW</td><td>50-130 kWp</td><td>Gewerbe/Industrie</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SPEICHER -->
+      <div id="speicher" class="tab-content">
+        <h2>🔋 Batteriespeicher</h2>
+        
+        <h3>Speichertechnologien</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Zyklen</th><th>Eigenschaften</th></tr></thead>
+          <tbody>
+            <tr><td><strong>LFP (LiFePO4)</strong></td><td>6000-10000</td><td>Sicher, langlebig, Standard</td></tr>
+            <tr><td><strong>NMC</strong></td><td>3000-6000</td><td>Höhere Energiedichte</td></tr>
+            <tr><td><strong>NCA</strong></td><td>2000-4000</td><td>Kompakt, Tesla etc.</td></tr>
+            <tr><td><strong>Salzwasser</strong></td><td>3000-5000</td><td>Umweltfreundlich, schwer</td></tr>
+            <tr><td><strong>Blei-Gel</strong></td><td>500-1500</td><td>Günstig, schwer, veraltet</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Speicher dimensionieren</h3>
+        <div class="form-group">
+          <label>PV-Leistung (kWp)</label>
+          <input type="number" id="sp-kwp" placeholder="z.B. 10" value="10" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Tagesverbrauch (kWh)</label>
+          <input type="number" id="sp-verbrauch" placeholder="z.B. 12" value="12" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Ziel</label>
+          <select id="sp-ziel">
+            <option value="standard">Standard (1 kWh/kWp)</option>
+            <option value="autarkie" selected>Hohe Autarkie (1,5 kWh/kWp)</option>
+            <option value="notstrom">Mit Notstrom (2 kWh/kWp)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcSpeicher()">Berechnen</button>
+        <div id="sp-result"></div>
+        
+        <h3 style="margin-top:20px">Typische Speichergrößen</h3>
+        <table class="data-table">
+          <thead><tr><th>PV-Anlage</th><th>Speicher</th><th>Autarkie</th></tr></thead>
+          <tbody>
+            <tr><td>5 kWp</td><td>5-7 kWh</td><td>60-70%</td></tr>
+            <tr><td>8 kWp</td><td>8-10 kWh</td><td>65-75%</td></tr>
+            <tr><td>10 kWp</td><td>10-15 kWh</td><td>70-80%</td></tr>
+            <tr><td>15 kWp</td><td>15-20 kWh</td><td>75-85%</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Wirtschaftlichkeit</h4>
+          <p>Speicher > 1,5 kWh/kWp oft nicht wirtschaftlich! Ausnahme: Notstromfunktion gewünscht.</p>
+        </div>
+      </div>
+
+      <!-- MONTAGE -->
+      <div id="montage" class="tab-content">
+        <h2>🔧 Montage & Installation</h2>
+        
+        <h3>Montagesysteme</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Dachtyp</th><th>Neigung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Aufdach Ziegel</strong></td><td>Schrägdach</td><td>Dachparallel</td></tr>
+            <tr><td><strong>Aufdach Blechfalz</strong></td><td>Blechdach</td><td>Dachparallel</td></tr>
+            <tr><td><strong>Indach</strong></td><td>Neubau/Sanierung</td><td>Dachparallel</td></tr>
+            <tr><td><strong>Aufständerung</strong></td><td>Flachdach</td><td>10-15° Süd</td></tr>
+            <tr><td><strong>Ost-West</strong></td><td>Flachdach</td><td>10° je Seite</td></tr>
+            <tr><td><strong>Fassade</strong></td><td>Außenwand</td><td>90°</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abstände Flachdach</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Reihenabstand Süd</td><td>1,5 - 2,5 × Modulhöhe</td></tr>
+            <tr><td>Reihenabstand Ost-West</td><td>0,3 - 0,5 m (minimal)</td></tr>
+            <tr><td>Abstand Attika</td><td>min. 0,5 m (Wind)</td></tr>
+            <tr><td>Wartungsgang</td><td>min. 0,8 m alle 20 m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">DC-Installation</h3>
+        <table class="data-table">
+          <thead><tr><th>Komponente</th><th>Anforderung</th></tr></thead>
+          <tbody>
+            <tr><td>DC-Leitung</td><td>Solarkabel H1Z2Z2-K, 4-6 mm²</td></tr>
+            <tr><td>Stecker</td><td>MC4 oder kompatibel</td></tr>
+            <tr><td>Überspannungsschutz</td><td>Typ 2 (DC) am WR</td></tr>
+            <tr><td>DC-Freischalter</td><td>Am WR oder extern</td></tr>
+            <tr><td>Leitungsführung</td><td>UV-beständig, getrennt von AC</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">AC-Installation</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Einspeisezähler</td><td>Beim Netzbetreiber anmelden</td></tr>
+            <tr><td>Sicherung WR</td><td>Nach WR-Vorgabe (typ. B16-B32)</td></tr>
+            <tr><td>RCD</td><td>Typ B bei trafolosen WR</td></tr>
+            <tr><td>NA-Schutz</td><td>Im WR integriert (ENS)</td></tr>
+            <tr><td>Potentialausgleich</td><td>Modulrahmen, Gestell an HES</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ERTRAG -->
+      <div id="ertrag" class="tab-content">
+        <h2>📊 Ertragsberechnung</h2>
+        
+        <h3>📐 Jahresertrag berechnen</h3>
+        <div class="form-group">
+          <label>Anlagenleistung (kWp)</label>
+          <input type="number" id="er-kwp" placeholder="z.B. 10" value="10" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Spezifischer Ertrag (kWh/kWp)</label>
+          <input type="number" id="er-spez" placeholder="z.B. 950" value="950">
+        </div>
+        <div class="form-group">
+          <label>Systemverluste (%)</label>
+          <select id="er-verluste">
+            <option value="0.14" selected>14% Standard (Kabel, WR, Temp.)</option>
+            <option value="0.10">10% Optimal</option>
+            <option value="0.18">18% Ungünstig (Verschattung)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcErtrag()">Berechnen</button>
+        <div id="er-result"></div>
+        
+        <h3 style="margin-top:25px">Spezifischer Ertrag Deutschland</h3>
+        <table class="data-table">
+          <thead><tr><th>Region</th><th>kWh/kWp</th></tr></thead>
+          <tbody>
+            <tr><td>Schleswig-Holstein</td><td>850-900</td></tr>
+            <tr><td>Niedersachsen</td><td>880-920</td></tr>
+            <tr><td>NRW</td><td>900-950</td></tr>
+            <tr><td>Hessen</td><td>920-980</td></tr>
+            <tr><td>Bayern (Norden)</td><td>950-1000</td></tr>
+            <tr><td>Bayern (Süden)</td><td>1000-1100</td></tr>
+            <tr><td>Baden-Württemberg</td><td>980-1050</td></tr>
+            <tr><td>Alpenrand</td><td>1050-1150</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Monatliche Verteilung</h3>
+        <table class="data-table">
+          <thead><tr><th>Monat</th><th>Anteil</th><th>Monat</th><th>Anteil</th></tr></thead>
+          <tbody>
+            <tr><td>Januar</td><td>3%</td><td>Juli</td><td>13%</td></tr>
+            <tr><td>Februar</td><td>5%</td><td>August</td><td>12%</td></tr>
+            <tr><td>März</td><td>9%</td><td>September</td><td>9%</td></tr>
+            <tr><td>April</td><td>11%</td><td>Oktober</td><td>6%</td></tr>
+            <tr><td>Mai</td><td>13%</td><td>November</td><td>3%</td></tr>
+            <tr><td>Juni</td><td>13%</td><td>Dezember</td><td>2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- NORMEN -->
+      <div id="normen" class="tab-content">
+        <h2>📋 Normen & Vorschriften</h2>
+        
+        <h3>Elektrotechnik</h3>
+        <table class="data-table">
+          <thead><tr><th>Norm</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>VDE 0100-712</strong></td><td>Errichten - PV-Anlagen</td></tr>
+            <tr><td><strong>VDE 0100-443</strong></td><td>Überspannungsschutz</td></tr>
+            <tr><td><strong>VDE 0100-534</strong></td><td>Überspannungsschutzgeräte</td></tr>
+            <tr><td><strong>VDE 0100-410</strong></td><td>Schutzmaßnahmen</td></tr>
+            <tr><td><strong>VDE-AR-N 4105</strong></td><td>Erzeugungsanlagen am NS-Netz</td></tr>
+            <tr><td><strong>VDE-AR-N 4110</strong></td><td>Erzeugungsanlagen am MS-Netz</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Komponenten</h3>
+        <table class="data-table">
+          <thead><tr><th>Norm</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>IEC 61215</strong></td><td>Kristalline PV-Module - Prüfung</td></tr>
+            <tr><td><strong>IEC 61730</strong></td><td>PV-Module - Sicherheit</td></tr>
+            <tr><td><strong>IEC 62109</strong></td><td>Wechselrichter - Sicherheit</td></tr>
+            <tr><td><strong>IEC 62619</strong></td><td>Lithium-Batterien - Sicherheit</td></tr>
+            <tr><td><strong>IEC 62446</strong></td><td>PV-Anlagen - Prüfung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Blitzschutz</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>DIN EN 62305</strong></td><td>Blitzschutz allgemein</td></tr>
+            <tr><td><strong>DIN EN 62305-3 BB5</strong></td><td>Blitzschutz für PV-Anlagen</td></tr>
+            <tr><td>Trennungsabstand</td><td>min. 0,5 m zu Fangeinrichtung</td></tr>
+            <tr><td>Überspannungsschutz</td><td>DC Typ 2, AC Typ 2 (Typ 1 bei Blitzschutz)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Feuerwehr / Brandschutz</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>DIN VDE 0100-420</strong></td><td>Brandschutz</td></tr>
+            <tr><td>Feuerwehrschalter</td><td>Bei Gebäude mit erhöhter Gefährdung</td></tr>
+            <tr><td>Kennzeichnung</td><td>Warnschild "PV-Anlage" am Zähler</td></tr>
+            <tr><td>DC-Freischaltung</td><td>Möglichkeit zur Spannungsfreischaltung</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen PV</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📝 Abkürzungen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Wp</strong></td><td>Watt peak (Nennleistung bei STC)</td></tr>
+              <tr><td><strong>kWp</strong></td><td>Kilowatt peak</td></tr>
+              <tr><td><strong>STC</strong></td><td>Standard Test Conditions (1000 W/m², 25°C, AM1.5)</td></tr>
+              <tr><td><strong>NOCT</strong></td><td>Nominal Operating Cell Temperature</td></tr>
+              <tr><td><strong>MPP</strong></td><td>Maximum Power Point</td></tr>
+              <tr><td><strong>Uoc</strong></td><td>Leerlaufspannung</td></tr>
+              <tr><td><strong>Isc</strong></td><td>Kurzschlussstrom</td></tr>
+              <tr><td><strong>Umpp</strong></td><td>Spannung am MPP</td></tr>
+              <tr><td><strong>Impp</strong></td><td>Strom am MPP</td></tr>
+              <tr><td><strong>FF</strong></td><td>Füllfaktor (Umpp×Impp)/(Uoc×Isc)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🌡️ Temperaturkoeffizienten</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Leistung Pmax</td><td>-0,35 bis -0,40 %/K</td></tr>
+              <tr><td>Spannung Uoc</td><td>-0,27 bis -0,32 %/K</td></tr>
+              <tr><td>Strom Isc</td><td>+0,04 bis +0,06 %/K</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;">Beispiel: Bei 50°C Modultemperatur (25K über STC) sinkt die Leistung um ca. 9%</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>💰 Wirtschaftlichkeit</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Anlagenkosten netto</td><td>1.200-1.600 €/kWp (ohne Speicher)</td></tr>
+              <tr><td>Speicherkosten</td><td>600-900 €/kWh</td></tr>
+              <tr><td>Einspeisevergütung (2024)</td><td>8,1 ct/kWh (< 10 kWp)</td></tr>
+              <tr><td>Strompreis Bezug</td><td>ca. 30-35 ct/kWh</td></tr>
+              <tr><td>Gestehungskosten</td><td>ca. 8-12 ct/kWh</td></tr>
+              <tr><td>Amortisation</td><td>8-12 Jahre (ohne Speicher)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Anmeldung & Förderung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Anmeldepflichten:</h4>
+            <ul style="margin:10px 0 10px 20px">
+              <li>Marktstammdatenregister (MaStR)</li>
+              <li>Netzbetreiber (Netzanschluss)</li>
+              <li>Finanzamt (bei Gewinnerzielung)</li>
+            </ul>
+            <h4>Förderung:</h4>
+            <ul style="margin:10px 0 10px 20px">
+              <li>KfW 270 (Kredit)</li>
+              <li>Einspeisevergütung (EEG)</li>
+              <li>Regionale Förderprogramme</li>
+              <li>Seit 2023: 0% MwSt. für PV ≤30 kWp</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>⚡ Netzanschluss</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>< 10,8 kVA</td><td>Einphasig möglich</td></tr>
+              <tr><td>< 30 kVA</td><td>Dreiphasig, vereinfachtes Verfahren</td></tr>
+              <tr><td>30 - 135 kVA</td><td>Netzverträglichkeitsprüfung</td></tr>
+              <tr><td>> 135 kVA</td><td>Mittelspannungsanschluss prüfen</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;">Schieflast: Max. 4,6 kVA Differenz zwischen Phasen</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'anlage')">
+      <span class="nav-icon">📐</span><span class="nav-label">Anlage</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'module')">
+      <span class="nav-icon">🔲</span><span class="nav-label">Module</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[3], 'speicher')">
+      <span class="nav-icon">🔋</span><span class="nav-label">Speicher</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[5], 'ertrag')">
+      <span class="nav-icon">📊</span><span class="nav-label">Ertrag</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[7], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcPVAnlage() {
+      const verbrauch = parseFloat(document.getElementById('pv-verbrauch').value);
+      const autarkie = parseFloat(document.getElementById('pv-autarkie').value) / 100;
+      const ertragProKwp = parseFloat(document.getElementById('pv-standort').value);
+      const ausrichtung = parseFloat(document.getElementById('pv-ausrichtung').value);
+      const neigung = parseFloat(document.getElementById('pv-neigung').value);
+      
+      if (isNaN(verbrauch)) { document.getElementById('pv-result').innerHTML = '<div class="danger">Bitte Verbrauch eingeben</div>'; return; }
+      
+      const effErtrag = ertragProKwp * ausrichtung * neigung * 0.86; // 14% Systemverluste
+      const benoetigteErzeugung = verbrauch * autarkie / 0.35; // Eigenverbrauchsquote ~35% ohne Speicher
+      const kwp = benoetigteErzeugung / effErtrag;
+      const kwpGerundet = Math.ceil(kwp * 2) / 2;
+      
+      const jahresertrag = kwpGerundet * effErtrag;
+      const speicher = autarkie > 0.4 ? kwpGerundet * 1.0 : 0;
+      const modulAnzahl = Math.ceil(kwpGerundet / 0.42); // ~420 Wp Module
+      const flaeche = modulAnzahl * 1.8;
+      
+      document.getElementById('pv-result').innerHTML = `
+        <div class="result">
+          <h3>Empfehlung</h3>
+          <div class="result-item"><span>PV-Leistung:</span><span><strong>${kwpGerundet.toFixed(1)} kWp</strong></span></div>
+          <div class="result-item"><span>Module (420 Wp):</span><span>ca. ${modulAnzahl} Stück</span></div>
+          <div class="result-item"><span>Dachfläche:</span><span>ca. ${flaeche.toFixed(0)} m²</span></div>
+          <div class="result-item"><span>Jahresertrag:</span><span>ca. ${jahresertrag.toFixed(0)} kWh</span></div>
+          ${speicher > 0 ? `<div class="result-item"><span>Speicher:</span><span><strong>${speicher.toFixed(0)} kWh</strong></span></div>` : ''}
+        </div>`;
+    }
+    
+    function calcString() {
+      const uoc = parseFloat(document.getElementById('str-uoc').value);
+      const umpp = parseFloat(document.getElementById('str-umpp').value);
+      const wrMin = parseFloat(document.getElementById('str-wr-min').value);
+      const wrMax = parseFloat(document.getElementById('str-wr-max').value);
+      const wrUmax = parseFloat(document.getElementById('str-wr-umax').value);
+      
+      // Temperaturkorrektur
+      const uocKalt = uoc * 1.14; // -10°C
+      const umppHeiss = umpp * 0.84; // 70°C
+      
+      // Modulanzahl berechnen
+      const minModule = Math.ceil(wrMin / umppHeiss);
+      const maxModuleMPP = Math.floor(wrMax / umpp);
+      const maxModuleUmax = Math.floor(wrUmax / uocKalt);
+      const maxModule = Math.min(maxModuleMPP, maxModuleUmax);
+      
+      document.getElementById('str-result').innerHTML = `
+        <div class="result">
+          <h3>Stringauslegung</h3>
+          <div class="result-item"><span>Uoc bei -10°C:</span><span>${uocKalt.toFixed(1)} V</span></div>
+          <div class="result-item"><span>Umpp bei 70°C:</span><span>${umppHeiss.toFixed(1)} V</span></div>
+          <div class="result-item"><span>Min. Module/String:</span><span><strong>${minModule}</strong></span></div>
+          <div class="result-item"><span>Max. Module/String:</span><span><strong>${maxModule}</strong></span></div>
+          <div class="result-item"><span>Empfehlung:</span><span><strong>${Math.floor((minModule + maxModule) / 2)} Module</strong></span></div>
+        </div>
+        ${maxModule < minModule ? '<div class="danger" style="margin-top:10px">⚠️ Keine gültige Konfiguration möglich!</div>' : ''}`;
+    }
+    
+    function calcWR() {
+      const kwp = parseFloat(document.getElementById('wr-kwp').value);
+      const dach = parseFloat(document.getElementById('wr-dach').value);
+      
+      const wrLeistung = kwp * dach * 0.9; // 90% der PV-Leistung
+      const wrGerundet = Math.round(wrLeistung);
+      
+      document.getElementById('wr-result').innerHTML = `
+        <div class="result">
+          <h3>Wechselrichter</h3>
+          <div class="result-item"><span>PV-Leistung:</span><span>${kwp} kWp</span></div>
+          <div class="result-item"><span>Empf. WR-Leistung:</span><span><strong>${wrGerundet} kW</strong></span></div>
+          <div class="result-item"><span>DC/AC-Verhältnis:</span><span>${(kwp / wrGerundet).toFixed(2)}</span></div>
+        </div>`;
+    }
+    
+    function calcSpeicher() {
+      const kwp = parseFloat(document.getElementById('sp-kwp').value);
+      const verbrauch = parseFloat(document.getElementById('sp-verbrauch').value);
+      const ziel = document.getElementById('sp-ziel').value;
+      
+      let faktor = 1.0;
+      if (ziel === 'autarkie') faktor = 1.5;
+      if (ziel === 'notstrom') faktor = 2.0;
+      
+      const speicherKwp = kwp * faktor;
+      const speicherVerbrauch = verbrauch * 0.6; // 60% des Tagesverbrauchs abdecken
+      const speicher = Math.min(speicherKwp, speicherVerbrauch);
+      const speicherGerundet = Math.ceil(speicher);
+      
+      const autarkie = 30 + (speicher / kwp) * 25;
+      
+      document.getElementById('sp-result').innerHTML = `
+        <div class="result">
+          <h3>Speicherempfehlung</h3>
+          <div class="result-item"><span>Speicherkapazität:</span><span><strong>${speicherGerundet} kWh</strong></span></div>
+          <div class="result-item"><span>Verhältnis:</span><span>${(speicherGerundet / kwp).toFixed(1)} kWh/kWp</span></div>
+          <div class="result-item"><span>Erwartete Autarkie:</span><span>ca. ${Math.min(autarkie, 85).toFixed(0)}%</span></div>
+        </div>`;
+    }
+    
+    function calcErtrag() {
+      const kwp = parseFloat(document.getElementById('er-kwp').value);
+      const spezErtrag = parseFloat(document.getElementById('er-spez').value);
+      const verluste = parseFloat(document.getElementById('er-verluste').value);
+      
+      const bruttoErtrag = kwp * spezErtrag;
+      const nettoErtrag = bruttoErtrag * (1 - verluste);
+      
+      // Einsparung berechnen
+      const eigenverbrauch = nettoErtrag * 0.3;
+      const einspeisung = nettoErtrag * 0.7;
+      const ersparnis = eigenverbrauch * 0.32 + einspeisung * 0.081;
+      
+      document.getElementById('er-result').innerHTML = `
+        <div class="result">
+          <h3>Jahresertrag</h3>
+          <div class="result-item"><span>Brutto:</span><span>${bruttoErtrag.toFixed(0)} kWh</span></div>
+          <div class="result-item"><span>Netto (nach Verlusten):</span><span><strong>${nettoErtrag.toFixed(0)} kWh</strong></span></div>
+          <div class="result-item"><span>Pro kWp:</span><span>${(nettoErtrag / kwp).toFixed(0)} kWh/kWp</span></div>
+          <div class="result-item"><span>Jährl. Ersparnis (30% EV):</span><span>ca. ${ersparnis.toFixed(0)} €</span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#8b5cf6">
+  <title>ch-Bau - Schallschutz</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #8b5cf6; --primary-dark: #7c3aed; }
+    .app-header { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); }
+  </style>
+</head>
+<body class="gewerk-schallschutz">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz" selected>🔊 Schallschutz</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🔊 Schallschutz</h2>
+      <p style="margin-bottom:20px;color:#6b7280">DIN 4109 · Luftschall · Trittschall · Haustechnik</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'anforderungen')">Anforderungen</button>
+        <button class="tab" onclick="switchTab(this, 'luftschall')">Luftschall</button>
+        <button class="tab" onclick="switchTab(this, 'trittschall')">Trittschall</button>
+        <button class="tab" onclick="switchTab(this, 'haustechnik')">Haustechnik</button>
+        <button class="tab" onclick="switchTab(this, 'aussenbau')">Außenbau</button>
+        <button class="tab" onclick="switchTab(this, 'rechner')">Rechner</button>
+        <button class="tab" onclick="switchTab(this, 'normen')">Normen</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- ANFORDERUNGEN -->
+      <div id="anforderungen" class="tab-content active">
+        <h2>📋 Mindestanforderungen DIN 4109</h2>
+        
+        <h3>Luftschalldämmung R'w</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>DIN 4109</th><th>Erhöht</th></tr></thead>
+          <tbody>
+            <tr><td>Wohnungstrennwand</td><td><strong>53 dB</strong></td><td>≥56 dB</td></tr>
+            <tr><td>Wohnungstrenndecke</td><td><strong>54 dB</strong></td><td>≥57 dB</td></tr>
+            <tr><td>Treppenraumwand</td><td><strong>53 dB</strong></td><td>≥56 dB</td></tr>
+            <tr><td>Wand zum Treppenraum (Flur)</td><td><strong>53 dB</strong></td><td>≥56 dB</td></tr>
+            <tr><td>Wand zu Hausflur</td><td><strong>53 dB</strong></td><td>≥56 dB</td></tr>
+            <tr><td>Wohnungseingangstür</td><td><strong>27 dB</strong></td><td>≥37 dB</td></tr>
+            <tr><td>Tür zum Treppenraum</td><td><strong>27 dB</strong></td><td>≥37 dB</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Trittschalldämmung L'n,w</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>DIN 4109</th><th>Erhöht</th></tr></thead>
+          <tbody>
+            <tr><td>Decke über fremder Wohnung</td><td><strong>≤53 dB</strong></td><td>≤46 dB</td></tr>
+            <tr><td>Decke unter fremdem Arbeitsraum</td><td><strong>≤53 dB</strong></td><td>≤46 dB</td></tr>
+            <tr><td>Treppen</td><td><strong>≤58 dB</strong></td><td>≤46 dB</td></tr>
+            <tr><td>Decke unter Dachräumen</td><td><strong>≤53 dB</strong></td><td>—</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Haustechnische Anlagen</h3>
+        <table class="data-table">
+          <thead><tr><th>Anlage</th><th>LAF,max,n</th></tr></thead>
+          <tbody>
+            <tr><td>Wasserinstallation (WC-Spülung, Armatur)</td><td><strong>≤30 dB(A)</strong></td></tr>
+            <tr><td>Sonstige Haustechnik (Aufzug, Heizung)</td><td><strong>≤30 dB(A)</strong></td></tr>
+            <tr><td>Nutzergeräusche (Begehen, Türen)</td><td>nicht geregelt</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Schallschutzstufen (VDI 4100)</h4>
+          <table class="data-table" style="margin-top:10px">
+            <tr><td><strong>SSt I</strong></td><td>Mindestschallschutz (= DIN 4109)</td></tr>
+            <tr><td><strong>SSt II</strong></td><td>Erhöhter Schallschutz</td></tr>
+            <tr><td><strong>SSt III</strong></td><td>Hoher Schallschutz (Eigentum)</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- LUFTSCHALL -->
+      <div id="luftschall" class="tab-content">
+        <h2>🔈 Luftschalldämmung</h2>
+        
+        <h3>Schalldämm-Maße R'w typischer Bauteile</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>R'w (dB)</th></tr></thead>
+          <tbody>
+            <tr><td colspan="2" style="background:#f3f4f6;font-weight:bold;">Mauerwerk</td></tr>
+            <tr><td>Kalksandstein 17,5 cm (ρ=1800)</td><td>52</td></tr>
+            <tr><td>Kalksandstein 24 cm (ρ=1800)</td><td>56</td></tr>
+            <tr><td>Kalksandstein 30 cm (ρ=2000)</td><td>59</td></tr>
+            <tr><td>Porenbeton 24 cm (ρ=600)</td><td>43</td></tr>
+            <tr><td>Porenbeton 36,5 cm (ρ=600)</td><td>47</td></tr>
+            <tr><td>Ziegel 24 cm (ρ=1400)</td><td>50</td></tr>
+            <tr><td colspan="2" style="background:#f3f4f6;font-weight:bold;">Beton</td></tr>
+            <tr><td>Stahlbeton 14 cm</td><td>51</td></tr>
+            <tr><td>Stahlbeton 18 cm</td><td>55</td></tr>
+            <tr><td>Stahlbeton 20 cm</td><td>57</td></tr>
+            <tr><td>Stahlbeton 24 cm</td><td>59</td></tr>
+            <tr><td colspan="2" style="background:#f3f4f6;font-weight:bold;">Leichtbau</td></tr>
+            <tr><td>Gipskarton einfach 2×12,5 + 50mm MW</td><td>42</td></tr>
+            <tr><td>Gipskarton doppelt 2×2×12,5 + 60mm MW</td><td>54</td></tr>
+            <tr><td>Gipskarton doppelt 2×2×12,5 + 100mm MW</td><td>58</td></tr>
+            <tr><td>GK entkoppelt + doppelt beplankt</td><td>62-67</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Vorsatzschalen</h3>
+        <table class="data-table">
+          <thead><tr><th>Ausführung</th><th>ΔR'w (dB)</th></tr></thead>
+          <tbody>
+            <tr><td>GK 12,5 + 40mm MW, Direktbefestigung</td><td>+5 bis +8</td></tr>
+            <tr><td>GK 12,5 + 60mm MW, freistehend</td><td>+10 bis +13</td></tr>
+            <tr><td>2×GK + 60mm MW, entkoppelt</td><td>+14 bis +18</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Flankenübertragung beachten!</h4>
+          <p>Das Schalldämm-Maß R'w im Bau ist stets niedriger als im Labor (Rw) durch Schallnebenwege über flankierende Bauteile.</p>
+        </div>
+      </div>
+
+      <!-- TRITTSCHALL -->
+      <div id="trittschall" class="tab-content">
+        <h2>👣 Trittschalldämmung</h2>
+        
+        <h3>Norm-Trittschallpegel L'n,w</h3>
+        <table class="data-table">
+          <thead><tr><th>Deckenaufbau</th><th>L'n,w (dB)</th></tr></thead>
+          <tbody>
+            <tr><td colspan="2" style="background:#f3f4f6;font-weight:bold;">Rohdecke ohne Belag</td></tr>
+            <tr><td>Stahlbeton 14 cm</td><td>~83</td></tr>
+            <tr><td>Stahlbeton 18 cm</td><td>~80</td></tr>
+            <tr><td>Stahlbeton 20 cm</td><td>~78</td></tr>
+            <tr><td>Stahlbeton 24 cm</td><td>~76</td></tr>
+            <tr><td colspan="2" style="background:#f3f4f6;font-weight:bold;">Mit Estrich auf Dämmung</td></tr>
+            <tr><td>+30mm Trittschalldämmung + Estrich</td><td>~48-52</td></tr>
+            <tr><td>+40mm Trittschalldämmung + Estrich</td><td>~44-48</td></tr>
+            <tr><td>+50mm Trittschalldämmung + Estrich</td><td>~40-44</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Trittschallminderung ΔLw</h3>
+        <table class="data-table">
+          <thead><tr><th>Bodenbelag</th><th>ΔLw (dB)</th></tr></thead>
+          <tbody>
+            <tr><td>Fliesen / Stein</td><td>0</td></tr>
+            <tr><td>Laminat (ohne Dämmung)</td><td>~2</td></tr>
+            <tr><td>Laminat + 3mm PE-Schaum</td><td>~14-18</td></tr>
+            <tr><td>Laminat + 5mm Kork</td><td>~18-22</td></tr>
+            <tr><td>PVC weich</td><td>~10-15</td></tr>
+            <tr><td>Linoleum</td><td>~5-8</td></tr>
+            <tr><td>Teppich dünn</td><td>~20-25</td></tr>
+            <tr><td>Teppich dick</td><td>~25-35</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Trittschall berechnen</h3>
+        <div class="form-group">
+          <label>Rohdecke L'n,w,eq (dB)</label>
+          <select id="ts-rohdecke">
+            <option value="83">Stahlbeton 14 cm (83 dB)</option>
+            <option value="80">Stahlbeton 18 cm (80 dB)</option>
+            <option value="78" selected>Stahlbeton 20 cm (78 dB)</option>
+            <option value="76">Stahlbeton 24 cm (76 dB)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Trittschalldämmung ΔLw (dB)</label>
+          <select id="ts-daemmung">
+            <option value="26">26 dB (30mm EPS-T)</option>
+            <option value="30" selected>30 dB (40mm EPS-T)</option>
+            <option value="34">34 dB (50mm MW)</option>
+            <option value="38">38 dB (60mm MW)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bodenbelag ΔLw (dB)</label>
+          <select id="ts-belag">
+            <option value="0" selected>Fliesen (0 dB)</option>
+            <option value="3">Laminat + PE (3 dB)</option>
+            <option value="15">PVC weich (15 dB)</option>
+            <option value="25">Teppich (25 dB)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcTrittschall()">Berechnen</button>
+        <div id="ts-result"></div>
+      </div>
+
+      <!-- HAUSTECHNIK -->
+      <div id="haustechnik" class="tab-content">
+        <h2>🔧 Haustechnik-Schall</h2>
+        
+        <h3>Installationsgeräusche (DIN 4109-36)</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>Anforderung</th></tr></thead>
+          <tbody>
+            <tr><td>WC-Spülung Aufputz</td><td>≤30 dB(A)</td></tr>
+            <tr><td>WC-Spülung Unterputz</td><td>≤25 dB(A)</td></tr>
+            <tr><td>Armatur bei 3 bar</td><td>≤20 dB(A) (Klasse I)</td></tr>
+            <tr><td>Durchlauferhitzer</td><td>≤30 dB(A)</td></tr>
+            <tr><td>Aufzug</td><td>≤30 dB(A)</td></tr>
+            <tr><td>Heizungsanlage</td><td>≤30 dB(A)</td></tr>
+            <tr><td>Lüftungsanlage</td><td>≤30 dB(A)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Schallschutzmaßnahmen</h3>
+        <table class="data-table">
+          <thead><tr><th>Maßnahme</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Körperschallentkopplung</strong></td><td>Rohrbefestigung, WC-Element</td></tr>
+            <tr><td><strong>Rohrschellen mit Einlage</strong></td><td>Alle Rohrleitungen</td></tr>
+            <tr><td><strong>Brandschutzmanschette leise</strong></td><td>Rohrdurchführungen</td></tr>
+            <tr><td><strong>Schallgedämmte Abwasserrohre</strong></td><td>dB-Rohre, SML</td></tr>
+            <tr><td><strong>Flexible Anschlüsse</strong></td><td>Pumpen, Verdichter</td></tr>
+            <tr><td><strong>Schwingungsdämpfer</strong></td><td>Lüfter, Klimageräte</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abwasserrohre - Schallpegel</h3>
+        <table class="data-table">
+          <thead><tr><th>Rohrsystem</th><th>dB(A)</th></tr></thead>
+          <tbody>
+            <tr><td>HT-Rohr (Standard)</td><td>~35-45</td></tr>
+            <tr><td>Schallgedämmt (dB-System)</td><td>~20-25</td></tr>
+            <tr><td>Guss (SML)</td><td>~15-20</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Armaturengruppen (DIN 4109)</h3>
+        <table class="data-table">
+          <thead><tr><th>Gruppe</th><th>Ap-Wert</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Gruppe I</strong></td><td>≤20 dB(A)</td><td>Wohnungstrennbau</td></tr>
+            <tr><td><strong>Gruppe II</strong></td><td>≤30 dB(A)</td><td>Innerhalb Wohnung</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>💡 Planungshinweise</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Installationsschächte nicht an Schlafräume grenzen</li>
+            <li>Vorwandinstallation entkoppelt ausführen</li>
+            <li>Fließdruck max. 5 bar (Geräuschentwicklung!)</li>
+            <li>Druckminderer bei >5 bar Ruhedruck</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- AUSSENBAU -->
+      <div id="aussenbau" class="tab-content">
+        <h2>🏠 Außenbauteile</h2>
+        
+        <h3>Lärmpegelbereiche (DIN 4109)</h3>
+        <table class="data-table">
+          <thead><tr><th>LPB</th><th>Maßgebl. Außenpegel</th><th>Erf. R'w,ges</th></tr></thead>
+          <tbody>
+            <tr><td>I</td><td>≤55 dB</td><td>30 dB</td></tr>
+            <tr><td>II</td><td>56-60 dB</td><td>30 dB</td></tr>
+            <tr><td>III</td><td>61-65 dB</td><td>35 dB</td></tr>
+            <tr><td>IV</td><td>66-70 dB</td><td>40 dB</td></tr>
+            <tr><td>V</td><td>71-75 dB</td><td>45 dB</td></tr>
+            <tr><td>VI</td><td>76-80 dB</td><td>50 dB</td></tr>
+            <tr><td>VII</td><td>>80 dB</td><td>Einzelnachweis</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Fenster-Schallschutzklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>SSK</th><th>Rw (dB)</th><th>Verglasung typisch</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>25-29</td><td>4/16/4</td></tr>
+            <tr><td>2</td><td>30-34</td><td>4/16/4 + dichter</td></tr>
+            <tr><td>3</td><td>35-39</td><td>6/16/4, VSG</td></tr>
+            <tr><td>4</td><td>40-44</td><td>8/16/6, VSG</td></tr>
+            <tr><td>5</td><td>45-49</td><td>10/20/8 VSG, Spezial</td></tr>
+            <tr><td>6</td><td>≥50</td><td>Kastenfenster</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Außenbauteil-Nachweis</h3>
+        <div class="form-group">
+          <label>Außenlärmpegel (dB)</label>
+          <input type="number" id="ab-aussen" placeholder="z.B. 65" value="65">
+        </div>
+        <div class="form-group">
+          <label>Raumart</label>
+          <select id="ab-raum">
+            <option value="0">Aufenthaltsraum</option>
+            <option value="5">Büro (+5 dB)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcAussenbau()">Berechnen</button>
+        <div id="ab-result"></div>
+        
+        <h3 style="margin-top:20px">Typische Außenwände</h3>
+        <table class="data-table">
+          <thead><tr><th>Aufbau</th><th>R'w (dB)</th></tr></thead>
+          <tbody>
+            <tr><td>WDVS auf 17,5 KS</td><td>47-50</td></tr>
+            <tr><td>WDVS auf 24 KS</td><td>52-55</td></tr>
+            <tr><td>Zweischalig 11,5+11,5 KS</td><td>58-62</td></tr>
+            <tr><td>Vorhangfassade hinterlüftet</td><td>45-55</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- RECHNER -->
+      <div id="rechner" class="tab-content">
+        <h2>🔢 Schallschutz-Rechner</h2>
+        
+        <h3>Schalldämm-Maß einschaliger Wände</h3>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:15px;">Nach Massegesetz (Faustformel)</p>
+        <div class="form-group">
+          <label>Flächenmasse m' (kg/m²)</label>
+          <input type="number" id="rw-masse" placeholder="z.B. 400" value="400">
+        </div>
+        <button class="btn" onclick="calcRw()">R'w berechnen</button>
+        <div id="rw-result"></div>
+        
+        <h3 style="margin-top:25px">Flächenanteil-Rechner</h3>
+        <p style="font-size:12px;color:#6b7280;margin-bottom:15px;">Resultierendes R'w,ges bei unterschiedlichen Bauteilen</p>
+        <div class="form-group">
+          <label>Fläche Wand (m²)</label>
+          <input type="number" id="fl-wand-a" placeholder="z.B. 10" value="10">
+        </div>
+        <div class="form-group">
+          <label>R'w Wand (dB)</label>
+          <input type="number" id="fl-wand-rw" placeholder="z.B. 55" value="55">
+        </div>
+        <div class="form-group">
+          <label>Fläche Fenster (m²)</label>
+          <input type="number" id="fl-fenster-a" placeholder="z.B. 2" value="2">
+        </div>
+        <div class="form-group">
+          <label>R'w Fenster (dB)</label>
+          <input type="number" id="fl-fenster-rw" placeholder="z.B. 35" value="35">
+        </div>
+        <button class="btn" onclick="calcFlaeche()">Berechnen</button>
+        <div id="fl-result"></div>
+        
+        <h3 style="margin-top:25px">Pegeladdition</h3>
+        <div class="form-group">
+          <label>Pegel 1 (dB)</label>
+          <input type="number" id="add-p1" placeholder="z.B. 60" value="60">
+        </div>
+        <div class="form-group">
+          <label>Pegel 2 (dB)</label>
+          <input type="number" id="add-p2" placeholder="z.B. 60" value="60">
+        </div>
+        <button class="btn" onclick="calcAddition()">Addieren</button>
+        <div id="add-result"></div>
+      </div>
+
+      <!-- NORMEN -->
+      <div id="normen" class="tab-content">
+        <h2>📋 Normen & Regelwerke</h2>
+        
+        <h3>DIN 4109 - Schallschutz im Hochbau</h3>
+        <table class="data-table">
+          <thead><tr><th>Teil</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>DIN 4109-1</strong></td><td>Mindestanforderungen</td></tr>
+            <tr><td><strong>DIN 4109-2</strong></td><td>Rechnerische Nachweise</td></tr>
+            <tr><td><strong>DIN 4109-4</strong></td><td>Bauakustische Prüfungen</td></tr>
+            <tr><td><strong>DIN 4109-31</strong></td><td>Daten für Massivbau</td></tr>
+            <tr><td><strong>DIN 4109-32</strong></td><td>Daten für Skelett-/Holzbau</td></tr>
+            <tr><td><strong>DIN 4109-33</strong></td><td>Daten für Leichtbau</td></tr>
+            <tr><td><strong>DIN 4109-34</strong></td><td>Daten für Vorsatzschalen</td></tr>
+            <tr><td><strong>DIN 4109-35</strong></td><td>Daten für Elemente, Außenbau</td></tr>
+            <tr><td><strong>DIN 4109-36</strong></td><td>Daten für Haustechnik</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Weitere Regelwerke</h3>
+        <table class="data-table">
+          <thead><tr><th>Norm</th><th>Inhalt</th></tr></thead>
+          <tbody>
+            <tr><td><strong>VDI 4100</strong></td><td>Schallschutz von Wohnungen</td></tr>
+            <tr><td><strong>DIN EN ISO 717-1</strong></td><td>Bewertung Luftschall</td></tr>
+            <tr><td><strong>DIN EN ISO 717-2</strong></td><td>Bewertung Trittschall</td></tr>
+            <tr><td><strong>DIN EN 12354</strong></td><td>Berechnung akust. Eigenschaften</td></tr>
+            <tr><td><strong>DIN 18041</strong></td><td>Raumakustik (Hörsamkeit)</td></tr>
+            <tr><td><strong>TA Lärm</strong></td><td>Gewerbe-, Industrielärm</td></tr>
+            <tr><td><strong>16. BImSchV</strong></td><td>Verkehrslärm</td></tr>
+            <tr><td><strong>18. BImSchV</strong></td><td>Sportanlagen</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Prüfnormen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td><strong>DIN EN ISO 10140</strong></td><td>Laborprüfung Bauteile</td></tr>
+            <tr><td><strong>DIN EN ISO 16283</strong></td><td>Bauakustische Messungen</td></tr>
+            <tr><td><strong>DIN EN ISO 3382</strong></td><td>Messung Raumakustik</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Schallschutz</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📝 Begriffe & Kurzzeichen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Rw</strong></td><td>Bewertetes Schalldämm-Maß (Labor)</td></tr>
+              <tr><td><strong>R'w</strong></td><td>Bewertetes Bau-Schalldämm-Maß (Bau)</td></tr>
+              <tr><td><strong>Ln,w</strong></td><td>Bewerteter Norm-Trittschallpegel (Labor)</td></tr>
+              <tr><td><strong>L'n,w</strong></td><td>Bewerteter Norm-Trittschallpegel (Bau)</td></tr>
+              <tr><td><strong>ΔLw</strong></td><td>Trittschallminderung</td></tr>
+              <tr><td><strong>LAF,max,n</strong></td><td>Max. A-bew. Schallpegel (Haustechnik)</td></tr>
+              <tr><td><strong>Dn,w</strong></td><td>Norm-Schallpegeldifferenz</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔢 Formeln</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>Massegesetz</strong></td><td>R'w ≈ 37,5 × lg(m') - 42 dB</td></tr>
+              <tr><td><strong>Pegeladdition</strong></td><td>L = 10 × lg(10^(L1/10) + 10^(L2/10))</td></tr>
+              <tr><td><strong>Mittelung</strong></td><td>R = -10 × lg(Σ(Si/S × 10^(-Ri/10)))</td></tr>
+              <tr><td><strong>2 gleiche Quellen</strong></td><td>+3 dB</td></tr>
+              <tr><td><strong>10 gleiche Quellen</strong></td><td>+10 dB</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>👂 Wahrnehmung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>+1 dB</td><td>Kaum wahrnehmbar</td></tr>
+              <tr><td>+3 dB</td><td>Gerade wahrnehmbar</td></tr>
+              <tr><td>+5 dB</td><td>Deutlich wahrnehmbar</td></tr>
+              <tr><td>+10 dB</td><td>Doppelte Lautstärke</td></tr>
+              <tr><td>+20 dB</td><td>4-fache Lautstärke</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔊 Typische Schallpegel</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>0 dB</td><td>Hörschwelle</td></tr>
+              <tr><td>20 dB</td><td>Blätterrascheln</td></tr>
+              <tr><td>30 dB</td><td>Flüstern</td></tr>
+              <tr><td>40 dB</td><td>Bibliothek</td></tr>
+              <tr><td>50 dB</td><td>Regen</td></tr>
+              <tr><td>60 dB</td><td>Normale Sprache</td></tr>
+              <tr><td>70 dB</td><td>PKW</td></tr>
+              <tr><td>80 dB</td><td>LKW</td></tr>
+              <tr><td>90 dB</td><td>Presslufthammer</td></tr>
+              <tr><td>100 dB</td><td>Diskothek</td></tr>
+              <tr><td>120 dB</td><td>Schmerzschwelle</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>⚖️ Rechtliche Bedeutung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>DIN 4109 = Mindestschallschutz</h4>
+            <p style="margin:10px 0">Die DIN 4109 definiert nur den <strong>Mindestschallschutz</strong>, der bauordnungsrechtlich geschuldet ist.</p>
+            <h4>Üblicher Qualitätsstandard:</h4>
+            <p style="margin:10px 0">BGH-Rechtsprechung: Bei Eigentumswohnungen kann ein <strong>über DIN 4109 hinausgehender</strong> Schallschutz geschuldet sein!</p>
+            <p style="color:#dc2626;font-weight:bold;">→ VDI 4100 SSt II/III oft als "üblich" angesehen</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'anforderungen')">
+      <span class="nav-icon">📋</span><span class="nav-label">Anforder.</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'luftschall')">
+      <span class="nav-icon">🔈</span><span class="nav-label">Luftschall</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[2], 'trittschall')">
+      <span class="nav-icon">👣</span><span class="nav-label">Trittschall</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[5], 'rechner')">
+      <span class="nav-icon">🔢</span><span class="nav-label">Rechner</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[7], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcTrittschall() {
+      const rohdecke = parseFloat(document.getElementById('ts-rohdecke').value);
+      const daemmung = parseFloat(document.getElementById('ts-daemmung').value);
+      const belag = parseFloat(document.getElementById('ts-belag').value);
+      
+      const ergebnis = rohdecke - daemmung - belag;
+      const anforderung = 53;
+      const ok = ergebnis <= anforderung;
+      
+      document.getElementById('ts-result').innerHTML = `
+        <div class="result">
+          <h3>Trittschallpegel L'n,w</h3>
+          <div class="result-item"><span>Rohdecke:</span><span>${rohdecke} dB</span></div>
+          <div class="result-item"><span>Dämmung:</span><span>-${daemmung} dB</span></div>
+          <div class="result-item"><span>Belag:</span><span>-${belag} dB</span></div>
+          <div class="result-item"><span>Ergebnis L'n,w:</span><span><strong>${ergebnis} dB</strong></span></div>
+          <div class="result-item"><span>Anforderung:</span><span>≤${anforderung} dB</span></div>
+          <div class="result-item"><span>Bewertung:</span><span>${ok ? '✅ Erfüllt' : '❌ Nicht erfüllt'}</span></div>
+        </div>`;
+    }
+    
+    function calcAussenbau() {
+      const aussen = parseFloat(document.getElementById('ab-aussen').value);
+      const raum = parseFloat(document.getElementById('ab-raum').value);
+      
+      const erfRw = aussen - 25 - raum; // Vereinfachte Formel
+      
+      let lpb = 'I';
+      if (aussen > 80) lpb = 'VII';
+      else if (aussen > 75) lpb = 'VI';
+      else if (aussen > 70) lpb = 'V';
+      else if (aussen > 65) lpb = 'IV';
+      else if (aussen > 60) lpb = 'III';
+      else if (aussen > 55) lpb = 'II';
+      
+      document.getElementById('ab-result').innerHTML = `
+        <div class="result">
+          <h3>Anforderung Außenbauteil</h3>
+          <div class="result-item"><span>Lärmpegelbereich:</span><span><strong>${lpb}</strong></span></div>
+          <div class="result-item"><span>Erf. R'w,ges:</span><span><strong>${erfRw} dB</strong></span></div>
+        </div>`;
+    }
+    
+    function calcRw() {
+      const masse = parseFloat(document.getElementById('rw-masse').value);
+      if (isNaN(masse) || masse <= 0) { document.getElementById('rw-result').innerHTML = '<div class="danger">Bitte gültige Masse eingeben</div>'; return; }
+      
+      const rw = 37.5 * Math.log10(masse) - 42;
+      
+      document.getElementById('rw-result').innerHTML = `
+        <div class="result">
+          <h3>Schalldämm-Maß (Massegesetz)</h3>
+          <div class="result-item"><span>Flächenmasse:</span><span>${masse} kg/m²</span></div>
+          <div class="result-item"><span>R'w (ca.):</span><span><strong>${rw.toFixed(0)} dB</strong></span></div>
+        </div>
+        <div class="info-box" style="margin-top:10px"><p>⚠️ Vereinfachte Formel! Tatsächliche Werte können abweichen (Koinzidenz, Resonanz).</p></div>`;
+    }
+    
+    function calcFlaeche() {
+      const aWand = parseFloat(document.getElementById('fl-wand-a').value);
+      const rwWand = parseFloat(document.getElementById('fl-wand-rw').value);
+      const aFenster = parseFloat(document.getElementById('fl-fenster-a').value);
+      const rwFenster = parseFloat(document.getElementById('fl-fenster-rw').value);
+      
+      const aGes = aWand + aFenster;
+      const tauWand = Math.pow(10, -rwWand / 10);
+      const tauFenster = Math.pow(10, -rwFenster / 10);
+      const tauGes = (aWand * tauWand + aFenster * tauFenster) / aGes;
+      const rwGes = -10 * Math.log10(tauGes);
+      
+      document.getElementById('fl-result').innerHTML = `
+        <div class="result">
+          <h3>Resultierendes R'w,ges</h3>
+          <div class="result-item"><span>Gesamtfläche:</span><span>${aGes} m²</span></div>
+          <div class="result-item"><span>Fensteranteil:</span><span>${(aFenster / aGes * 100).toFixed(0)}%</span></div>
+          <div class="result-item"><span>R'w,ges:</span><span><strong>${rwGes.toFixed(1)} dB</strong></span></div>
+        </div>`;
+    }
+    
+    function calcAddition() {
+      const p1 = parseFloat(document.getElementById('add-p1').value);
+      const p2 = parseFloat(document.getElementById('add-p2').value);
+      
+      const sum = 10 * Math.log10(Math.pow(10, p1/10) + Math.pow(10, p2/10));
+      
+      document.getElementById('add-result').innerHTML = `
+        <div class="result">
+          <h3>Pegeladdition</h3>
+          <div class="result-item"><span>${p1} dB + ${p2} dB =</span><span><strong>${sum.toFixed(1)} dB</strong></span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

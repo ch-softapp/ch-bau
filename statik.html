@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#7c3aed">
+  <title>ch-Bau - Statik</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #7c3aed; --primary-dark: #6d28d9; }
+    .app-header { background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); }
+  </style>
+</head>
+<body class="gewerk-statik">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik" selected>🏗️ Statik</option>
+        <option value="brandschutz">🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🏗️ Statik</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Tragwerksplanung · Überschlägige Berechnungen</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'gewicht')">Gewicht</button>
+        <button class="tab" onclick="switchTab(this, 'lasten')">Lasten</button>
+        <button class="tab" onclick="switchTab(this, 'traeger')">Träger</button>
+        <button class="tab" onclick="switchTab(this, 'stuetzen')">Stützen</button>
+        <button class="tab" onclick="switchTab(this, 'fundament')">Fundament</button>
+        <button class="tab" onclick="switchTab(this, 'beton')">Beton</button>
+        <button class="tab" onclick="switchTab(this, 'bewehrung')">Bewehrung</button>
+        <button class="tab" onclick="switchTab(this, 'stahl')">Stahl</button>
+        <button class="tab" onclick="switchTab(this, 'verbindung')">Verbindung</button>
+        <button class="tab" onclick="switchTab(this, 'holz')">Holz</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- GEWICHT -->
+      <div id="gewicht" class="tab-content active">
+        <h2>⚖️ Gewichtsberechnung</h2>
+        
+        <div class="form-group">
+          <label>Bauteilform</label>
+          <select id="gew-form" onchange="updateGewichtFields()">
+            <option value="quader">Quader / Platte / Wand</option>
+            <option value="zylinder">Zylinder / Rohr / Stütze rund</option>
+            <option value="profil">Stahlprofil (nach kg/m)</option>
+            <option value="flaeche">Flächenlast (kN/m²)</option>
+          </select>
+        </div>
+        
+        <div id="gew-quader-fields">
+          <div class="form-group">
+            <label>Material</label>
+            <select id="gew-material">
+              <option value="25">Stahlbeton (25 kN/m³)</option>
+              <option value="24">Beton unbewehrt (24 kN/m³)</option>
+              <option value="15">Leichtbeton (15 kN/m³)</option>
+              <option value="18">Mauerwerk Ziegel (18 kN/m³)</option>
+              <option value="12">Mauerwerk Hochloch (12 kN/m³)</option>
+              <option value="6">Porenbeton/Ytong (6 kN/m³)</option>
+              <option value="20">Kalksandstein (20 kN/m³)</option>
+              <option value="78.5">Stahl (78,5 kN/m³)</option>
+              <option value="5">Nadelholz (5 kN/m³)</option>
+              <option value="7">Laubholz (7 kN/m³)</option>
+              <option value="22">Estrich (22 kN/m³)</option>
+              <option value="25">Glas (25 kN/m³)</option>
+              <option value="27">Granit/Naturstein (27 kN/m³)</option>
+              <option value="10">Wasser (10 kN/m³)</option>
+              <option value="16">Sand trocken (16 kN/m³)</option>
+              <option value="18">Kies (18 kN/m³)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Länge (m)</label>
+            <input type="number" id="gew-laenge" placeholder="z.B. 5" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Breite (m)</label>
+            <input type="number" id="gew-breite" placeholder="z.B. 0.3" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Höhe/Dicke (m)</label>
+            <input type="number" id="gew-hoehe" placeholder="z.B. 0.5" step="0.01">
+          </div>
+        </div>
+        
+        <div id="gew-zylinder-fields" style="display:none;">
+          <div class="form-group">
+            <label>Material</label>
+            <select id="gew-material2">
+              <option value="25">Stahlbeton (25 kN/m³)</option>
+              <option value="78.5">Stahl (78,5 kN/m³)</option>
+              <option value="24">Beton (24 kN/m³)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Außendurchmesser (m)</label>
+            <input type="number" id="gew-durchm-a" placeholder="z.B. 0.3" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Innendurchmesser (m) - 0 für Vollzylinder</label>
+            <input type="number" id="gew-durchm-i" placeholder="0" value="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Länge/Höhe (m)</label>
+            <input type="number" id="gew-zyl-laenge" placeholder="z.B. 3" step="0.01">
+          </div>
+        </div>
+        
+        <div id="gew-profil-fields" style="display:none;">
+          <div class="form-group">
+            <label>Profil</label>
+            <select id="gew-profil">
+              <option value="8.1">IPE 100 (8,1 kg/m)</option>
+              <option value="12.9">IPE 140 (12,9 kg/m)</option>
+              <option value="18.8">IPE 180 (18,8 kg/m)</option>
+              <option value="26.2">IPE 220 (26,2 kg/m)</option>
+              <option value="36.1">IPE 270 (36,1 kg/m)</option>
+              <option value="49.1">IPE 330 (49,1 kg/m)</option>
+              <option value="66.3">IPE 400 (66,3 kg/m)</option>
+              <option value="90.7">IPE 500 (90,7 kg/m)</option>
+              <option value="122">IPE 600 (122 kg/m)</option>
+              <option value="20.4">HEB 100 (20,4 kg/m)</option>
+              <option value="33.7">HEB 140 (33,7 kg/m)</option>
+              <option value="51.2">HEB 180 (51,2 kg/m)</option>
+              <option value="71.5">HEB 220 (71,5 kg/m)</option>
+              <option value="103">HEB 280 (103 kg/m)</option>
+              <option value="134">HEB 340 (134 kg/m)</option>
+              <option value="155">HEB 400 (155 kg/m)</option>
+              <option value="14.2">HEA 100 (16,7 kg/m)</option>
+              <option value="24.7">HEA 140 (24,7 kg/m)</option>
+              <option value="35.5">HEA 180 (35,5 kg/m)</option>
+              <option value="50.5">HEA 220 (50,5 kg/m)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Länge (m)</label>
+            <input type="number" id="gew-profil-laenge" placeholder="z.B. 6" step="0.01">
+          </div>
+        </div>
+        
+        <div id="gew-flaeche-fields" style="display:none;">
+          <div class="form-group">
+            <label>Bauteil / Aufbau</label>
+            <select id="gew-aufbau">
+              <option value="3.5">Stahlbetondecke 14 cm (3,5 kN/m²)</option>
+              <option value="4.5">Stahlbetondecke 18 cm (4,5 kN/m²)</option>
+              <option value="5.0">Stahlbetondecke 20 cm (5,0 kN/m²)</option>
+              <option value="6.25">Stahlbetondecke 25 cm (6,25 kN/m²)</option>
+              <option value="2.5">Hohlkörperdecke 20 cm (2,5 kN/m²)</option>
+              <option value="0.6">Estrich 3 cm (0,6 kN/m²)</option>
+              <option value="1.1">Estrich 5 cm (1,1 kN/m²)</option>
+              <option value="1.5">Estrich + FBH (1,5 kN/m²)</option>
+              <option value="0.5">Trockenbau-Decke (0,5 kN/m²)</option>
+              <option value="0.25">Gipskarton 12,5mm (0,25 kN/m²)</option>
+              <option value="0.5">Gipskarton doppelt (0,5 kN/m²)</option>
+              <option value="0.6">Dachziegel (0,6 kN/m²)</option>
+              <option value="0.15">Trapezblech (0,15 kN/m²)</option>
+              <option value="0.5">Dachbegrünung extensiv (0,5-1,5 kN/m²)</option>
+              <option value="2.0">Dachbegrünung intensiv (2,0-3,0 kN/m²)</option>
+              <option value="0.5">Wärmedämmung 20cm (0,5 kN/m²)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fläche (m²)</label>
+            <input type="number" id="gew-flaeche-m2" placeholder="z.B. 50" step="0.1">
+          </div>
+        </div>
+        
+        <button class="btn" onclick="calcGewicht()">Berechnen</button>
+        <div id="gew-result"></div>
+        
+        <h3 style="margin-top:25px">Schnellreferenz Flächenlasten</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>kN/m²</th><th>kg/m²</th></tr></thead>
+          <tbody>
+            <tr><td>Stahlbeton 20 cm</td><td>5,0</td><td>500</td></tr>
+            <tr><td>Stahlbeton 25 cm</td><td>6,25</td><td>625</td></tr>
+            <tr><td>Stahlbeton 30 cm</td><td>7,5</td><td>750</td></tr>
+            <tr><td>Filigrandecke 16+5 cm</td><td>5,25</td><td>525</td></tr>
+            <tr><td>Estrich 5 cm</td><td>1,1</td><td>110</td></tr>
+            <tr><td>Fliesen + Kleber</td><td>0,5</td><td>50</td></tr>
+            <tr><td>Parkett</td><td>0,15</td><td>15</td></tr>
+            <tr><td>Trittschalldämmung</td><td>0,05</td><td>5</td></tr>
+            <tr><td>Putz 15mm</td><td>0,3</td><td>30</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LASTEN -->
+      <div id="lasten" class="tab-content">
+        <h2>📊 Lastannahmen EC1</h2>
+        
+        <h3>Eigenlasten (Wichten)</h3>
+        <table class="data-table">
+          <thead><tr><th>Material</th><th>γ (kN/m³)</th></tr></thead>
+          <tbody>
+            <tr><td>Stahlbeton</td><td>25</td></tr>
+            <tr><td>Beton unbewehrt</td><td>24</td></tr>
+            <tr><td>Leichtbeton</td><td>12-20</td></tr>
+            <tr><td>Mauerwerk (Vollziegel)</td><td>18-20</td></tr>
+            <tr><td>Mauerwerk (Hochloch)</td><td>12-15</td></tr>
+            <tr><td>Porenbeton/Ytong</td><td>5-8</td></tr>
+            <tr><td>Kalksandstein</td><td>18-20</td></tr>
+            <tr><td>Baustahl</td><td>78,5</td></tr>
+            <tr><td>Holz (Nadelholz)</td><td>5-6</td></tr>
+            <tr><td>Holz (Laubholz)</td><td>7-8</td></tr>
+            <tr><td>Estrich</td><td>22</td></tr>
+            <tr><td>Glas</td><td>25</td></tr>
+            <tr><td>Wasser</td><td>10</td></tr>
+            <tr><td>Sand trocken</td><td>16</td></tr>
+            <tr><td>Kies</td><td>18</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Nutzlasten (DIN EN 1991-1-1)</h3>
+        <table class="data-table">
+          <thead><tr><th>Kategorie</th><th>qk (kN/m²)</th><th>Qk (kN)</th></tr></thead>
+          <tbody>
+            <tr><td>A - Wohn/Aufenthalt</td><td>1,5 - 2,0</td><td>2,0 - 3,0</td></tr>
+            <tr><td>B - Büroflächen</td><td>2,0 - 3,0</td><td>2,5 - 4,5</td></tr>
+            <tr><td>C1 - Versammlung (Tische)</td><td>3,0</td><td>4,0</td></tr>
+            <tr><td>C3 - Ohne Hindernisse</td><td>5,0</td><td>4,0</td></tr>
+            <tr><td>D1 - Verkauf bis 50m²</td><td>4,0</td><td>4,0</td></tr>
+            <tr><td>D2 - Verkauf über 50m²</td><td>5,0</td><td>7,0</td></tr>
+            <tr><td>E1 - Lager</td><td>7,5</td><td>7,0</td></tr>
+            <tr><td>F - Garage PKW</td><td>2,5</td><td>20</td></tr>
+            <tr><td>H - Nicht begehbar</td><td>0,4</td><td>1,0</td></tr>
+            <tr><td>I - Begehbar (Wartung)</td><td>1,5</td><td>1,5</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Schneelasten</h3>
+        <table class="data-table">
+          <thead><tr><th>Zone</th><th>sk (kN/m²)</th><th>Gebiet (Beispiele)</th></tr></thead>
+          <tbody>
+            <tr><td>Zone 1</td><td>0,65</td><td>Norddeutschland, Küste</td></tr>
+            <tr><td>Zone 1a</td><td>0,81</td><td>Niedersachsen, NRW</td></tr>
+            <tr><td>Zone 2</td><td>0,85</td><td>Mitteldeutschland</td></tr>
+            <tr><td>Zone 2a</td><td>1,06</td><td>Mittelgebirge</td></tr>
+            <tr><td>Zone 3</td><td>1,10</td><td>Alpenvorland, Hochlagen</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TRÄGER -->
+      <div id="traeger" class="tab-content">
+        <h2>📏 Trägerüberschlag</h2>
+        
+        <div class="form-group">
+          <label>Spannweite L (m)</label>
+          <input type="number" id="tr-spannweite" placeholder="z.B. 6" step="0.1">
+        </div>
+        
+        <div class="form-group">
+          <label>Gleichlast q (kN/m)</label>
+          <input type="number" id="tr-last" placeholder="z.B. 15" step="0.1">
+        </div>
+        
+        <div class="form-group">
+          <label>System</label>
+          <select id="tr-system">
+            <option value="1">Einfeldträger</option>
+            <option value="0.7">Zweifeldträger</option>
+            <option value="0.8">Kragarm</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Material</label>
+          <select id="tr-material">
+            <option value="stahl">Baustahl S235/S355</option>
+            <option value="beton">Stahlbeton C25/30</option>
+            <option value="holz">BSH GL24h</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcTraeger()">Berechnen</button>
+        <div id="tr-result"></div>
+        
+        <h3 style="margin-top:25px">Faustformeln Trägerhöhe</h3>
+        <table class="data-table">
+          <thead><tr><th>Trägertyp</th><th>h ≈</th></tr></thead>
+          <tbody>
+            <tr><td>Stahlträger Einfeldträger</td><td>L/15 bis L/20</td></tr>
+            <tr><td>Stahlträger Durchlaufträger</td><td>L/20 bis L/25</td></tr>
+            <tr><td>Stahlbetonbalken</td><td>L/10 bis L/15</td></tr>
+            <tr><td>Stahlbeton-Platte einachsig</td><td>L/25 bis L/35</td></tr>
+            <tr><td>Stahlbeton-Platte zweiachsig</td><td>L/35 bis L/45</td></tr>
+            <tr><td>Holzbalken (Vollholz)</td><td>L/10 bis L/15</td></tr>
+            <tr><td>BSH-Träger</td><td>L/12 bis L/18</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STÜTZEN -->
+      <div id="stuetzen" class="tab-content">
+        <h2>📐 Stützenüberschlag</h2>
+        
+        <div class="form-group">
+          <label>Normalkraft Nd (kN)</label>
+          <input type="number" id="st-kraft" placeholder="z.B. 500">
+        </div>
+        
+        <div class="form-group">
+          <label>Stützenhöhe l (m)</label>
+          <input type="number" id="st-hoehe" placeholder="z.B. 3.5" step="0.1">
+        </div>
+        
+        <div class="form-group">
+          <label>Knicklängenbeiwert β</label>
+          <select id="st-beta">
+            <option value="1.0" selected>1,0 - beidseitig gelenkig</option>
+            <option value="0.7">0,7 - unten eingespannt, oben gelenkig</option>
+            <option value="0.5">0,5 - beidseitig eingespannt</option>
+            <option value="2.0">2,0 - Kragstütze (unten fest)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Material</label>
+          <select id="st-material">
+            <option value="beton">Stahlbeton C25/30</option>
+            <option value="stahl">Baustahl S235</option>
+            <option value="holz">Holz C24</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcStuetze()">Berechnen</button>
+        <div id="st-result"></div>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Stahlbetonstützen</h4>
+          <table class="data-table" style="margin-top:10px">
+            <tr><td>Min. Querschnitt</td><td>200 × 200 mm</td></tr>
+            <tr><td>Min. Längsbewehrung</td><td>0,3% · Ac</td></tr>
+            <tr><td>Max. Längsbewehrung</td><td>6% · Ac</td></tr>
+            <tr><td>Betondeckung XC1</td><td>min. 30 mm</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- FUNDAMENT -->
+      <div id="fundament" class="tab-content">
+        <h2>🏛️ Fundamentüberschlag</h2>
+        
+        <div class="form-group">
+          <label>Vertikallast Vd (kN)</label>
+          <input type="number" id="fund-last" placeholder="z.B. 300">
+        </div>
+        
+        <div class="form-group">
+          <label>Zul. Bodenpressung σRd (kN/m²)</label>
+          <select id="fund-boden">
+            <option value="100">Schluff locker (100)</option>
+            <option value="150">Sand locker (150)</option>
+            <option value="200" selected>Sand mitteldicht (200)</option>
+            <option value="300">Sand dicht (300)</option>
+            <option value="400">Kies mitteldicht (400)</option>
+            <option value="500">Kies dicht (500)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcFundament()">Berechnen</button>
+        <div id="fund-result"></div>
+        
+        <h3 style="margin-top:25px">Bodenkennwerte</h3>
+        <table class="data-table">
+          <thead><tr><th>Bodenart</th><th>σRd (kN/m²)</th><th>γ (kN/m³)</th></tr></thead>
+          <tbody>
+            <tr><td>Schluff locker</td><td>80-150</td><td>18</td></tr>
+            <tr><td>Sand locker</td><td>100-200</td><td>17</td></tr>
+            <tr><td>Sand mitteldicht</td><td>150-300</td><td>18</td></tr>
+            <tr><td>Sand dicht</td><td>250-400</td><td>19</td></tr>
+            <tr><td>Kies</td><td>300-600</td><td>19</td></tr>
+            <tr><td>Ton steif</td><td>150-300</td><td>19</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BETON -->
+      <div id="beton" class="tab-content">
+        <h2>🧱 Stahlbeton</h2>
+        
+        <h3>Betonfestigkeitsklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>fck</th><th>fcd</th><th>fctm</th></tr></thead>
+          <tbody>
+            <tr><td>C20/25</td><td>20</td><td>11,3</td><td>2,2</td></tr>
+            <tr><td>C25/30</td><td>25</td><td>14,2</td><td>2,6</td></tr>
+            <tr><td>C30/37</td><td>30</td><td>17,0</td><td>2,9</td></tr>
+            <tr><td>C35/45</td><td>35</td><td>19,8</td><td>3,2</td></tr>
+            <tr><td>C40/50</td><td>40</td><td>22,7</td><td>3,5</td></tr>
+            <tr><td>C45/55</td><td>45</td><td>25,5</td><td>3,8</td></tr>
+            <tr><td>C50/60</td><td>50</td><td>28,3</td><td>4,1</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Stabstahl-Querschnitte</h3>
+        <table class="data-table">
+          <thead><tr><th>Ø</th><th>As (cm²)</th><th>kg/m</th></tr></thead>
+          <tbody>
+            <tr><td>6</td><td>0,28</td><td>0,22</td></tr>
+            <tr><td>8</td><td>0,50</td><td>0,40</td></tr>
+            <tr><td>10</td><td>0,79</td><td>0,62</td></tr>
+            <tr><td>12</td><td>1,13</td><td>0,89</td></tr>
+            <tr><td>14</td><td>1,54</td><td>1,21</td></tr>
+            <tr><td>16</td><td>2,01</td><td>1,58</td></tr>
+            <tr><td>20</td><td>3,14</td><td>2,47</td></tr>
+            <tr><td>25</td><td>4,91</td><td>3,85</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BEWEHRUNG -->
+      <div id="bewehrung" class="tab-content">
+        <h2>🔗 Bewehrung</h2>
+        
+        <h3>Betonstähle (DIN 488)</h3>
+        <table class="data-table">
+          <thead><tr><th>Bezeichnung</th><th>fyk (N/mm²)</th><th>ftk (N/mm²)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>B500A</strong></td><td>500</td><td>525</td></tr>
+            <tr><td><strong>B500B</strong></td><td>500</td><td>540</td></tr>
+            <tr><td><strong>B500C</strong></td><td>500</td><td>575</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Stabdurchmesser und Flächen</h3>
+        <table class="data-table">
+          <thead><tr><th>Ø (mm)</th><th>As (cm²)</th><th>kg/m</th><th>Abstand</th></tr></thead>
+          <tbody>
+            <tr><td>6</td><td>0,28</td><td>0,22</td><td>@10: 2,83 cm²/m</td></tr>
+            <tr><td>8</td><td>0,50</td><td>0,39</td><td>@10: 5,03 cm²/m</td></tr>
+            <tr><td>10</td><td>0,79</td><td>0,62</td><td>@10: 7,85 cm²/m</td></tr>
+            <tr><td>12</td><td>1,13</td><td>0,89</td><td>@15: 7,54 cm²/m</td></tr>
+            <tr><td>14</td><td>1,54</td><td>1,21</td><td>@15: 10,26 cm²/m</td></tr>
+            <tr><td>16</td><td>2,01</td><td>1,58</td><td>@15: 13,40 cm²/m</td></tr>
+            <tr><td>20</td><td>3,14</td><td>2,47</td><td>@20: 15,71 cm²/m</td></tr>
+            <tr><td>25</td><td>4,91</td><td>3,85</td><td>@20: 24,54 cm²/m</td></tr>
+            <tr><td>28</td><td>6,16</td><td>4,83</td><td>@20: 30,79 cm²/m</td></tr>
+            <tr><td>32</td><td>8,04</td><td>6,31</td><td>@20: 40,21 cm²/m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Bewehrungsfläche berechnen</h3>
+        <div class="form-group">
+          <label>Stabdurchmesser (mm)</label>
+          <select id="bew-ds">
+            <option value="0.50">Ø8</option>
+            <option value="0.79">Ø10</option>
+            <option value="1.13" selected>Ø12</option>
+            <option value="1.54">Ø14</option>
+            <option value="2.01">Ø16</option>
+            <option value="3.14">Ø20</option>
+            <option value="4.91">Ø25</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Stabanzahl oder Abstand</label>
+          <select id="bew-art">
+            <option value="anzahl">Anzahl Stäbe</option>
+            <option value="abstand" selected>Abstand (cm)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Wert</label>
+          <input type="number" id="bew-wert" placeholder="z.B. 15" value="15">
+        </div>
+        <button class="btn" onclick="calcBewehrung()">Berechnen</button>
+        <div id="bew-result"></div>
+        
+        <h3 style="margin-top:25px">Betondeckung</h3>
+        <table class="data-table">
+          <thead><tr><th>Expositionsklasse</th><th>cmin (mm)</th></tr></thead>
+          <tbody>
+            <tr><td>XC1 (trocken)</td><td>10</td></tr>
+            <tr><td>XC2/XC3</td><td>20</td></tr>
+            <tr><td>XC4</td><td>25</td></tr>
+            <tr><td>XD1/XS1</td><td>30</td></tr>
+            <tr><td>XD2/XS2</td><td>35</td></tr>
+            <tr><td>XD3/XS3</td><td>40</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Mindestbewehrung</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Platten Längs</td><td>As,min = 0,15% × b × d</td></tr>
+            <tr><td>Platten Quer</td><td>As,min = 20% der Längsbew.</td></tr>
+            <tr><td>Balken Zug</td><td>As,min = 0,26 × fctm/fyk × b × d</td></tr>
+            <tr><td>Stützen</td><td>As,min = 0,15 × NEd/fyd</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verankerung / Übergreifung</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>Länge</th></tr></thead>
+          <tbody>
+            <tr><td>Verankerung Zug</td><td>lb = α × Ø × fyd / (4 × fbd)</td></tr>
+            <tr><td>Übergreifung</td><td>l0 = α6 × lb (α6 = 1,0-1,5)</td></tr>
+            <tr><td>Richtwert Ø12</td><td>ca. 50-60 cm</td></tr>
+            <tr><td>Richtwert Ø16</td><td>ca. 65-80 cm</td></tr>
+            <tr><td>Richtwert Ø20</td><td>ca. 80-100 cm</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STAHL -->
+      <div id="stahl" class="tab-content">
+        <h2>🔩 Stahlbau</h2>
+        
+        <h3>Stahlsorten</h3>
+        <table class="data-table">
+          <thead><tr><th>Sorte</th><th>fy (N/mm²)</th><th>fu (N/mm²)</th></tr></thead>
+          <tbody>
+            <tr><td>S235</td><td>235</td><td>360</td></tr>
+            <tr><td>S275</td><td>275</td><td>430</td></tr>
+            <tr><td>S355</td><td>355</td><td>510</td></tr>
+            <tr><td>S460</td><td>460</td><td>550</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">IPE-Profile</h3>
+        <table class="data-table">
+          <thead><tr><th>Profil</th><th>h×b</th><th>kg/m</th><th>Iy (cm⁴)</th></tr></thead>
+          <tbody>
+            <tr><td>IPE 100</td><td>100×55</td><td>8,1</td><td>171</td></tr>
+            <tr><td>IPE 140</td><td>140×73</td><td>12,9</td><td>541</td></tr>
+            <tr><td>IPE 180</td><td>180×91</td><td>18,8</td><td>1317</td></tr>
+            <tr><td>IPE 220</td><td>220×110</td><td>26,2</td><td>2772</td></tr>
+            <tr><td>IPE 270</td><td>270×135</td><td>36,1</td><td>5790</td></tr>
+            <tr><td>IPE 330</td><td>330×160</td><td>49,1</td><td>11770</td></tr>
+            <tr><td>IPE 400</td><td>400×180</td><td>66,3</td><td>23130</td></tr>
+            <tr><td>IPE 500</td><td>500×200</td><td>90,7</td><td>48200</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">HEB-Profile</h3>
+        <table class="data-table">
+          <thead><tr><th>Profil</th><th>h×b</th><th>kg/m</th><th>Iy (cm⁴)</th></tr></thead>
+          <tbody>
+            <tr><td>HEB 100</td><td>100×100</td><td>20,4</td><td>450</td></tr>
+            <tr><td>HEB 140</td><td>140×140</td><td>33,7</td><td>1509</td></tr>
+            <tr><td>HEB 180</td><td>180×180</td><td>51,2</td><td>3831</td></tr>
+            <tr><td>HEB 220</td><td>220×220</td><td>71,5</td><td>8091</td></tr>
+            <tr><td>HEB 280</td><td>280×280</td><td>103</td><td>19270</td></tr>
+            <tr><td>HEB 340</td><td>340×300</td><td>134</td><td>36660</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VERBINDUNGSMITTEL -->
+      <div id="verbindung" class="tab-content">
+        <h2>🔩 Verbindungsmittel</h2>
+        
+        <h3>Schrauben (DIN EN ISO 4014/4017)</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>fub (N/mm²)</th><th>fyb (N/mm²)</th></tr></thead>
+          <tbody>
+            <tr><td>4.6</td><td>400</td><td>240</td></tr>
+            <tr><td>5.6</td><td>500</td><td>300</td></tr>
+            <tr><td>8.8</td><td>800</td><td>640</td></tr>
+            <tr><td>10.9</td><td>1000</td><td>900</td></tr>
+            <tr><td>12.9</td><td>1200</td><td>1080</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Schrauben-Tragfähigkeit (Schub)</h3>
+        <table class="data-table">
+          <thead><tr><th>Schraube</th><th>Klasse 4.6</th><th>Klasse 8.8</th><th>Klasse 10.9</th></tr></thead>
+          <tbody>
+            <tr><td>M12</td><td>22,6 kN</td><td>45,2 kN</td><td>56,5 kN</td></tr>
+            <tr><td>M16</td><td>40,2 kN</td><td>80,4 kN</td><td>100,5 kN</td></tr>
+            <tr><td>M20</td><td>62,8 kN</td><td>125,6 kN</td><td>157,0 kN</td></tr>
+            <tr><td>M24</td><td>90,4 kN</td><td>180,9 kN</td><td>226,1 kN</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Schweißnähte</h3>
+        <table class="data-table">
+          <thead><tr><th>Nahtart</th><th>Formel</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Stumpfnaht</strong></td><td>Fw,Rd = a × L × fvw,d</td></tr>
+            <tr><td><strong>Kehlnaht</strong></td><td>Fw,Rd = a × L × fu / (√3 × βw × γM2)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Kehlnaht Tragfähigkeit</h3>
+        <table class="data-table">
+          <thead><tr><th>Nahtdicke a</th><th>S235</th><th>S355</th></tr></thead>
+          <tbody>
+            <tr><td>3 mm</td><td>0,52 kN/mm</td><td>0,68 kN/mm</td></tr>
+            <tr><td>4 mm</td><td>0,69 kN/mm</td><td>0,90 kN/mm</td></tr>
+            <tr><td>5 mm</td><td>0,86 kN/mm</td><td>1,13 kN/mm</td></tr>
+            <tr><td>6 mm</td><td>1,04 kN/mm</td><td>1,35 kN/mm</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Dübel / Anker</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Spreizdübel</strong></td><td>Beton gerissen/ungerissen</td></tr>
+            <tr><td><strong>Hinterschnittdübel</strong></td><td>Hohe Lasten, Beton</td></tr>
+            <tr><td><strong>Verbunddübel</strong></td><td>Mauerwerk, Beton</td></tr>
+            <tr><td><strong>Injektionsanker</strong></td><td>Hohlstein, Porenbeton</td></tr>
+            <tr><td><strong>Schwerlastanker</strong></td><td>Maschinenbefestigung</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Holzverbindungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Mittel</th><th>Anwendung</th><th>Tragfähigkeit</th></tr></thead>
+          <tbody>
+            <tr><td>Nagel</td><td>Verkleidung, Lattung</td><td>Gering</td></tr>
+            <tr><td>Holzschraube</td><td>Beplankung, Verbindung</td><td>Mittel</td></tr>
+            <tr><td>Stabdübel</td><td>Trägeranschlüsse</td><td>Hoch</td></tr>
+            <tr><td>Passbolzen</td><td>Binder, Rahmenecken</td><td>Hoch</td></tr>
+            <tr><td>Nagelplatte</td><td>Fachwerkbinder</td><td>Hoch</td></tr>
+            <tr><td>BVD-Verbinder</td><td>Sparren, Pfetten</td><td>Mittel-Hoch</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Mindestabstände</h4>
+          <table class="data-table" style="margin-top:10px">
+            <tr><td>Schraube - Rand</td><td>min. 1,5 × d</td></tr>
+            <tr><td>Schraube - Schraube</td><td>min. 3 × d</td></tr>
+            <tr><td>Schweißnaht a</td><td>min. 3 mm</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- HOLZ -->
+      <div id="holz" class="tab-content">
+        <h2>🪵 Holzbau</h2>
+        
+        <h3>Festigkeitsklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>fm,k</th><th>fc,0,k</th><th>ρk</th></tr></thead>
+          <tbody>
+            <tr><td colspan="4" style="background:#f3f4f6;font-weight:bold;">Vollholz</td></tr>
+            <tr><td>C14</td><td>14</td><td>16</td><td>290</td></tr>
+            <tr><td>C18</td><td>18</td><td>18</td><td>320</td></tr>
+            <tr><td>C24</td><td>24</td><td>21</td><td>350</td></tr>
+            <tr><td>C30</td><td>30</td><td>24</td><td>380</td></tr>
+            <tr><td colspan="4" style="background:#f3f4f6;font-weight:bold;">BSH</td></tr>
+            <tr><td>GL24h</td><td>24</td><td>24</td><td>380</td></tr>
+            <tr><td>GL28h</td><td>28</td><td>26,5</td><td>410</td></tr>
+            <tr><td>GL32h</td><td>32</td><td>29</td><td>430</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">BSH Querschnitte</h3>
+        <table class="data-table">
+          <thead><tr><th>b × h</th><th>A (cm²)</th><th>Wy (cm³)</th></tr></thead>
+          <tbody>
+            <tr><td>80 × 160</td><td>128</td><td>341</td></tr>
+            <tr><td>100 × 200</td><td>200</td><td>667</td></tr>
+            <tr><td>120 × 240</td><td>288</td><td>1152</td></tr>
+            <tr><td>140 × 280</td><td>392</td><td>1830</td></tr>
+            <tr><td>160 × 320</td><td>512</td><td>2731</td></tr>
+            <tr><td>180 × 360</td><td>648</td><td>3888</td></tr>
+            <tr><td>200 × 400</td><td>800</td><td>5333</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Statik</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔢 Teilsicherheitsbeiwerte γ</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>γG,sup (ständig ungünstig)</td><td><strong>1,35</strong></td></tr>
+              <tr><td>γG,inf (ständig günstig)</td><td><strong>1,00</strong></td></tr>
+              <tr><td>γQ (veränderlich)</td><td><strong>1,50</strong></td></tr>
+              <tr><td>γC (Beton)</td><td><strong>1,50</strong></td></tr>
+              <tr><td>γS (Betonstahl)</td><td><strong>1,15</strong></td></tr>
+              <tr><td>γM0 (Baustahl)</td><td><strong>1,00</strong></td></tr>
+              <tr><td>γM1 (Stahl Stabilität)</td><td><strong>1,10</strong></td></tr>
+              <tr><td>γM (Holz)</td><td><strong>1,30</strong></td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📐 Kombinationsbeiwerte ψ</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Einwirkung</th><th>ψ0</th><th>ψ1</th><th>ψ2</th></tr></thead>
+              <tbody>
+                <tr><td>Nutzlast A-C</td><td>0,7</td><td>0,5</td><td>0,3</td></tr>
+                <tr><td>Nutzlast D-E</td><td>0,7</td><td>0,7</td><td>0,6</td></tr>
+                <tr><td>Schnee ≤1000m</td><td>0,5</td><td>0,2</td><td>0</td></tr>
+                <tr><td>Wind</td><td>0,6</td><td>0,2</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📏 Durchbiegungsgrenzen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Decken/Balken allgemein</td><td>L/250</td></tr>
+              <tr><td>Decken unter Trennwänden</td><td>L/500</td></tr>
+              <tr><td>Kragarm</td><td>L/150</td></tr>
+              <tr><td>Dächer</td><td>L/200</td></tr>
+              <tr><td>Stahlträger</td><td>L/300</td></tr>
+              <tr><td>Holzbalken (Endzustand)</td><td>L/200 bis L/300</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🏗️ Betondeckung (EC2)</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <thead><tr><th>Expositionsklasse</th><th>cmin,dur</th><th>Beispiel</th></tr></thead>
+              <tbody>
+                <tr><td>XC1</td><td>15 mm</td><td>Innenraum trocken</td></tr>
+                <tr><td>XC2</td><td>25 mm</td><td>Dauerhaft nass</td></tr>
+                <tr><td>XC3</td><td>25 mm</td><td>Wechselfeucht</td></tr>
+                <tr><td>XC4</td><td>30 mm</td><td>Außenbauteile</td></tr>
+                <tr><td>XD1</td><td>35 mm</td><td>Sprühwasser Chlorid</td></tr>
+                <tr><td>XS1</td><td>35 mm</td><td>Meerwasser Luft</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#6b7280;">cnom = cmin + Δcdev (10mm)</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Wichtige Eurocodes</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>EN 1990</strong></td><td>Grundlagen Tragwerksplanung</td></tr>
+              <tr><td><strong>EN 1991</strong></td><td>Einwirkungen auf Tragwerke</td></tr>
+              <tr><td><strong>EN 1992</strong></td><td>Bemessung Betonbau (EC2)</td></tr>
+              <tr><td><strong>EN 1993</strong></td><td>Bemessung Stahlbau (EC3)</td></tr>
+              <tr><td><strong>EN 1994</strong></td><td>Bemessung Verbundbau (EC4)</td></tr>
+              <tr><td><strong>EN 1995</strong></td><td>Bemessung Holzbau (EC5)</td></tr>
+              <tr><td><strong>EN 1996</strong></td><td>Bemessung Mauerwerksbau (EC6)</td></tr>
+              <tr><td><strong>EN 1997</strong></td><td>Geotechnik (EC7)</td></tr>
+              <tr><td><strong>EN 1998</strong></td><td>Erdbeben (EC8)</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔩 Schrauben/Dübel Tragfähigkeit</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Schwerlastdübel in Beton C20/25</h4>
+            <table class="data-table">
+              <thead><tr><th>Größe</th><th>Zug (kN)</th><th>Quer (kN)</th></tr></thead>
+              <tbody>
+                <tr><td>M8</td><td>~5-8</td><td>~4-6</td></tr>
+                <tr><td>M10</td><td>~8-12</td><td>~6-10</td></tr>
+                <tr><td>M12</td><td>~12-18</td><td>~10-15</td></tr>
+                <tr><td>M16</td><td>~20-30</td><td>~18-25</td></tr>
+                <tr><td>M20</td><td>~30-45</td><td>~25-35</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#dc2626;">⚠️ Werte abhängig von Randabstand, Achs­abstand und Hersteller - immer ETA prüfen!</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📊 Umrechnungen</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>1 kN</td><td>≈ 100 kg (genau: 101,97 kg)</td></tr>
+              <tr><td>1 kN/m²</td><td>≈ 100 kg/m²</td></tr>
+              <tr><td>1 kN/m³</td><td>≈ 100 kg/m³</td></tr>
+              <tr><td>1 MN</td><td>= 1000 kN = ~100 t</td></tr>
+              <tr><td>1 N/mm²</td><td>= 1 MPa = 10 bar</td></tr>
+              <tr><td>1 kNm</td><td>= 1000 Nm</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'gewicht')">
+      <span class="nav-icon">⚖️</span><span class="nav-label">Gewicht</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'lasten')">
+      <span class="nav-icon">📊</span><span class="nav-label">Lasten</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[5], 'beton')">
+      <span class="nav-icon">🧱</span><span class="nav-label">Beton</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[6], 'stahl')">
+      <span class="nav-icon">🔩</span><span class="nav-label">Stahl</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[8], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function updateGewichtFields() {
+      const form = document.getElementById('gew-form').value;
+      document.getElementById('gew-quader-fields').style.display = form === 'quader' ? 'block' : 'none';
+      document.getElementById('gew-zylinder-fields').style.display = form === 'zylinder' ? 'block' : 'none';
+      document.getElementById('gew-profil-fields').style.display = form === 'profil' ? 'block' : 'none';
+      document.getElementById('gew-flaeche-fields').style.display = form === 'flaeche' ? 'block' : 'none';
+    }
+    
+    function calcGewicht() {
+      const form = document.getElementById('gew-form').value;
+      let volumen = 0, gewichtKN = 0, gewichtKG = 0, beschreibung = '';
+      
+      if (form === 'quader') {
+        const gamma = parseFloat(document.getElementById('gew-material').value);
+        const L = parseFloat(document.getElementById('gew-laenge').value);
+        const B = parseFloat(document.getElementById('gew-breite').value);
+        const H = parseFloat(document.getElementById('gew-hoehe').value);
+        if (isNaN(L) || isNaN(B) || isNaN(H)) { document.getElementById('gew-result').innerHTML = '<div class="danger">Bitte alle Maße eingeben</div>'; return; }
+        volumen = L * B * H;
+        gewichtKN = volumen * gamma;
+        beschreibung = `${L} × ${B} × ${H} m = ${volumen.toFixed(3)} m³`;
+      } else if (form === 'zylinder') {
+        const gamma = parseFloat(document.getElementById('gew-material2').value);
+        const da = parseFloat(document.getElementById('gew-durchm-a').value);
+        const di = parseFloat(document.getElementById('gew-durchm-i').value) || 0;
+        const L = parseFloat(document.getElementById('gew-zyl-laenge').value);
+        if (isNaN(da) || isNaN(L)) { document.getElementById('gew-result').innerHTML = '<div class="danger">Bitte alle Maße eingeben</div>'; return; }
+        const ra = da / 2, ri = di / 2;
+        volumen = Math.PI * (ra*ra - ri*ri) * L;
+        gewichtKN = volumen * gamma;
+        beschreibung = di > 0 ? `Rohr Ø${da*1000}/${di*1000} × ${L} m` : `Vollzylinder Ø${da*1000} × ${L} m`;
+      } else if (form === 'profil') {
+        const kgm = parseFloat(document.getElementById('gew-profil').value);
+        const L = parseFloat(document.getElementById('gew-profil-laenge').value);
+        if (isNaN(L)) { document.getElementById('gew-result').innerHTML = '<div class="danger">Bitte Länge eingeben</div>'; return; }
+        gewichtKG = kgm * L;
+        gewichtKN = gewichtKG / 100;
+        beschreibung = `${kgm} kg/m × ${L} m`;
+      } else if (form === 'flaeche') {
+        const qk = parseFloat(document.getElementById('gew-aufbau').value);
+        const A = parseFloat(document.getElementById('gew-flaeche-m2').value);
+        if (isNaN(A)) { document.getElementById('gew-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>'; return; }
+        gewichtKN = qk * A;
+        beschreibung = `${qk} kN/m² × ${A} m²`;
+      }
+      
+      if (form !== 'profil') gewichtKG = gewichtKN * 100;
+      const gewichtT = gewichtKG / 1000;
+      
+      document.getElementById('gew-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Berechnung:</span><span>${beschreibung}</span></div>
+          ${volumen > 0 ? `<div class="result-item"><span>Volumen:</span><span>${volumen.toFixed(3)} m³</span></div>` : ''}
+          <div class="result-item"><span>Gewicht:</span><span><strong>${gewichtKN.toFixed(2)} kN</strong></span></div>
+          <div class="result-item"><span></span><span><strong>${gewichtKG.toFixed(1)} kg</strong></span></div>
+          ${gewichtT >= 1 ? `<div class="result-item"><span></span><span><strong>${gewichtT.toFixed(2)} t</strong></span></div>` : ''}
+        </div>`;
+    }
+    
+    function calcTraeger() {
+      const L = parseFloat(document.getElementById('tr-spannweite').value);
+      const q = parseFloat(document.getElementById('tr-last').value);
+      const system = parseFloat(document.getElementById('tr-system').value);
+      const mat = document.getElementById('tr-material').value;
+      if (isNaN(L) || isNaN(q)) { document.getElementById('tr-result').innerHTML = '<div class="danger">Bitte alle Felder ausfüllen</div>'; return; }
+      
+      const M = (q * L * L / 8) * system;
+      const V = (q * L / 2);
+      
+      let hoehe, empf, E, I, durchbiegung, grenze;
+      
+      if (mat === 'beton') { 
+        hoehe = L / 12;
+        const b = hoehe * 0.4;
+        const h = hoehe;
+        E = 31000; // N/mm² C25/30
+        I = (b * Math.pow(h, 3) / 12) * 1e12; // mm⁴
+        durchbiegung = (5 * q * Math.pow(L * 1000, 4)) / (384 * E * I);
+        grenze = L * 1000 / 250;
+        empf = `Stahlbetonbalken b/h ≈ ${(b*100).toFixed(0)}/${(h*100).toFixed(0)} cm`; 
+      }
+      else if (mat === 'holz') { 
+        hoehe = L / 14;
+        const b = hoehe * 0.5;
+        const h = hoehe;
+        E = 11600; // N/mm² GL24h
+        I = (b * Math.pow(h, 3) / 12) * 1e12;
+        durchbiegung = (5 * q * Math.pow(L * 1000, 4)) / (384 * E * I);
+        grenze = L * 1000 / 300;
+        empf = `BSH b/h ≈ ${(b*100).toFixed(0)}/${(h*100).toFixed(0)} cm`; 
+      }
+      else { 
+        hoehe = L / 17;
+        E = 210000; // N/mm² Stahl
+        // Geschätztes I für IPE in mm⁴
+        const hMm = hoehe * 1000;
+        I = 0.00005 * Math.pow(hMm, 4); // Näherung
+        durchbiegung = (5 * q * Math.pow(L * 1000, 4)) / (384 * E * I);
+        grenze = L * 1000 / 300;
+        empf = `IPE/HEB ca. ${hMm.toFixed(0)} mm Höhe`; 
+      }
+      
+      const ausnutzung = (durchbiegung / grenze * 100).toFixed(0);
+      const ok = durchbiegung <= grenze;
+      
+      document.getElementById('tr-result').innerHTML = `
+        <div class="result">
+          <h3>Ergebnis</h3>
+          <div class="result-item"><span>Feldmoment MEd:</span><span><strong>${M.toFixed(1)} kNm</strong></span></div>
+          <div class="result-item"><span>Querkraft VEd:</span><span>${V.toFixed(1)} kN</span></div>
+          <div class="result-item"><span>Durchbiegung ca.:</span><span>${durchbiegung.toFixed(1)} mm</span></div>
+          <div class="result-item"><span>Grenzwert L/250:</span><span>${grenze.toFixed(1)} mm (${ausnutzung}%)</span></div>
+          <div class="result-item"><span>Empfehlung:</span><span><strong>${empf}</strong></span></div>
+        </div>
+        <div class="${ok ? 'info-box' : 'danger'}" style="margin-top:15px">
+          ${ok ? '✅ Durchbiegung eingehalten' : '❌ Durchbiegung überschritten - größeres Profil wählen!'}
+        </div>
+        <div class="warning" style="margin-top:10px">⚠️ Überschlag - statischer Nachweis erforderlich!</div>`;
+    }
+    
+    function calcStuetze() {
+      const N = parseFloat(document.getElementById('st-kraft').value);
+      const h = parseFloat(document.getElementById('st-hoehe').value);
+      const beta = parseFloat(document.getElementById('st-beta').value);
+      const mat = document.getElementById('st-material').value;
+      if (isNaN(N) || isNaN(h)) { document.getElementById('st-result').innerHTML = '<div class="danger">Bitte alle Felder ausfüllen</div>'; return; }
+      const lk = h * beta;
+      let empf;
+      if (mat === 'beton') { const A = N * 1000 / 14 * 1.5 / 10000; const d = Math.sqrt(A) * 100; empf = `Stahlbetonstütze ${Math.max(Math.ceil(d/5)*5,20)} × ${Math.max(Math.ceil(d/5)*5,20)} cm`; }
+      else if (mat === 'holz') { const A = N * 1000 / 14 * 1.3 / 100; const d = Math.sqrt(A); empf = `Holzstütze ${Math.ceil(d/2)*2} × ${Math.ceil(d/2)*2} cm`; }
+      else { const A = N * 1000 / 235 * 1.1; empf = `Stahlprofil erf. A ≈ ${A.toFixed(0)} mm²`; }
+      document.getElementById('st-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Normalkraft NEd:</span><span>${N} kN</span></div><div class="result-item"><span>Knicklänge lk:</span><span>${lk.toFixed(2)} m</span></div><div class="result-item"><span>Empfehlung:</span><span><strong>${empf}</strong></span></div></div>`;
+    }
+    
+    function calcFundament() {
+      const N = parseFloat(document.getElementById('fund-last').value);
+      const sigma = parseFloat(document.getElementById('fund-boden').value);
+      if (isNaN(N)) { document.getElementById('fund-result').innerHTML = '<div class="danger">Bitte Last eingeben</div>'; return; }
+      const A = N / sigma;
+      const seite = Math.sqrt(A);
+      const gerundet = Math.ceil(seite * 10) / 10;
+      document.getElementById('fund-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Erf. Fläche:</span><span>${A.toFixed(2)} m²</span></div><div class="result-item"><span>Einzelfundament:</span><span><strong>${(gerundet*100).toFixed(0)} × ${(gerundet*100).toFixed(0)} cm</strong></span></div></div>`;
+    }
+    
+    function calcBewehrung() {
+      const as = parseFloat(document.getElementById('bew-ds').value);
+      const art = document.getElementById('bew-art').value;
+      const wert = parseFloat(document.getElementById('bew-wert').value);
+      
+      if (isNaN(wert) || wert <= 0) {
+        document.getElementById('bew-result').innerHTML = '<div class="danger">Bitte Wert eingeben</div>';
+        return;
+      }
+      
+      let asGes, beschreibung;
+      
+      if (art === 'anzahl') {
+        asGes = as * wert;
+        beschreibung = `${wert} Stäbe à ${as.toFixed(2)} cm²`;
+      } else {
+        // Abstand in cm -> Stäbe pro Meter
+        const proMeter = 100 / wert;
+        asGes = as * proMeter;
+        beschreibung = `Abstand ${wert} cm = ${proMeter.toFixed(1)} Stäbe/m`;
+      }
+      
+      document.getElementById('bew-result').innerHTML = `
+        <div class="result">
+          <h3>Bewehrungsfläche</h3>
+          <div class="result-item"><span>Einzelfläche As:</span><span>${as.toFixed(2)} cm²</span></div>
+          <div class="result-item"><span>${beschreibung}</span></div>
+          <div class="result-item"><span>Gesamtfläche:</span><span><strong>${asGes.toFixed(2)} cm²/m</strong></span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>

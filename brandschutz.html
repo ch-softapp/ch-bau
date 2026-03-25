@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#dc2626">
+  <title>ch-Bau - Brandschutz</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    :root { --primary: #dc2626; --primary-dark: #b91c1c; }
+    .app-header { background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); }
+  </style>
+</head>
+<body class="gewerk-brandschutz">
+  <header class="app-header">
+    <div class="header-content">
+      <select id="gewerk-select" class="gewerk-dropdown" onchange="changeGewerk(this.value)">
+        <option value="elektro">⚡ Elektro</option>
+        <option value="hlsk">🔧 HLSK</option>
+        <option value="statik">🏗️ Statik</option>
+        <option value="brandschutz" selected>🔥 Brandschutz</option>
+        <option value="arbeitsschutz">⚠️ Arbeitsschutz</option>
+        <option value="baurecht">📋 Baurecht</option>
+        <option value="geg">🌱 GEG/Energie</option>
+        <option value="pv">☀️ PV/Solar</option>
+        <option value="schallschutz">🔊 Schallschutz</option>
+        <option value="knx">🏠 KNX/Smart Home</option>
+        <option value="tiefbau">🚧 Tiefbau</option>
+        <option value="impressum">ℹ️ Impressum</option>
+      </select>
+      <span class="offline-indicator" id="offline-badge">Offline</span>
+    </div>
+  </header>
+
+  <main id="content">
+    <div class="welcome">
+      <h2>🔥 Brandschutz</h2>
+      <p style="margin-bottom:20px;color:#6b7280">Baulicher · Anlagentechnischer · Organisatorischer Brandschutz</p>
+    </div>
+
+    <div class="tab-container">
+      <div class="tabs" style="flex-wrap:wrap;">
+        <button class="tab active" onclick="switchTab(this, 'feuerwider')">Feuerwiderst.</button>
+        <button class="tab" onclick="switchTab(this, 'flucht')">Flucht</button>
+        <button class="tab" onclick="switchTab(this, 'abstaende')">Abstände</button>
+        <button class="tab" onclick="switchTab(this, 'anlagen')">Anlagen</button>
+        <button class="tab" onclick="switchTab(this, 'schottung')">Schottung</button>
+        <button class="tab" onclick="switchTab(this, 'kabel')">Kabel</button>
+        <button class="tab" onclick="switchTab(this, 'loeschwasser')">Löschwasser</button>
+        <button class="tab" onclick="switchTab(this, 'klassen')">Klassen</button>
+        <button class="tab" onclick="switchTab(this, 'loescher')">Löscher</button>
+        <button class="tab" onclick="switchTab(this, 'wissen')">Wissen</button>
+      </div>
+
+      <!-- FEUERWIDERSTAND -->
+      <div id="feuerwider" class="tab-content active">
+        <h2>🧱 Feuerwiderstandsklassen</h2>
+        
+        <h3>Klassifizierung nach DIN EN 13501-2</h3>
+        <table class="data-table">
+          <thead><tr><th>Kriterium</th><th>Symbol</th><th>Bedeutung</th></tr></thead>
+          <tbody>
+            <tr><td>Tragfähigkeit</td><td>R</td><td>Résistance</td></tr>
+            <tr><td>Raumabschluss</td><td>E</td><td>Étanchéité</td></tr>
+            <tr><td>Wärmedämmung</td><td>I</td><td>Isolation</td></tr>
+            <tr><td>Stoßbeanspruchung</td><td>M</td><td>Mechanical</td></tr>
+            <tr><td>Selbstschließend</td><td>C</td><td>Closing</td></tr>
+            <tr><td>Rauchdicht</td><td>S</td><td>Smoke</td></tr>
+            <tr><td>Strahlung</td><td>W</td><td>radiation</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Anforderungen nach MBO</h3>
+        <table class="data-table">
+          <thead><tr><th>Bauteil</th><th>GK 1-3</th><th>GK 4</th><th>GK 5</th></tr></thead>
+          <tbody>
+            <tr><td>Tragende Wände</td><td>R 30</td><td>REI 60-A</td><td>REI 90-A</td></tr>
+            <tr><td>Außenwände (tragend)</td><td>R 30</td><td>REI 60-A</td><td>REI 90-A</td></tr>
+            <tr><td>Trennwände</td><td>EI 30</td><td>EI 60-A</td><td>EI 90-A</td></tr>
+            <tr><td>Brandwand</td><td>REI-M 90</td><td>REI-M 90</td><td>REI-M 90-A</td></tr>
+            <tr><td>Decken</td><td>R 30</td><td>REI 60-A</td><td>REI 90-A</td></tr>
+            <tr><td>Treppenraumwände</td><td>EI 30</td><td>REI 60-A</td><td>REI 90-A</td></tr>
+            <tr><td>Türen Treppenraum</td><td>-</td><td>EI₂30-C-S</td><td>EI₂30-C-S</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Alte vs. Neue Bezeichnung</h3>
+        <table class="data-table">
+          <thead><tr><th>Alt (DIN 4102)</th><th>Neu (EN 13501)</th><th>Dauer</th></tr></thead>
+          <tbody>
+            <tr><td>F 30-B</td><td>REI 30</td><td>30 min</td></tr>
+            <tr><td>F 60-AB</td><td>REI 60-A₂</td><td>60 min</td></tr>
+            <tr><td>F 90-A</td><td>REI 90-A</td><td>90 min</td></tr>
+            <tr><td>T 30</td><td>EI₂ 30-C</td><td>30 min</td></tr>
+            <tr><td>T 30-RS</td><td>EI₂ 30-C-S</td><td>30 min + Rauch</td></tr>
+            <tr><td>T 90</td><td>EI₂ 90-C</td><td>90 min</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FLUCHT -->
+      <div id="flucht" class="tab-content">
+        <h2>🚪 Flucht- und Rettungswege</h2>
+        
+        <h3>Rettungsweglängen</h3>
+        <table class="data-table">
+          <thead><tr><th>Nutzung / Bauordnung</th><th>Max. Länge</th></tr></thead>
+          <tbody>
+            <tr><td>Aufenthaltsräume MBO</td><td>35 m</td></tr>
+            <tr><td>Arbeitsstätten ASR A2.3</td><td>35 m (Brand)</td></tr>
+            <tr><td>Arbeitsstätten (Explosion)</td><td>20 m</td></tr>
+            <tr><td>Versammlungsstätten MVStättVO</td><td>30 m</td></tr>
+            <tr><td>Verkaufsstätten MVkVO</td><td>25 m (Gang) / 35 m (Treppe)</td></tr>
+            <tr><td>Hochhäuser MHHR</td><td>35 m</td></tr>
+            <tr><td>Industriebau MIndBauRL</td><td>35-70 m (nach Sicherheitskategorie)</td></tr>
+            <tr><td>Garagen MGarVO</td><td>30 m (geschlossen)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Türbreiten Berechnung</h3>
+        <div class="form-group">
+          <label>Personenzahl</label>
+          <input type="number" id="flucht-personen" placeholder="z.B. 200">
+        </div>
+        
+        <div class="form-group">
+          <label>Gebäudeart</label>
+          <select id="flucht-art">
+            <option value="standard">Standard (1,2 m / 200 Pers.)</option>
+            <option value="vs">Versammlungsstätte (1,2 m / 200 Pers.)</option>
+            <option value="schule">Schule (1,2 m / 200 Pers.)</option>
+          </select>
+        </div>
+        
+        <button class="btn" onclick="calcFluchtweg()">Berechnen</button>
+        <div id="flucht-result"></div>
+        
+        <h3 style="margin-top:25px">Mindestbreiten</h3>
+        <table class="data-table">
+          <thead><tr><th>Element</th><th>Lichte Breite</th></tr></thead>
+          <tbody>
+            <tr><td>Türen allgemein</td><td>≥ 0,90 m</td></tr>
+            <tr><td>Türen barrierefrei</td><td>≥ 0,90 m licht</td></tr>
+            <tr><td>Türen Versammlungsstätte</td><td>≥ 0,90 m (Einzel) / ≥ 1,20 m (Ausgang)</td></tr>
+            <tr><td>Flure einseitig</td><td>≥ 1,00 m</td></tr>
+            <tr><td>Flure beidseitig</td><td>≥ 1,25 m</td></tr>
+            <tr><td>Notwendige Treppen</td><td>≥ 1,00 m</td></tr>
+            <tr><td>Treppen Versammlungsstätte</td><td>≥ 1,20 m</td></tr>
+            <tr><td>Treppen Hochhaus</td><td>≥ 1,25 m</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Türen in Rettungswegen</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>In Fluchtrichtung aufschlagend (ab 200 Pers.)</li>
+            <li>Panikbeschlag nach DIN EN 1125 ab 200 Personen</li>
+            <li>Notausgangsverschluss nach DIN EN 179</li>
+            <li>Maximale Öffnungskraft: 100 N</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ABSTÄNDE -->
+      <div id="abstaende" class="tab-content">
+        <h2>📏 Brandschutzabstände</h2>
+        
+        <h3>Brandwand-Anforderungen</h3>
+        <table class="data-table">
+          <thead><tr><th>Situation</th><th>Anforderung</th></tr></thead>
+          <tbody>
+            <tr><td>Überstand über Dach</td><td>≥ 30 cm (harte Bedachung)</td></tr>
+            <tr><td>Überstand über Dach (weich)</td><td>≥ 50 cm</td></tr>
+            <tr><td>Vor Außenwand</td><td>≥ 50 cm seitlich vorgezogen</td></tr>
+            <tr><td>Bei Dachüberstand</td><td>Bis zur Traufe führen</td></tr>
+            <tr><td>Maximaler Abstand</td><td>alle 40 m</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Öffnungen in Außenwänden</h3>
+        <table class="data-table">
+          <thead><tr><th>Situation</th><th>Abstand / Maßnahme</th></tr></thead>
+          <tbody>
+            <tr><td>Fenster zur Grenze</td><td>≥ 5 m oder EI 30</td></tr>
+            <tr><td>Fenster über Eck (90°)</td><td>≥ 5 m horizontal</td></tr>
+            <tr><td>Fenster gegenüber (gleich)</td><td>≥ 5 m horizontal</td></tr>
+            <tr><td>Tür in Brandwand</td><td>EI₂ 30-C-S selbstschließend</td></tr>
+            <tr><td>Lüftung durch Brandwand</td><td>Brandschutzklappe K 90</td></tr>
+            <tr><td>Kabel durch Brandwand</td><td>Abschottung S 90</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Harte Bedachung</h3>
+        <table class="data-table">
+          <thead><tr><th>Dachneigung</th><th>Abstand zur Grenze</th></tr></thead>
+          <tbody>
+            <tr><td>≤ 20° (flach)</td><td>≥ 2 m</td></tr>
+            <tr><td>> 20° (geneigt)</td><td>≥ 3 m (ab First)</td></tr>
+            <tr><td>Angrenzend höher</td><td>Brandwand an Grenze</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="danger" style="margin-top:20px">
+          <h4>⚠️ Leitungsanlagen</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Alle Durchführungen müssen dem Feuerwiderstand der Wand/Decke entsprechen</li>
+            <li>Abschottung mit allgemeiner Bauartgenehmigung (aBG) / Zulassung (abP)</li>
+            <li>Dokumentation und Kennzeichnung erforderlich</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ANLAGEN -->
+      <div id="anlagen" class="tab-content">
+        <h2>🚨 Anlagentechnischer Brandschutz</h2>
+        
+        <h3>BMA - Brandmeldeanlage (DIN 14675)</h3>
+        <table class="data-table">
+          <thead><tr><th>Melder</th><th>Überwachungsfläche</th><th>Max. Abstand</th></tr></thead>
+          <tbody>
+            <tr><td>Rauch (punktförmig) h≤6m</td><td>max. 60 m²</td><td>7,5 m</td></tr>
+            <tr><td>Rauch h 6-12m</td><td>max. 80 m²</td><td>8,5 m</td></tr>
+            <tr><td>Rauch Linienmelder</td><td>max. 1600 m²</td><td>-</td></tr>
+            <tr><td>Wärmemelder h≤6m</td><td>max. 30 m²</td><td>5,5 m</td></tr>
+            <tr><td>Handfeuermelder</td><td>pro Fluchtweg</td><td>an Ausgängen</td></tr>
+          </tbody>
+        </table>
+        <p style="color:#6b7280;font-size:12px;margin-top:8px;">Wandabstand: max. 50% des Melderabstands</p>
+        
+        <h3 style="margin-top:20px">RWA - Rauch- und Wärmeabzug</h3>
+        <table class="data-table">
+          <thead><tr><th>Anwendung</th><th>Öffnungsfläche</th></tr></thead>
+          <tbody>
+            <tr><td>Treppenraum Hochhaus</td><td>min. 1 m² an oberster Stelle</td></tr>
+            <tr><td>Treppenraum > 5 Geschosse</td><td>min. 1 m²</td></tr>
+            <tr><td>Versammlungsstätten</td><td>1,5% der Grundfläche</td></tr>
+            <tr><td>Verkaufsstätten</td><td>1-2% der Grundfläche</td></tr>
+            <tr><td>Industriebau</td><td>2-5% nach Sicherheitskategorie</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sprinkleranlagen (VdS CEA 4001)</h3>
+        <table class="data-table">
+          <thead><tr><th>Gefährdung</th><th>Fläche/Sprinkler</th><th>Wasserdichte</th></tr></thead>
+          <tbody>
+            <tr><td>LH (leicht)</td><td>max. 21 m²</td><td>2,25 mm/min</td></tr>
+            <tr><td>OH1 (normal 1)</td><td>max. 12 m²</td><td>5 mm/min</td></tr>
+            <tr><td>OH2 (normal 2)</td><td>max. 12 m²</td><td>5 mm/min</td></tr>
+            <tr><td>OH3 (normal 3)</td><td>max. 12 m²</td><td>5 mm/min</td></tr>
+            <tr><td>HHP (hoch Produktion)</td><td>max. 9 m²</td><td>7,5-12,5 mm/min</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Wandhydranten</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Schlauchlänge</th><th>Durchfluss</th></tr></thead>
+          <tbody>
+            <tr><td>Typ F (formstabil)</td><td>20 m / 30 m</td><td>≥ 24 l/min</td></tr>
+            <tr><td>Typ S (Flachschlauch)</td><td>15 m / 20 m / 30 m</td><td>≥ 100 l/min</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SCHOTTUNG -->
+      <div id="schottung" class="tab-content">
+        <h2>🔌 Brandschutz-Abschottung</h2>
+        
+        <h3>Durchführungen nach MLAR</h3>
+        <table class="data-table">
+          <thead><tr><th>Durchführung</th><th>Anforderung</th><th>Hinweis</th></tr></thead>
+          <tbody>
+            <tr><td>Einzelkabel ≤ Ø32mm</td><td>Mörtelverschluss</td><td>Ringspalt ≤ 50mm</td></tr>
+            <tr><td>Einzelrohr nicht brennbar</td><td>Mörtelverschluss</td><td>Ringspalt abdichten</td></tr>
+            <tr><td>Einzelrohr brennbar ≤32mm</td><td>Brandschutzmanschette</td><td>aBG erforderlich</td></tr>
+            <tr><td>Kabeltrasse / Bündel</td><td>Systemschott</td><td>aBG erforderlich</td></tr>
+            <tr><td>Lüftungsleitung</td><td>Brandschutzklappe</td><td>K 90 / EI 90</td></tr>
+            <tr><td>Kombischott (Kabel+Rohr)</td><td>Systemschott</td><td>aBG erforderlich</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Abschottungssysteme</h3>
+        <table class="data-table">
+          <thead><tr><th>System</th><th>Anwendung</th><th>Feuerwiderstand</th></tr></thead>
+          <tbody>
+            <tr><td>Brandschutzmörtel</td><td>Einzelkabel, kleine Öffnungen</td><td>S 30 - S 90</td></tr>
+            <tr><td>Brandschutzschaum</td><td>Nachbelegung, Wartung</td><td>S 30 - S 120</td></tr>
+            <tr><td>Brandschutzkissen</td><td>Große Öffnungen, flexibel</td><td>S 90 - S 120</td></tr>
+            <tr><td>Brandschutzmanschette</td><td>Kunststoffrohre einzeln</td><td>S 90 - S 120</td></tr>
+            <tr><td>Weichschott</td><td>Kabeltrassen mit Nachbelegung</td><td>S 90</td></tr>
+            <tr><td>Kombimanschette</td><td>Mehrere Rohre</td><td>S 90 - S 120</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Dokumentationspflicht</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Abnahmeprotokoll mit Foto</li>
+            <li>Verwendete Produkte (aBG-Nummer)</li>
+            <li>Einbauanleitung befolgt</li>
+            <li>Fachunternehmerbestätigung</li>
+            <li>Kennzeichnung der Schottung</li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Funktionserhalt E30/E90</h3>
+        <table class="data-table">
+          <thead><tr><th>Klassifizierung</th><th>Dauer</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td>E 30</td><td>30 min</td><td>Sicherheitsbeleuchtung</td></tr>
+            <tr><td>E 60</td><td>60 min</td><td>BMA, RWA</td></tr>
+            <tr><td>E 90</td><td>90 min</td><td>Sprinkler, Aufzüge, Hochhaus</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- KABEL E30/E90 -->
+      <div id="kabel" class="tab-content">
+        <h2>🔌 Kabelanlagen Funktionserhalt</h2>
+        
+        <h3>Klassifizierung nach DIN 4102-12</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>Dauer</th><th>Prüftemperatur</th></tr></thead>
+          <tbody>
+            <tr><td><strong>E 30</strong></td><td>30 Minuten</td><td>ETK (bis 842°C)</td></tr>
+            <tr><td><strong>E 60</strong></td><td>60 Minuten</td><td>ETK (bis 925°C)</td></tr>
+            <tr><td><strong>E 90</strong></td><td>90 Minuten</td><td>ETK (bis 986°C)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Anwendungsbereiche</h3>
+        <table class="data-table">
+          <thead><tr><th>Anlage</th><th>Funktionserhalt</th></tr></thead>
+          <tbody>
+            <tr><td>Sicherheitsbeleuchtung</td><td><strong>E 30</strong></td></tr>
+            <tr><td>Brandmeldeanlage (BMA)</td><td><strong>E 30</strong></td></tr>
+            <tr><td>Alarmierungsanlage (ELA)</td><td><strong>E 30</strong></td></tr>
+            <tr><td>Rauch-/Wärmeabzug (RWA)</td><td><strong>E 30</strong> - E 90</td></tr>
+            <tr><td>Feuerwehraufzug</td><td><strong>E 90</strong></td></tr>
+            <tr><td>Sprinkleranlage (Pumpe)</td><td><strong>E 90</strong></td></tr>
+            <tr><td>Druckbelüftung</td><td><strong>E 90</strong></td></tr>
+            <tr><td>Hochhaus (>22m)</td><td><strong>E 90</strong></td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Systemkomponenten</h3>
+        <table class="data-table">
+          <thead><tr><th>Komponente</th><th>Anforderung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Kabel</strong></td><td>E30/E90 geprüft nach DIN 4102-12</td></tr>
+            <tr><td><strong>Trasse</strong></td><td>E30/E90 Tragekonstruktion</td></tr>
+            <tr><td><strong>Befestigung</strong></td><td>Stahlschellen mit Dübel</td></tr>
+            <tr><td><strong>Dübelabstand</strong></td><td>≤ 500 mm (typ. 300-500 mm)</td></tr>
+            <tr><td><strong>Montage</strong></td><td>Nach Herstellerzulassung (AbP)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Kabeltypen</h3>
+        <table class="data-table">
+          <thead><tr><th>Bezeichnung</th><th>Aufbau</th></tr></thead>
+          <tbody>
+            <tr><td>NHXH</td><td>Halogenfreies Kabel (Standard)</td></tr>
+            <tr><td>NHXH-J FE180</td><td>E30 Funktionserhalt</td></tr>
+            <tr><td>NHXH-J E30</td><td>E30 Funktionserhalt</td></tr>
+            <tr><td>NHXH-J E90</td><td>E90 Funktionserhalt</td></tr>
+            <tr><td>NHMH</td><td>Mantelleitung halogenhaltig</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Verlegung E30/E90</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Verlegesystem</td><td>Vollständig geprüftes System</td></tr>
+            <tr><td>Kabelabstand</td><td>Nach Zulassung (min. 20 mm)</td></tr>
+            <tr><td>Durchführungen</td><td>Mit Brandschott verschließen</td></tr>
+            <tr><td>Mischbelegung</td><td>Nur wenn in Zulassung erlaubt</td></tr>
+            <tr><td>Dokumentation</td><td>Übereinstimmungserklärung</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="warning" style="margin-top:20px">
+          <h4>⚠️ Wichtig</h4>
+          <p>Funktionserhalt nur mit komplettem System (Kabel + Trasse + Befestigung + Montage) nach gültiger AbP!</p>
+        </div>
+      </div>
+
+      <!-- LÖSCHWASSER -->
+      <div id="loeschwasser" class="tab-content">
+        <h2>💧 Löschwasserversorgung</h2>
+        
+        <h3>Grundschutz (DVGW W 405)</h3>
+        <table class="data-table">
+          <thead><tr><th>Gebiet</th><th>Löschwasserbedarf</th><th>Dauer</th></tr></thead>
+          <tbody>
+            <tr><td>Kleinsiedlung</td><td>24-48 m³/h (400-800 l/min)</td><td>2 h</td></tr>
+            <tr><td>Wohngebiet</td><td>48-96 m³/h (800-1600 l/min)</td><td>2 h</td></tr>
+            <tr><td>Gewerbe/Industrie klein</td><td>96 m³/h (1600 l/min)</td><td>2 h</td></tr>
+            <tr><td>Gewerbe/Industrie groß</td><td>192 m³/h (3200 l/min)</td><td>2 h</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Objektschutz (DIN 14462)</h3>
+        <table class="data-table">
+          <thead><tr><th>Anlage</th><th>Durchfluss</th><th>Druck</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Wandhydrant Typ S</strong></td><td>24 l/min</td><td>2 bar (fließend)</td></tr>
+            <tr><td><strong>Wandhydrant Typ F</strong></td><td>100-200 l/min</td><td>3 bar (fließend)</td></tr>
+            <tr><td><strong>Steigleitung nass</strong></td><td>300 l/min je Abgang</td><td>4,5 bar</td></tr>
+            <tr><td><strong>Steigleitung trocken</strong></td><td>Nach Einspeisung</td><td>-</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Wandhydranten</h3>
+        <table class="data-table">
+          <thead><tr><th>Typ</th><th>Kennzeichen</th><th>Anwendung</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Typ S</strong></td><td>Formstabiler Schlauch 25m</td><td>Selbsthilfe durch Laien</td></tr>
+            <tr><td><strong>Typ F</strong></td><td>C-Schlauch 20-30m</td><td>Feuerwehr, Einsatzkräfte</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Hydranten außen</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Überflurhydrant</td><td>DN 80/100, gut sichtbar</td></tr>
+            <tr><td>Unterflurhydrant</td><td>DN 80, mit Hinweisschild</td></tr>
+            <tr><td>Abstand</td><td>max. 100-150 m</td></tr>
+            <tr><td>Fließdruck</td><td>min. 1,5 bar</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sprinkleranlagen</h3>
+        <table class="data-table">
+          <thead><tr><th>Kennwert</th><th>Nassanlage</th><th>Trockenanlage</th></tr></thead>
+          <tbody>
+            <tr><td>Wasserversorgung</td><td>Sofort</td><td>Nach Auslösung</td></tr>
+            <tr><td>Einsatz</td><td>Normal beheizt</td><td>Frostgefährdet</td></tr>
+            <tr><td>Betriebsdruck</td><td>12 bar max.</td><td>12 bar max.</td></tr>
+            <tr><td>Wasserbedarf OH1</td><td>2,25 mm/min × Fläche</td><td>-</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">📐 Löschwasserbedarf</h3>
+        <div class="form-group">
+          <label>Fläche Brandabschnitt (m²)</label>
+          <input type="number" id="lw-flaeche" placeholder="z.B. 1000" value="1000">
+        </div>
+        <div class="form-group">
+          <label>Sprinklerdichte (mm/min)</label>
+          <select id="lw-dichte">
+            <option value="2.25">OH1 (2,25 mm/min)</option>
+            <option value="5.0" selected>OH2 (5,0 mm/min)</option>
+            <option value="7.5">OH3 (7,5 mm/min)</option>
+            <option value="10.0">OH4 (10,0 mm/min)</option>
+          </select>
+        </div>
+        <button class="btn" onclick="calcLoeschwasser()">Berechnen</button>
+        <div id="lw-result"></div>
+      </div>
+
+      <!-- KLASSEN -->
+      <div id="klassen" class="tab-content">
+        <h2>📋 Klassifizierungen</h2>
+        
+        <h3>Brandklassen (DIN EN 2)</h3>
+        <table class="data-table">
+          <thead><tr><th>Klasse</th><th>Brennstoff</th><th>Löschmittel</th></tr></thead>
+          <tbody>
+            <tr><td style="background:#dc2626;color:white;font-weight:bold;">A</td><td>Feste Stoffe (Holz, Papier, Textil)</td><td>Wasser, Schaum, Pulver</td></tr>
+            <tr><td style="background:#eab308;color:white;font-weight:bold;">B</td><td>Flüssige Stoffe (Benzin, Öl, Lack)</td><td>Schaum, CO₂, Pulver</td></tr>
+            <tr><td style="background:#3b82f6;color:white;font-weight:bold;">C</td><td>Gasförmige Stoffe (Erdgas, Propan)</td><td>Pulver, CO₂</td></tr>
+            <tr><td style="background:#6b7280;color:white;font-weight:bold;">D</td><td>Metalle (Mg, Al, Na, Li)</td><td>Metallbrandpulver, Sand</td></tr>
+            <tr><td style="background:#22c55e;color:white;font-weight:bold;">F</td><td>Speisefette/-öle</td><td>Spezial Fettbrandlöscher</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Gebäudeklassen (MBO §2)</h3>
+        <table class="data-table">
+          <thead><tr><th>GK</th><th>Beschreibung</th><th>OKFFB</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>Freistehend, ≤2 NE, ≤400m²</td><td>≤ 7 m</td></tr>
+            <tr><td><strong>2</strong></td><td>Nicht freistehend, ≤2 NE</td><td>≤ 7 m</td></tr>
+            <tr><td><strong>3</strong></td><td>Sonstige Gebäude</td><td>≤ 7 m</td></tr>
+            <tr><td><strong>4</strong></td><td>NE ≤400m²</td><td>≤ 13 m</td></tr>
+            <tr><td><strong>5</strong></td><td>Sonstige oder NE >400m²</td><td>> 13 m</td></tr>
+            <tr><td style="background:#fef2f2;"><strong>Hochhaus</strong></td><td>Sonderbau</td><td>> 22 m</td></tr>
+          </tbody>
+        </table>
+        <p style="color:#6b7280;font-size:12px;margin-top:8px;">OKFFB = Oberkante Fußboden Aufenthaltsraum über Gelände | NE = Nutzungseinheit</p>
+        
+        <h3 style="margin-top:20px">Baustoffklassen</h3>
+        <table class="data-table">
+          <thead><tr><th>DIN 4102</th><th>DIN EN 13501</th><th>Bezeichnung</th></tr></thead>
+          <tbody>
+            <tr><td>A1</td><td>A1</td><td>Nichtbrennbar, ohne Anteile</td></tr>
+            <tr><td>A2</td><td>A2</td><td>Nichtbrennbar, mit Anteilen</td></tr>
+            <tr><td>B1</td><td>B, C</td><td>Schwerentflammbar</td></tr>
+            <tr><td>B2</td><td>D, E</td><td>Normalentflammbar</td></tr>
+            <tr><td>B3</td><td>F</td><td>Leichtentflammbar (verboten)</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Sonderbauten (Beispiele)</h3>
+        <table class="data-table">
+          <tbody>
+            <tr><td>Hochhäuser</td><td>OKFFB > 22 m</td></tr>
+            <tr><td>Versammlungsstätten</td><td>> 200 Personen</td></tr>
+            <tr><td>Verkaufsstätten</td><td>> 800 m² VKF</td></tr>
+            <tr><td>Beherbergungsstätten</td><td>> 12 Gästebetten</td></tr>
+            <tr><td>Gaststätten</td><td>> 40 Gastplätze</td></tr>
+            <tr><td>Schulen</td><td>-</td></tr>
+            <tr><td>Krankenhäuser</td><td>-</td></tr>
+            <tr><td>Industriebauten</td><td>> 2000 m²</td></tr>
+            <tr><td>Garagen</td><td>> 100 m² (geschlossen)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FEUERLÖSCHER -->
+      <div id="loescher" class="tab-content">
+        <h2>🧯 Feuerlöscher (ASR A2.2)</h2>
+        
+        <h3>Grundausstattung nach Fläche</h3>
+        <table class="data-table">
+          <thead><tr><th>Grundfläche</th><th>Geringe Gef.</th><th>Mittlere Gef.</th><th>Große Gef.</th></tr></thead>
+          <tbody>
+            <tr><td>≤ 50 m²</td><td>6 LE</td><td>12 LE</td><td>18 LE</td></tr>
+            <tr><td>≤ 100 m²</td><td>9 LE</td><td>18 LE</td><td>27 LE</td></tr>
+            <tr><td>≤ 200 m²</td><td>12 LE</td><td>24 LE</td><td>36 LE</td></tr>
+            <tr><td>≤ 400 m²</td><td>18 LE</td><td>36 LE</td><td>54 LE</td></tr>
+            <tr><td>≤ 600 m²</td><td>24 LE</td><td>48 LE</td><td>72 LE</td></tr>
+            <tr><td>≤ 800 m²</td><td>30 LE</td><td>60 LE</td><td>90 LE</td></tr>
+            <tr><td>≤ 1000 m²</td><td>36 LE</td><td>72 LE</td><td>108 LE</td></tr>
+          </tbody>
+        </table>
+        
+        <h3 style="margin-top:20px">Löschmitteleinheiten (LE)</h3>
+        <table class="data-table">
+          <thead><tr><th>Löscher</th><th>LE</th><th>Rating</th></tr></thead>
+          <tbody>
+            <tr><td>Pulver 2 kg</td><td>4 LE</td><td>8A 34B</td></tr>
+            <tr><td>Pulver 6 kg</td><td>10 LE</td><td>21A 113B</td></tr>
+            <tr><td>Pulver 12 kg</td><td>15 LE</td><td>43A 183B</td></tr>
+            <tr><td>Schaum 6 L</td><td>6 LE</td><td>21A 183B</td></tr>
+            <tr><td>Schaum 9 L</td><td>9 LE</td><td>27A 183B</td></tr>
+            <tr><td>Wasser 6 L</td><td>4 LE</td><td>13A</td></tr>
+            <tr><td>Wasser 9 L</td><td>6 LE</td><td>21A</td></tr>
+            <tr><td>CO₂ 2 kg</td><td>2 LE</td><td>34B</td></tr>
+            <tr><td>CO₂ 5 kg</td><td>5 LE</td><td>89B</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="info-box" style="margin-top:20px">
+          <h4>📌 Aufstellregeln</h4>
+          <ul style="margin:10px 0 0 20px">
+            <li>Max. Entfernung zum Löscher: <strong>20 m</strong></li>
+            <li>Griffhöhe: 0,80 - 1,20 m</li>
+            <li>Gut sichtbar und frei zugänglich</li>
+            <li>Kennzeichnung nach ASR A1.3</li>
+            <li>Prüfung alle 2 Jahre</li>
+          </ul>
+        </div>
+        
+        <h3 style="margin-top:20px">Brandklassen-Eignung</h3>
+        <table class="data-table">
+          <thead><tr><th>Löschmittel</th><th>A</th><th>B</th><th>C</th><th>D</th><th>F</th></tr></thead>
+          <tbody>
+            <tr><td>Wasser</td><td>✓</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td></tr>
+            <tr><td>Schaum</td><td>✓</td><td>✓</td><td>✗</td><td>✗</td><td>✗</td></tr>
+            <tr><td>ABC-Pulver</td><td>✓</td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+            <tr><td>BC-Pulver</td><td>✗</td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+            <tr><td>CO₂</td><td>✗</td><td>✓</td><td>✗</td><td>✗</td><td>✗</td></tr>
+            <tr><td>Fettbrand</td><td>✗</td><td>✗</td><td>✗</td><td>✗</td><td>✓</td></tr>
+            <tr><td>Metallbrand</td><td>✗</td><td>✗</td><td>✗</td><td>✓</td><td>✗</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WISSEN -->
+      <div id="wissen" class="tab-content">
+        <h2>📚 Wissen Brandschutz</h2>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🚨 Alarmierung & Evakuierung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Räumungszeit Büro</td><td>2-3 min pro Etage</td></tr>
+              <tr><td>Räumungszeit Schule</td><td>3-5 min</td></tr>
+              <tr><td>Räumungszeit Krankenhaus</td><td>10-15 min pro Station</td></tr>
+              <tr><td>Gehgeschwindigkeit horizontal</td><td>1,0-1,3 m/s</td></tr>
+              <tr><td>Gehgeschwindigkeit Treppe ab</td><td>0,5-0,7 m/s</td></tr>
+              <tr><td>Personendichte kritisch</td><td>> 4 Pers./m²</td></tr>
+              <tr><td>Durchfluss Tür 1m</td><td>~80 Pers./min</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🔥 Brandentwicklung</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Entstehungsbrand</td><td>0-3 min</td></tr>
+              <tr><td>Ausbreitungsphase</td><td>3-10 min</td></tr>
+              <tr><td>Flashover (Durchzündung)</td><td>bei ~600°C</td></tr>
+              <tr><td>Vollbrand</td><td>ab ~10 min</td></tr>
+              <tr><td>Rauchgastemperatur max.</td><td>800-1200°C</td></tr>
+              <tr><td>Rauchausbreitung</td><td>1-3 m/s horizontal</td></tr>
+              <tr><td>Rauchaufstieg</td><td>3-5 m/s vertikal</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#dc2626;">⚠️ Rauch ist die häufigste Todesursache bei Bränden!</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📏 Feuerwehr-Zugänglichkeit</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Feuerwehrzufahrt Breite</td><td>min. 3,0 m</td></tr>
+              <tr><td>Feuerwehrzufahrt lichte Höhe</td><td>min. 3,5 m</td></tr>
+              <tr><td>Kurvenradius innen</td><td>min. 10,5 m</td></tr>
+              <tr><td>Aufstellfläche Drehleiter</td><td>min. 4 × 11 m</td></tr>
+              <tr><td>Tragfähigkeit</td><td>min. 16 t (Achslast 10 t)</td></tr>
+              <tr><td>Abstand Gebäude</td><td>3-9 m (je nach Anleiterhöhe)</td></tr>
+              <tr><td>Anleiterhöhe Drehleiter</td><td>max. 23 m</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🏗️ Bauordnungsrecht</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <h4>Schutzziele MBO §14</h4>
+            <ul style="margin:10px 0 0 20px">
+              <li>Entstehung eines Brandes verhindern</li>
+              <li>Ausbreitung von Feuer und Rauch verhindern</li>
+              <li>Rettung von Menschen und Tieren ermöglichen</li>
+              <li>Wirksame Löscharbeiten ermöglichen</li>
+            </ul>
+            <h4 style="margin-top:15px;">Zwei unabhängige Rettungswege</h4>
+            <ul style="margin:10px 0 0 20px">
+              <li>1. RW: Notwendige Treppe</li>
+              <li>2. RW: Weitere Treppe, Rettungsgerät FW, oder Fenster (mit Anleiterung)</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>⚡ E-Installation Brandschutz</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Brandlast Kabel</td><td>~40-70 MJ/kg</td></tr>
+              <tr><td>Funktionserhalt E30</td><td>30 min (Sicherheitsbeleucht.)</td></tr>
+              <tr><td>Funktionserhalt E90</td><td>90 min (Aufzüge, Sprinkler)</td></tr>
+              <tr><td>AFDD Pflicht</td><td>Schlafräume, Holzgebäude</td></tr>
+              <tr><td>Zentralbatterie DGUV</td><td>1h (3h bei Übernachtung)</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:12px;color:#6b7280;">MLAR: Muster-Leitungsanlagen-Richtlinie</p>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>📋 Wichtige Vorschriften</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td><strong>MBO</strong></td><td>Musterbauordnung</td></tr>
+              <tr><td><strong>MLAR</strong></td><td>Leitungsanlagen-Richtlinie</td></tr>
+              <tr><td><strong>MIndBauRL</strong></td><td>Industriebau-Richtlinie</td></tr>
+              <tr><td><strong>MVStättVO</strong></td><td>Versammlungsstätten</td></tr>
+              <tr><td><strong>MVkVO</strong></td><td>Verkaufsstätten</td></tr>
+              <tr><td><strong>MBeVO</strong></td><td>Beherbergungsstätten</td></tr>
+              <tr><td><strong>MHHR</strong></td><td>Hochhaus-Richtlinie</td></tr>
+              <tr><td><strong>MGarVO</strong></td><td>Garagen</td></tr>
+              <tr><td><strong>ASR A2.2</strong></td><td>Maßnahmen gegen Brände</td></tr>
+              <tr><td><strong>ASR A2.3</strong></td><td>Fluchtwege/Notausgänge</td></tr>
+              <tr><td><strong>DIN 14675</strong></td><td>Brandmeldeanlagen</td></tr>
+              <tr><td><strong>DIN 14676</strong></td><td>Rauchwarnmelder</td></tr>
+              <tr><td><strong>DIN EN 13501</strong></td><td>Klassifizierung Brandverh.</td></tr>
+              <tr><td><strong>VdS CEA 4001</strong></td><td>Sprinkleranlagen</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="knowledge-card" onclick="this.classList.toggle('active')">
+          <div class="knowledge-header"><span>🚨 Rauchwarnmelder DIN 14676</span><span class="toggle-icon">▼</span></div>
+          <div class="knowledge-content">
+            <table class="data-table">
+              <tr><td>Pflichtbereiche</td><td>Schlafräume, Kinderzimmer, Flure</td></tr>
+              <tr><td>Montage</td><td>Deckenmitte, min. 50cm von Wand</td></tr>
+              <tr><td>Fläche pro Melder</td><td>max. 60 m²</td></tr>
+              <tr><td>Prüfung</td><td>jährlich durch Fachperson</td></tr>
+              <tr><td>Austausch</td><td>nach 10 Jahren (+6 Monate)</td></tr>
+              <tr><td>Batterie fest</td><td>10 Jahre Lithium</td></tr>
+              <tr><td>Lautstärke</td><td>min. 85 dB(A) in 3m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab(document.querySelector('.tab'), 'feuerwider')">
+      <span class="nav-icon">🧱</span><span class="nav-label">Feuerw.</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[1], 'flucht')">
+      <span class="nav-icon">🚪</span><span class="nav-label">Flucht</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[3], 'anlagen')">
+      <span class="nav-icon">🚨</span><span class="nav-label">Anlagen</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[4], 'schottung')">
+      <span class="nav-icon">🔌</span><span class="nav-label">Schottung</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[6], 'loescher')">
+      <span class="nav-icon">🧯</span><span class="nav-label">Löscher</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab(document.querySelectorAll('.tab')[7], 'wissen')">
+      <span class="nav-icon">📚</span><span class="nav-label">Wissen</span>
+    </button>
+  </nav>
+
+  <script src="./js/app.js"></script>
+  <script>
+    function calcFluchtweg() {
+      const personen = parseFloat(document.getElementById('flucht-personen').value);
+      if (isNaN(personen)) { document.getElementById('flucht-result').innerHTML = '<div class="danger">Bitte Personenzahl eingeben</div>'; return; }
+      
+      const breiteProEinheit = 1.2;
+      const personenProEinheit = 200;
+      const einheiten = Math.ceil(personen / personenProEinheit);
+      const breite = einheiten * breiteProEinheit;
+      const mindestbreite = Math.max(breite, 1.2);
+      const tueren = Math.ceil(mindestbreite / 1.2);
+      
+      document.getElementById('flucht-result').innerHTML = `<div class="result"><h3>Ergebnis</h3><div class="result-item"><span>Erforderliche Breite:</span><span><strong>${mindestbreite.toFixed(2)} m</strong></span></div><div class="result-item"><span>Breiteneinheiten:</span><span>${einheiten}</span></div><div class="result-item"><span>Anzahl Türen (1,2m):</span><span><strong>${tueren}</strong></span></div></div>`;
+    }
+    
+    function calcLoeschwasser() {
+      const flaeche = parseFloat(document.getElementById('lw-flaeche').value);
+      const dichte = parseFloat(document.getElementById('lw-dichte').value);
+      
+      if (isNaN(flaeche) || flaeche <= 0) {
+        document.getElementById('lw-result').innerHTML = '<div class="danger">Bitte Fläche eingeben</div>';
+        return;
+      }
+      
+      // Wasserbedarf in l/min
+      const lmin = flaeche * dichte;
+      const m3h = lmin * 60 / 1000;
+      const dauer = 60; // 60 Minuten Standarddauer
+      const gesamtM3 = m3h * 1;
+      
+      document.getElementById('lw-result').innerHTML = `
+        <div class="result">
+          <h3>Löschwasserbedarf (Sprinkler)</h3>
+          <div class="result-item"><span>Fläche:</span><span>${flaeche} m²</span></div>
+          <div class="result-item"><span>Sprinklerdichte:</span><span>${dichte} mm/min</span></div>
+          <div class="result-item"><span>Volumenstrom:</span><span><strong>${lmin.toFixed(0)} l/min</strong></span></div>
+          <div class="result-item"><span>Entspricht:</span><span>${m3h.toFixed(1)} m³/h</span></div>
+          <div class="result-item"><span>Wasserreserve (60 min):</span><span>${gesamtM3.toFixed(0)} m³</span></div>
+        </div>`;
+    }
+  </script>
+  <style>
+    .knowledge-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+    .knowledge-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; cursor: pointer; font-weight: 600; }
+    .knowledge-content { display: none; padding: 0 15px 15px; border-top: 1px solid #e5e7eb; }
+    .knowledge-card.active .knowledge-content { display: block; }
+    .knowledge-card.active .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform 0.2s; }
+  </style>
+</body>
+</html>
