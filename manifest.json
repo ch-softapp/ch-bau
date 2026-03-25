@@ -2,7 +2,7 @@
   "name": "ch-Bau",
   "short_name": "ch-Bau",
   "description": "Komplette Bau-Suite für alle Gewerke - Elektro, HLSK, Statik, Brandschutz",
-  "start_url": "./index.html",
+  "start_url": "./elektro.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
