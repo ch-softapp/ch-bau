@@ -1,0 +1,507 @@
+<!-- Erweiterte Berechnungen Page -->
+<div class="tab-container">
+  <div class="tabs" style="flex-wrap:wrap;">
+    <button class="tab active" onclick="switchTab(this, 'erdung')">Erdung</button>
+    <button class="tab" onclick="switchTab(this, 'kurzschluss')">Kurzschluss</button>
+    <button class="tab" onclick="switchTab(this, 'trafo')">Trafo</button>
+    <button class="tab" onclick="switchTab(this, 'blitzschutz')">Blitz</button>
+    <button class="tab" onclick="switchTab(this, 'selektiv')">Selektiv</button>
+    <button class="tab" onclick="switchTab(this, 'motor')">Motor</button>
+    <button class="tab" onclick="switchTab(this, 'kompens')">Blindl.</button>
+    <button class="tab" onclick="switchTab(this, 'kabelgewicht')">Gewicht</button>
+    <button class="tab" onclick="switchTab(this, 'trasse')">Trasse</button>
+  </div>
+
+<!-- Erdung -->
+<div id="erdung" class="tab-content active">
+  <h2>⚡ Erdungswiderstand berechnen</h2>
+  <p style="margin-bottom:20px;color:var(--gray-500)">Nach DIN VDE 0100-540</p>
+  
+  <div class="form-group">
+    <label>Erdungsart</label>
+    <select id="erdung-art">
+      <option value="stab">Tiefenerder (Staberder)</option>
+      <option value="ring">Ringerder / Fundamenterder</option>
+      <option value="band">Banderder horizontal</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Länge des Erders (m)</label>
+    <input type="number" id="erdung-laenge" placeholder="z.B. 2.5" step="0.1">
+  </div>
+  
+  <div class="form-group">
+    <label>Durchmesser (mm)</label>
+    <input type="number" id="erdung-durchmesser" value="20" placeholder="z.B. 20">
+  </div>
+  
+  <div class="form-group">
+    <label>Spezifischer Bodenwiderstand ρE (Ωm)</label>
+    <select id="erdung-boden">
+      <option value="30">Moorerde, Sumpf (30 Ωm)</option>
+      <option value="50">Torf, feuchter Humus (50 Ωm)</option>
+      <option value="100" selected>Feuchter Lehm, Ton (100 Ωm)</option>
+      <option value="200">Lehm, Ackerboden (200 Ωm)</option>
+      <option value="500">Feuchter Sand (500 Ωm)</option>
+      <option value="1000">Trockener Sand (1000 Ωm)</option>
+      <option value="2000">Kies (2000 Ωm)</option>
+      <option value="3000">Steiniger Boden (3000 Ωm)</option>
+    </select>
+  </div>
+  
+  <button class="btn" onclick="calculateEarthing()">Berechnen</button>
+  <div id="erdung-result"></div>
+  
+  <div class="info-box">
+    <h4>📌 Grenzwerte</h4>
+    <ul>
+      <li><strong>TN-System:</strong> RA ≤ 2 Ω empfohlen</li>
+      <li><strong>TT-System:</strong> RA × IΔn ≤ 50V</li>
+      <li><strong>Blitzschutz:</strong> RA ≤ 10 Ω</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Kurzschluss -->
+<div id="kurzschluss" class="tab-content">
+  <h2>⚡ Kurzschlussstrom berechnen</h2>
+  <p style="margin-bottom:20px;color:var(--gray-500)">Für Selektivität und Schaltvermögen</p>
+  
+  <div class="form-group">
+    <label>Trafoleistung (kVA)</label>
+    <input type="number" id="kss-trafo" placeholder="z.B. 630">
+  </div>
+  
+  <div class="form-group">
+    <label>Trafo Kurzschlussspannung uk (%)</label>
+    <input type="number" id="kss-uk" value="4" step="0.1">
+  </div>
+  
+  <div class="form-group">
+    <label>Sekundärspannung (V)</label>
+    <select id="kss-spannung">
+      <option value="400" selected>400 V (Drehstrom)</option>
+      <option value="230">230 V (Einphasig)</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Leitungslänge vom Trafo (m)</label>
+    <input type="number" id="kss-laenge" placeholder="z.B. 50">
+  </div>
+  
+  <div class="form-group">
+    <label>Leitungsquerschnitt (mm²)</label>
+    <select id="kss-querschnitt">
+      <option value="16">16 mm²</option>
+      <option value="25">25 mm²</option>
+      <option value="35">35 mm²</option>
+      <option value="50" selected>50 mm²</option>
+      <option value="70">70 mm²</option>
+      <option value="95">95 mm²</option>
+      <option value="120">120 mm²</option>
+      <option value="150">150 mm²</option>
+      <option value="185">185 mm²</option>
+      <option value="240">240 mm²</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Material</label>
+    <select id="kss-material">
+      <option value="cu">Kupfer</option>
+      <option value="al">Aluminium</option>
+    </select>
+  </div>
+  
+  <button class="btn" onclick="calculateShortCircuit()">Berechnen</button>
+  <div id="kss-result"></div>
+</div>
+
+<!-- Trafo -->
+<div id="trafo" class="tab-content">
+  <h2>🔄 Trafo dimensionieren</h2>
+  
+  <div class="form-group">
+    <label>Gesamtleistung aller Verbraucher (kW)</label>
+    <input type="number" id="trafo-leistung" placeholder="z.B. 450">
+  </div>
+  
+  <div class="form-group">
+    <label>Gleichzeitigkeitsfaktor g</label>
+    <select id="trafo-gleich">
+      <option value="0.5">0,5 (Wohngebäude groß)</option>
+      <option value="0.6" selected>0,6 (Wohngebäude Standard)</option>
+      <option value="0.7">0,7 (Bürogebäude)</option>
+      <option value="0.8">0,8 (Gewerbe gemischt)</option>
+      <option value="0.9">0,9 (Industrie)</option>
+      <option value="1.0">1,0 (Volllast / kritisch)</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Leistungsfaktor cos φ</label>
+    <input type="number" id="trafo-cosphi" value="0.9" step="0.01" min="0.7" max="1">
+  </div>
+  
+  <div class="form-group">
+    <label>Reserve für Erweiterung (%)</label>
+    <select id="trafo-reserve">
+      <option value="0">0% (keine Reserve)</option>
+      <option value="20" selected>20% (Standard)</option>
+      <option value="30">30% (geplante Erweiterung)</option>
+      <option value="50">50% (große Reserve)</option>
+    </select>
+  </div>
+  
+  <button class="btn" onclick="calculateTransformer()">Berechnen</button>
+  <div id="trafo-result"></div>
+  
+  <div class="info-box">
+    <h4>📌 Standard-Trafogrößen (kVA)</h4>
+    <p>100, 160, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500</p>
+  </div>
+</div>
+
+<!-- Blitzschutz -->
+<div id="blitzschutz" class="tab-content">
+  <h2>⚡ Blitzschutz nach DIN EN 62305</h2>
+  
+  <h3>Blitzschutzklassen</h3>
+  <table class="data-table">
+    <thead><tr><th>LPS</th><th>Wirksamkeit</th><th>Blitzkugelradius</th><th>Maschenweite</th></tr></thead>
+    <tbody>
+      <tr><td><strong>I</strong></td><td>98%</td><td>20 m</td><td>5 × 5 m</td></tr>
+      <tr><td><strong>II</strong></td><td>95%</td><td>30 m</td><td>10 × 10 m</td></tr>
+      <tr><td><strong>III</strong></td><td>90%</td><td>45 m</td><td>15 × 15 m</td></tr>
+      <tr><td><strong>IV</strong></td><td>80%</td><td>60 m</td><td>20 × 20 m</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Trennungsabstand</h3>
+  <div class="form-group">
+    <label>Blitzschutzklasse</label>
+    <select id="bs-klasse">
+      <option value="0.08">I (ki=0,08)</option>
+      <option value="0.06" selected>II (ki=0,06)</option>
+      <option value="0.04">III/IV (ki=0,04)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Material Ableitung</label>
+    <select id="bs-material">
+      <option value="1">Luft (km=1)</option>
+      <option value="0.5">Feste Stoffe (km=0,5)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Länge Ableitung bis Nahtstelle (m)</label>
+    <input type="number" id="bs-laenge" placeholder="z.B. 10" value="10">
+  </div>
+  <button class="btn" onclick="calcTrennungsabstand()">Berechnen</button>
+  <div id="bs-result"></div>
+  
+  <h3 style="margin-top:20px">Blitzstromparameter</h3>
+  <table class="data-table">
+    <thead><tr><th>LPS</th><th>I max</th><th>Ladung Q</th></tr></thead>
+    <tbody>
+      <tr><td>I</td><td>200 kA</td><td>300 C</td></tr>
+      <tr><td>II</td><td>150 kA</td><td>225 C</td></tr>
+      <tr><td>III/IV</td><td>100 kA</td><td>150 C</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Überspannungsschutz (SPD)</h3>
+  <table class="data-table">
+    <tbody>
+      <tr><td><strong>Typ 1</strong></td><td>Blitzstromableiter, am Gebäudeeingang bei äußerem Blitzschutz</td></tr>
+      <tr><td><strong>Typ 2</strong></td><td>Überspannungsableiter, in Unterverteilungen</td></tr>
+      <tr><td><strong>Typ 3</strong></td><td>Geräteschutz, direkt vor empfindlichen Geräten</td></tr>
+      <tr><td><strong>Typ 1+2</strong></td><td>Kombiableiter für kompakte Installation</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Selektivität -->
+<div id="selektiv" class="tab-content">
+  <h2>🔀 Selektivität</h2>
+  
+  <h3>Selektivitätsarten</h3>
+  <table class="data-table">
+    <thead><tr><th>Art</th><th>Prinzip</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Stromselektivität</strong></td><td>Unterschiedliche Auslöseströme (I-Staffelung)</td></tr>
+      <tr><td><strong>Zeitselektivität</strong></td><td>Unterschiedliche Auslösezeiten (t-Staffelung)</td></tr>
+      <tr><td><strong>Energieselektivität</strong></td><td>Durchlassenergie I²t-Staffelung</td></tr>
+      <tr><td><strong>Zonenselektivität</strong></td><td>Kommunikation zwischen Schutzgeräten</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Stromselektivität LSS</h3>
+  <table class="data-table">
+    <thead><tr><th>Vorgeschaltet</th><th>Nachgeschaltet</th><th>Selektiv bis</th></tr></thead>
+    <tbody>
+      <tr><td>B 25A</td><td>B 16A</td><td>~130 A</td></tr>
+      <tr><td>B 32A</td><td>B 16A</td><td>~160 A</td></tr>
+      <tr><td>C 25A</td><td>B 16A</td><td>~160 A</td></tr>
+      <tr><td>C 32A</td><td>B 16A</td><td>~250 A</td></tr>
+      <tr><td>D 40A</td><td>B 16A</td><td>~320 A</td></tr>
+      <tr><td>NH 63A gL</td><td>B 16A</td><td>Vollselektiv</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Faustregeln</h3>
+  <div class="info-box">
+    <ul style="margin:10px 0 0 20px">
+      <li>LSS gleicher Charakteristik: Verhältnis mind. 1,6:1</li>
+      <li>Vorgeschaltet C, nachgeschaltet B: besser selektiv</li>
+      <li>NH-Sicherungen vor LSS: oft vollselektiv</li>
+      <li>Selektivitätstabellen der Hersteller beachten!</li>
+    </ul>
+  </div>
+  
+  <h3 style="margin-top:20px">Back-up-Schutz</h3>
+  <p style="color:#6b7280;margin-bottom:10px;">Wenn keine Selektivität: Wer schaltet bei Kurzschluss ab?</p>
+  <table class="data-table">
+    <tbody>
+      <tr><td>Ik < Isvor</td><td>Nur nachgeschalteter LSS</td></tr>
+      <tr><td>Ik > Isvor</td><td>Beide schalten (Back-up)</td></tr>
+      <tr><td>Back-up zulässig</td><td>Wenn I²t-Wert ≤ Bemessungswert</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Motorschutz -->
+<div id="motor" class="tab-content">
+  <h2>🔄 Motorschutz</h2>
+  
+  <h3>Anlaufstrom berechnen</h3>
+  <div class="form-group">
+    <label>Motornennleistung (kW)</label>
+    <input type="number" id="mot-leistung" placeholder="z.B. 5.5" value="5.5" step="0.1">
+  </div>
+  <div class="form-group">
+    <label>Nennspannung</label>
+    <select id="mot-spannung">
+      <option value="400">400 V (Drehstrom)</option>
+      <option value="230">230 V (Wechselstrom)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Anlaufart</label>
+    <select id="mot-anlauf">
+      <option value="7">Direktanlauf (Ia/In = 7)</option>
+      <option value="4">Stern-Dreieck (Ia/In = 4)</option>
+      <option value="3">Sanftanlauf (Ia/In = 3)</option>
+      <option value="1.5">Frequenzumrichter (Ia/In = 1,5)</option>
+    </select>
+  </div>
+  <button class="btn" onclick="calcMotor()">Berechnen</button>
+  <div id="mot-result"></div>
+  
+  <h3 style="margin-top:20px">Schutzgeräte</h3>
+  <table class="data-table">
+    <thead><tr><th>Schutz</th><th>Funktion</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Motorschutzschalter</strong></td><td>Überlast + Kurzschluss</td></tr>
+      <tr><td><strong>Thermisches Relais</strong></td><td>Nur Überlast (+ Sicherung)</td></tr>
+      <tr><td><strong>Motorschutzrelais</strong></td><td>Elektronisch, alle Schutzfunktionen</td></tr>
+      <tr><td><strong>PTC-Auswertung</strong></td><td>Direkter Wicklungsschutz</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Sicherungsauswahl für Motor</h3>
+  <table class="data-table">
+    <thead><tr><th>Anlaufart</th><th>Sicherung (gL/gG)</th></tr></thead>
+    <tbody>
+      <tr><td>Direktanlauf normal</td><td>1,6 × In</td></tr>
+      <tr><td>Direktanlauf schwer</td><td>2,0 × In</td></tr>
+      <tr><td>Stern-Dreieck</td><td>1,25 × In</td></tr>
+      <tr><td>Sanftanlauf/FU</td><td>1,1 × In</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Typische Anlaufzeiten</h3>
+  <table class="data-table">
+    <tbody>
+      <tr><td>Leichter Anlauf</td><td>< 5 s</td></tr>
+      <tr><td>Normaler Anlauf</td><td>5-10 s</td></tr>
+      <tr><td>Schwerer Anlauf</td><td>10-30 s</td></tr>
+      <tr><td>Sehr schwer</td><td>> 30 s (Sanftanlauf!)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Blindleistungskompensation -->
+<div id="kompens" class="tab-content">
+  <h2>⚡ Blindleistungskompensation</h2>
+  
+  <h3>Kompensationsleistung berechnen</h3>
+  <div class="form-group">
+    <label>Wirkleistung P (kW)</label>
+    <input type="number" id="ko-p" placeholder="z.B. 100" value="100">
+  </div>
+  <div class="form-group">
+    <label>Aktueller cos φ</label>
+    <input type="number" id="ko-ist" placeholder="z.B. 0.75" value="0.75" step="0.01">
+  </div>
+  <div class="form-group">
+    <label>Ziel cos φ</label>
+    <select id="ko-soll">
+      <option value="0.90">0,90 (Minimum EVU)</option>
+      <option value="0.95" selected>0,95 (Standard)</option>
+      <option value="0.98">0,98 (Optimal)</option>
+      <option value="1.00">1,00 (Vollkompensation)</option>
+    </select>
+  </div>
+  <button class="btn" onclick="calcKompensation()">Berechnen</button>
+  <div id="ko-result"></div>
+  
+  <h3 style="margin-top:20px">Kompensationsarten</h3>
+  <table class="data-table">
+    <thead><tr><th>Art</th><th>Einsatz</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Einzelkompensation</strong></td><td>Am Verbraucher (Motor), entlastet auch Zuleitung</td></tr>
+      <tr><td><strong>Gruppenkompensation</strong></td><td>An Unterverteilung</td></tr>
+      <tr><td><strong>Zentralkompensation</strong></td><td>An Hauptverteilung, geregelt</td></tr>
+      <tr><td><strong>Verdrosselt</strong></td><td>Bei Oberschwingungen (p=5,67% oder 7%)</td></tr>
+      <tr><td><strong>Aktivfilter</strong></td><td>Bei starken Oberschwingungen</td></tr>
+    </tbody>
+  </table>
+  
+  <h3 style="margin-top:20px">Richtwerte Blindleistungsbedarf</h3>
+  <table class="data-table">
+    <thead><tr><th>Verbraucher</th><th>cos φ</th></tr></thead>
+    <tbody>
+      <tr><td>Asynchronmotor Leerlauf</td><td>0,15-0,30</td></tr>
+      <tr><td>Asynchronmotor Nennlast</td><td>0,75-0,85</td></tr>
+      <tr><td>Schweißtransformator</td><td>0,40-0,60</td></tr>
+      <tr><td>Leuchtstofflampen (KVG)</td><td>0,40-0,50</td></tr>
+      <tr><td>LED, EVG</td><td>0,90-0,99</td></tr>
+      <tr><td>Frequenzumrichter</td><td>0,95-0,98</td></tr>
+    </tbody>
+  </table>
+  
+  <div class="warning" style="margin-top:20px">
+    <h4>⚠️ Achtung Oberschwingungen</h4>
+    <p>Kondensatoren können Oberschwingungen verstärken! Bei THD > 5% verdrosselte Kondensatoren oder Aktivfilter verwenden.</p>
+  </div>
+</div>
+
+<!-- Kabelgewicht -->
+<div id="kabelgewicht" class="tab-content">
+  <h2>⚖️ Kabelgewicht berechnen</h2>
+  
+  <div class="form-group">
+    <label>Kabeltyp</label>
+    <select id="gewicht-typ">
+      <option value="nym">NYM-J (Mantelleitung)</option>
+      <option value="nyy">NYY-J (Erdkabel)</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Querschnitt (mm²)</label>
+    <select id="gewicht-querschnitt">
+      <option value="1.5">1,5 mm²</option>
+      <option value="2.5" selected>2,5 mm²</option>
+      <option value="4">4 mm²</option>
+      <option value="6">6 mm²</option>
+      <option value="10">10 mm²</option>
+      <option value="16">16 mm²</option>
+      <option value="25">25 mm²</option>
+      <option value="35">35 mm²</option>
+      <option value="50">50 mm²</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Anzahl Adern</label>
+    <select id="gewicht-adern">
+      <option value="3">3-adrig</option>
+      <option value="4">4-adrig</option>
+      <option value="5" selected>5-adrig</option>
+    </select>
+  </div>
+  
+  <div class="form-group">
+    <label>Kabellänge (m)</label>
+    <input type="number" id="gewicht-laenge" value="100" placeholder="z.B. 100">
+  </div>
+  
+  <button class="btn" onclick="calculateCableWeight()">Berechnen</button>
+  <div id="gewicht-result"></div>
+</div>
+
+<!-- Trasse -->
+<div id="trasse" class="tab-content">
+  <h2>📐 Kabeltrasse dimensionieren</h2>
+  
+  <div class="form-group">
+    <label>Eingabemethode</label>
+    <select id="trasse-methode" onchange="updateTrasseFields()">
+      <option value="manuell">Manuell (Anzahl × Durchmesser)</option>
+      <option value="auswahl">Kabel aus Liste wählen</option>
+    </select>
+  </div>
+  
+  <div id="trasse-manuell-fields">
+    <div class="form-group">
+      <label>Anzahl der Kabel</label>
+      <input type="number" id="trasse-anzahl" placeholder="z.B. 12">
+    </div>
+    
+    <div class="form-group">
+      <label>Mittlerer Kabeldurchmesser (mm)</label>
+      <input type="number" id="trasse-durchmesser" placeholder="z.B. 15">
+    </div>
+  </div>
+  
+  <div id="trasse-auswahl-fields" style="display:none;">
+    <div id="kabel-liste">
+      <div class="kabel-eintrag" style="display:flex;gap:10px;margin-bottom:10px;">
+        <select class="kabel-typ" style="flex:2">
+          <option value="9.5">NYM-J 3×1,5 (Ø9,5)</option>
+          <option value="11">NYM-J 3×2,5 (Ø11)</option>
+          <option value="11">NYM-J 5×1,5 (Ø11)</option>
+          <option value="13">NYM-J 5×2,5 (Ø13)</option>
+          <option value="15">NYM-J 5×4 (Ø15)</option>
+          <option value="17">NYM-J 5×6 (Ø17)</option>
+          <option value="20">NYM-J 5×10 (Ø20)</option>
+          <option value="24">NYM-J 5×16 (Ø24)</option>
+          <option value="14">NYY-J 5×1,5 (Ø14)</option>
+          <option value="16">NYY-J 5×2,5 (Ø16)</option>
+          <option value="20">NYY-J 5×6 (Ø20)</option>
+          <option value="24">NYY-J 5×10 (Ø24)</option>
+          <option value="28">NYY-J 5×16 (Ø28)</option>
+          <option value="33">NYY-J 5×25 (Ø33)</option>
+          <option value="6">Cat.6 (Ø6)</option>
+          <option value="7">Cat.7 (Ø7)</option>
+        </select>
+        <input type="number" class="kabel-menge" placeholder="Anzahl" style="flex:1" value="1">
+      </div>
+    </div>
+    <button type="button" class="btn" style="margin-bottom:15px;background:#6b7280;" onclick="addKabelZeile()">+ Kabel hinzufügen</button>
+  </div>
+  
+  <div class="form-group">
+    <label>Maximaler Füllgrad (%)</label>
+    <select id="trasse-fuellgrad">
+      <option value="35">35% (optimal, viel Reserve)</option>
+      <option value="40" selected>40% (empfohlen)</option>
+      <option value="50">50% (Standard)</option>
+      <option value="60">60% (Maximum)</option>
+    </select>
+  </div>
+  
+  <button class="btn" onclick="calculateTray()">Berechnen</button>
+  <div id="trasse-result"></div>
+  
+  <div class="info-box">
+    <h4>📌 Standard-Trassenbreiten (mm)</h4>
+    <p>50, 75, 100, 150, 200, 300, 400, 500, 600</p>
+    <p style="margin-top:8px"><strong>Tipp:</strong> Füllgrad max. 40-50% für Wärmeabfuhr und Nachbelegung!</p>
+  </div>
+</div>
+</div>

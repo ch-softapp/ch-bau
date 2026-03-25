@@ -1,0 +1,60 @@
+<!-- Statik Stahlbeton -->
+<h2>🧱 Stahlbeton</h2>
+<p style="margin-bottom:20px;color:#6b7280">Nach DIN EN 1992 (Eurocode 2)</p>
+
+<h3>Betonfestigkeitsklassen</h3>
+<table class="data-table">
+  <thead><tr><th>Klasse</th><th>fck N/mm²</th><th>fcd N/mm²</th><th>Anwendung</th></tr></thead>
+  <tbody>
+    <tr><td>C12/15</td><td>12</td><td>6,8</td><td>Sauberkeitsschicht</td></tr>
+    <tr><td>C16/20</td><td>16</td><td>9,1</td><td>Unbewehrter Beton</td></tr>
+    <tr><td>C20/25</td><td>20</td><td>11,3</td><td>Fundamente</td></tr>
+    <tr><td>C25/30</td><td>25</td><td>14,2</td><td>Standard Hochbau</td></tr>
+    <tr><td>C30/37</td><td>30</td><td>17,0</td><td>Decken, Wände</td></tr>
+    <tr><td>C35/45</td><td>35</td><td>19,8</td><td>Stützen, Fertigteile</td></tr>
+    <tr><td>C40/50</td><td>40</td><td>22,7</td><td>Hochbeansprucht</td></tr>
+    <tr><td>C50/60</td><td>50</td><td>28,3</td><td>Brückenbau</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Betonstahl</h3>
+<table class="data-table">
+  <thead><tr><th>Sorte</th><th>fyk N/mm²</th><th>fyd N/mm²</th><th>Durchmesser</th></tr></thead>
+  <tbody>
+    <tr><td>B500A</td><td>500</td><td>435</td><td>6-12 mm (Stab)</td></tr>
+    <tr><td>B500B</td><td>500</td><td>435</td><td>6-40 mm (Stab/Matte)</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Betondeckung cnom</h3>
+<table class="data-table">
+  <thead><tr><th>Expositionsklasse</th><th>cmin mm</th><th>Beispiel</th></tr></thead>
+  <tbody>
+    <tr><td>XC1 (trocken)</td><td>10</td><td>Innenbauteile</td></tr>
+    <tr><td>XC2 (feucht)</td><td>20</td><td>Fundamente</td></tr>
+    <tr><td>XC3 (wechselnd)</td><td>20</td><td>Außenbauteile geschützt</td></tr>
+    <tr><td>XC4 (zyklisch)</td><td>25</td><td>Außenbauteile ungeschützt</td></tr>
+    <tr><td>XD1 (Chlorid mäßig)</td><td>40</td><td>Sprühwasser, Garage</td></tr>
+    <tr><td>XF1 (Frost ohne TM)</td><td>25</td><td>Fassaden, Balkone</td></tr>
+  </tbody>
+</table>
+<p style="color:#6b7280;font-size:12px;margin-top:5px;">cnom = cmin + Δcdev (Δcdev meist 10-15 mm)</p>
+
+<h3 style="margin-top:25px;">Mindestbewehrung Biegung</h3>
+<table class="data-table">
+  <thead><tr><th>Bauteil</th><th>As,min</th></tr></thead>
+  <tbody>
+    <tr><td>Platten, Balken</td><td>0,26 × (fctm/fyk) × bt × d ≥ 0,0013 × bt × d</td></tr>
+    <tr><td>Stützen</td><td>0,10 × NEd/fyd ≥ 0,002 × Ac</td></tr>
+    <tr><td>Wände</td><td>0,002 × Ac (je Seite)</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box" style="margin-top:20px;">
+  <h4>📌 Faustregel Deckenstärke</h4>
+  <ul>
+    <li><strong>Einfeld:</strong> d ≈ L/30 bis L/35</li>
+    <li><strong>Durchlauf:</strong> d ≈ L/35 bis L/40</li>
+    <li><strong>Flachdecke:</strong> d ≈ L/30</li>
+  </ul>
+</div>

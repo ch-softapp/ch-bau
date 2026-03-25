@@ -1,0 +1,72 @@
+<!-- HLSK Heizlast -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'tab-heizberechnung')">Berechnung</button>
+    <button class="tab" onclick="switchTab(this, 'tab-heizwerte')">Richtwerte</button>
+  </div>
+
+  <div id="tab-heizberechnung" class="tab-content active">
+    <h2>🌡️ Heizlast-Überschlag</h2>
+    <p style="margin-bottom:20px;color:#6b7280">Vereinfachte Berechnung nach Richtwerten</p>
+    
+    <div class="form-group">
+      <label>Beheizte Fläche (m²)</label>
+      <input type="number" id="hl-flaeche" placeholder="z.B. 120">
+    </div>
+    
+    <div class="form-group">
+      <label>Gebäudetyp</label>
+      <select id="hl-gebaeude">
+        <option value="neubau">Neubau (EnEV/GEG Standard)</option>
+        <option value="altbau_saniert">Altbau saniert</option>
+        <option value="altbau_unsaniert">Altbau unsaniert</option>
+        <option value="altbau_schlecht">Altbau schlecht gedämmt</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Raumhöhe (m)</label>
+      <input type="number" id="hl-hoehe" value="2.5" step="0.1">
+    </div>
+    
+    <button class="btn" onclick="calculateHeizlast()">Berechnen</button>
+    <div id="hl-result"></div>
+  </div>
+
+  <div id="tab-heizwerte" class="tab-content">
+    <h2>Heizlast-Richtwerte</h2>
+    <p style="margin-bottom:20px;color:#6b7280">Überschlagswerte in W/m² nach Gebäudetyp</p>
+    
+    <table class="data-table">
+      <thead><tr><th>Gebäudetyp</th><th>W/m²</th><th>Beispiel 100m²</th></tr></thead>
+      <tbody>
+        <tr><td>Passivhaus</td><td>10-15</td><td>1,0-1,5 kW</td></tr>
+        <tr><td>KfW 40</td><td>25-35</td><td>2,5-3,5 kW</td></tr>
+        <tr><td>Neubau EnEV/GEG</td><td>30-50</td><td>3,0-5,0 kW</td></tr>
+        <tr><td>Altbau saniert</td><td>50-80</td><td>5,0-8,0 kW</td></tr>
+        <tr><td>Altbau unsaniert</td><td>80-120</td><td>8,0-12,0 kW</td></tr>
+        <tr><td>Altbau schlecht</td><td>120-180</td><td>12,0-18,0 kW</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top:25px;">Wärmepumpen-Dimensionierung</h3>
+    <table class="data-table">
+      <thead><tr><th>Heizlast</th><th>WP Leistung</th><th>Pufferspeicher</th></tr></thead>
+      <tbody>
+        <tr><td>bis 6 kW</td><td>6-8 kW</td><td>100-200 L</td></tr>
+        <tr><td>6-10 kW</td><td>8-12 kW</td><td>200-300 L</td></tr>
+        <tr><td>10-15 kW</td><td>12-17 kW</td><td>300-500 L</td></tr>
+        <tr><td>15-20 kW</td><td>17-22 kW</td><td>500-750 L</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="info-box" style="margin-top:20px;">
+      <h4>📌 Vorlauftemperaturen</h4>
+      <ul>
+        <li><strong>Fußbodenheizung:</strong> 30-35°C</li>
+        <li><strong>Niedertemperatur-Heizkörper:</strong> 45-55°C</li>
+        <li><strong>Konventionelle Heizkörper:</strong> 55-70°C</li>
+      </ul>
+    </div>
+  </div>
+</div>

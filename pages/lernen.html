@@ -1,0 +1,25 @@
+<!-- Lernen Page - Quiz System -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'quiz-basis')">Basis-Quiz</button>
+    <button class="tab" onclick="switchTab(this, 'quiz-geselle')">Gesellenprüfung</button>
+  </div>
+
+  <!-- Basis Quiz -->
+  <div id="quiz-basis" class="tab-content active">
+    <h2>🎯 Basis-Quiz für Azubis</h2>
+    <p style="margin-bottom:15px;color:var(--gray-500)">Teste dein Grundwissen!</p>
+    
+    <div id="quiz-container"></div>
+    <button class="btn" onclick="startQuiz('basis')" id="btn-basis">Quiz starten</button>
+  </div>
+
+  <!-- Gesellenprüfung -->
+  <div id="quiz-geselle" class="tab-content">
+    <h2>🎓 Prüfungsvorbereitung</h2>
+    <p style="margin-bottom:15px;color:var(--gray-500)">Typische Prüfungsfragen</p>
+    
+    <div id="quiz-geselle-container"></div>
+    <button class="btn" onclick="startQuiz('geselle')" id="btn-geselle">Quiz starten</button>
+  </div>
+</div>

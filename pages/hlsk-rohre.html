@@ -1,0 +1,85 @@
+<!-- HLSK Rohrdimensionierung -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'tab-rohrberechnung')">Berechnung</button>
+    <button class="tab" onclick="switchTab(this, 'tab-rohrtabellen')">Tabellen</button>
+  </div>
+
+  <div id="tab-rohrberechnung" class="tab-content active">
+    <h2>🔩 Rohrdimensionierung</h2>
+    <p style="margin-bottom:20px;color:#6b7280">Nach max. Fließgeschwindigkeit</p>
+    
+    <div class="form-group">
+      <label>Volumenstrom (l/h)</label>
+      <input type="number" id="rohr-volumenstrom" placeholder="z.B. 500">
+    </div>
+    
+    <div class="form-group">
+      <label>Max. Fließgeschwindigkeit (m/s)</label>
+      <select id="rohr-geschwindigkeit">
+        <option value="0.5">0,5 m/s (Trinkwasser)</option>
+        <option value="1.0" selected>1,0 m/s (Heizung Standard)</option>
+        <option value="1.5">1,5 m/s (Heizung erhöht)</option>
+        <option value="2.0">2,0 m/s (Maximum)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Rohrmaterial</label>
+      <select id="rohr-material">
+        <option value="kupfer">Kupfer</option>
+        <option value="stahl">Stahl (Gewinderohr)</option>
+        <option value="kunststoff">Kunststoff (PE-X/Verbund)</option>
+      </select>
+    </div>
+    
+    <button class="btn" onclick="calculateRohr()">Berechnen</button>
+    <div id="rohr-result"></div>
+  </div>
+
+  <div id="tab-rohrtabellen" class="tab-content">
+    <h2>Rohrdimensionen</h2>
+    
+    <h3>Kupferrohr nach DIN EN 1057</h3>
+    <table class="data-table">
+      <thead><tr><th>Bezeichnung</th><th>Außen-Ø</th><th>Innen-Ø</th><th>Wandstärke</th></tr></thead>
+      <tbody>
+        <tr><td>10×1</td><td>10 mm</td><td>8 mm</td><td>1,0 mm</td></tr>
+        <tr><td>12×1</td><td>12 mm</td><td>10 mm</td><td>1,0 mm</td></tr>
+        <tr><td>15×1</td><td>15 mm</td><td>13 mm</td><td>1,0 mm</td></tr>
+        <tr><td>18×1</td><td>18 mm</td><td>16 mm</td><td>1,0 mm</td></tr>
+        <tr><td>22×1</td><td>22 mm</td><td>20 mm</td><td>1,0 mm</td></tr>
+        <tr><td>28×1,5</td><td>28 mm</td><td>25 mm</td><td>1,5 mm</td></tr>
+        <tr><td>35×1,5</td><td>35 mm</td><td>32 mm</td><td>1,5 mm</td></tr>
+        <tr><td>42×1,5</td><td>42 mm</td><td>39 mm</td><td>1,5 mm</td></tr>
+        <tr><td>54×2</td><td>54 mm</td><td>50 mm</td><td>2,0 mm</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top:25px;">Stahlrohr (Gewinderohr) nach DIN EN 10255</h3>
+    <table class="data-table">
+      <thead><tr><th>DN</th><th>Außen-Ø</th><th>Innen-Ø</th><th>Gewinde</th></tr></thead>
+      <tbody>
+        <tr><td>DN 10</td><td>17,2 mm</td><td>12,5 mm</td><td>3/8"</td></tr>
+        <tr><td>DN 15</td><td>21,3 mm</td><td>16,0 mm</td><td>1/2"</td></tr>
+        <tr><td>DN 20</td><td>26,9 mm</td><td>21,6 mm</td><td>3/4"</td></tr>
+        <tr><td>DN 25</td><td>33,7 mm</td><td>27,2 mm</td><td>1"</td></tr>
+        <tr><td>DN 32</td><td>42,4 mm</td><td>35,9 mm</td><td>1 1/4"</td></tr>
+        <tr><td>DN 40</td><td>48,3 mm</td><td>41,8 mm</td><td>1 1/2"</td></tr>
+        <tr><td>DN 50</td><td>60,3 mm</td><td>53,0 mm</td><td>2"</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top:25px;">Max. Fließgeschwindigkeiten</h3>
+    <table class="data-table">
+      <thead><tr><th>Anwendung</th><th>Max. v</th></tr></thead>
+      <tbody>
+        <tr><td>Trinkwasser kalt</td><td>2,0 m/s</td></tr>
+        <tr><td>Trinkwasser warm (Zirkulation)</td><td>0,5 m/s</td></tr>
+        <tr><td>Heizung (Verteilleitungen)</td><td>1,0 m/s</td></tr>
+        <tr><td>Heizung (Steigleitungen)</td><td>1,5 m/s</td></tr>
+        <tr><td>Fußbodenheizung</td><td>0,5 m/s</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>

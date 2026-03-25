@@ -1,0 +1,63 @@
+<!-- Statik Formeln -->
+<h2>📐 Wichtige Formeln</h2>
+
+<h3>Schnittgrößen Einfeldträger</h3>
+<table class="data-table">
+  <thead><tr><th>Last</th><th>Mmax</th><th>Amax</th></tr></thead>
+  <tbody>
+    <tr><td>Gleichlast q</td><td>q×L²/8</td><td>q×L/2</td></tr>
+    <tr><td>Einzellast F (Mitte)</td><td>F×L/4</td><td>F/2</td></tr>
+    <tr><td>Dreieckslast</td><td>q×L²/12</td><td>q×L/3</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Durchbiegung Einfeldträger</h3>
+<table class="data-table">
+  <thead><tr><th>Last</th><th>wmax</th></tr></thead>
+  <tbody>
+    <tr><td>Gleichlast q</td><td>5×q×L⁴ / (384×E×I)</td></tr>
+    <tr><td>Einzellast F (Mitte)</td><td>F×L³ / (48×E×I)</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Spannungsnachweise</h3>
+<table class="data-table">
+  <thead><tr><th>Spannung</th><th>Formel</th></tr></thead>
+  <tbody>
+    <tr><td>Biegespannung</td><td>σ = M / W</td></tr>
+    <tr><td>Normalspannung</td><td>σ = N / A</td></tr>
+    <tr><td>Schubspannung</td><td>τ = V×S / (I×b)</td></tr>
+    <tr><td>Torsion (Kreis)</td><td>τ = T / Wt</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Flächenmomente</h3>
+<table class="data-table">
+  <thead><tr><th>Querschnitt</th><th>Iy</th><th>Wy</th></tr></thead>
+  <tbody>
+    <tr><td>Rechteck b×h</td><td>b×h³/12</td><td>b×h²/6</td></tr>
+    <tr><td>Kreis Ø d</td><td>π×d⁴/64</td><td>π×d³/32</td></tr>
+    <tr><td>Kreisring d/D</td><td>π×(D⁴-d⁴)/64</td><td>π×(D⁴-d⁴)/(32×D)</td></tr>
+    <tr><td>Dreieck b×h</td><td>b×h³/36</td><td>b×h²/24</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Knicklängen</h3>
+<table class="data-table">
+  <thead><tr><th>Lagerung</th><th>β</th><th>sk = β×L</th></tr></thead>
+  <tbody>
+    <tr><td>Beidseitig gelenkig</td><td>1,0</td><td>sk = L</td></tr>
+    <tr><td>Einseitig eingespannt</td><td>2,0</td><td>sk = 2×L</td></tr>
+    <tr><td>Beidseitig eingespannt</td><td>0,5</td><td>sk = 0,5×L</td></tr>
+    <tr><td>Ein Gelenk + ein eingespannt</td><td>0,7</td><td>sk = 0,7×L</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box" style="margin-top:20px;">
+  <h4>📌 Durchbiegungsgrenzen</h4>
+  <ul>
+    <li><strong>Decken, Dächer:</strong> L/250 (ständige Last)</li>
+    <li><strong>Decken:</strong> L/300 (veränderliche Last)</li>
+    <li><strong>Auskragungen:</strong> L/150</li>
+  </ul>
+</div>

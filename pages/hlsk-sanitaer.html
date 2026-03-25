@@ -1,0 +1,78 @@
+<!-- HLSK Sanitär -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'tab-anschluss')">Anschlusswerte</button>
+    <button class="tab" onclick="switchTab(this, 'tab-gefaelle')">Gefälle</button>
+  </div>
+
+  <div id="tab-anschluss" class="tab-content active">
+    <h2>🚿 Anschlusswerte (DIN 1988-300)</h2>
+    
+    <table class="data-table">
+      <thead><tr><th>Entnahmestelle</th><th>Kalt l/s</th><th>Warm l/s</th><th>Anschluss</th></tr></thead>
+      <tbody>
+        <tr><td>Waschbecken</td><td>0,07</td><td>0,07</td><td>DN 15</td></tr>
+        <tr><td>Bidet</td><td>0,07</td><td>0,07</td><td>DN 15</td></tr>
+        <tr><td>Dusche</td><td>0,15</td><td>0,15</td><td>DN 15</td></tr>
+        <tr><td>Badewanne</td><td>0,15</td><td>0,15</td><td>DN 15</td></tr>
+        <tr><td>Küchenspüle</td><td>0,07</td><td>0,07</td><td>DN 15</td></tr>
+        <tr><td>WC Spülkasten</td><td>0,13</td><td>-</td><td>DN 15</td></tr>
+        <tr><td>WC Druckspüler</td><td>1,0</td><td>-</td><td>DN 25</td></tr>
+        <tr><td>Urinal Druckspüler</td><td>0,3</td><td>-</td><td>DN 15</td></tr>
+        <tr><td>Waschmaschine</td><td>0,25</td><td>-</td><td>DN 15</td></tr>
+        <tr><td>Geschirrspüler</td><td>0,15</td><td>-</td><td>DN 15</td></tr>
+        <tr><td>Ausgussbecken</td><td>0,15</td><td>0,15</td><td>DN 15</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top:25px;">Warmwasserbedarf</h3>
+    <table class="data-table">
+      <thead><tr><th>Nutzung</th><th>Liter/Person/Tag</th></tr></thead>
+      <tbody>
+        <tr><td>Niedriger Bedarf</td><td>20-30 L</td></tr>
+        <tr><td>Mittlerer Bedarf</td><td>30-50 L</td></tr>
+        <tr><td>Hoher Bedarf</td><td>50-80 L</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="tab-gefaelle" class="tab-content">
+    <h2>Gefälle Abwasser</h2>
+    
+    <h3>Mindestgefälle nach DIN EN 12056</h3>
+    <table class="data-table">
+      <thead><tr><th>Leitung</th><th>DN</th><th>Gefälle</th></tr></thead>
+      <tbody>
+        <tr><td>Einzelanschluss</td><td>40</td><td>1:50 (2%)</td></tr>
+        <tr><td>Einzelanschluss</td><td>50</td><td>1:50 (2%)</td></tr>
+        <tr><td>Sammelanschluss</td><td>70</td><td>1:50 (2%)</td></tr>
+        <tr><td>Sammelanschluss</td><td>100</td><td>1:100 (1%)</td></tr>
+        <tr><td>Grundleitung</td><td>100</td><td>1:50 - 1:100</td></tr>
+        <tr><td>Grundleitung</td><td>125-150</td><td>1:100 (1%)</td></tr>
+      </tbody>
+    </table>
+    
+    <h3 style="margin-top:25px;">Anschluss-DN</h3>
+    <table class="data-table">
+      <thead><tr><th>Objekt</th><th>Anschluss-DN</th></tr></thead>
+      <tbody>
+        <tr><td>Waschbecken</td><td>DN 40</td></tr>
+        <tr><td>Dusche (bodengleich)</td><td>DN 50</td></tr>
+        <tr><td>Badewanne</td><td>DN 50</td></tr>
+        <tr><td>WC</td><td>DN 100</td></tr>
+        <tr><td>Spüle</td><td>DN 50</td></tr>
+        <tr><td>Waschmaschine</td><td>DN 50</td></tr>
+        <tr><td>Bodenablauf</td><td>DN 70-100</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="info-box" style="margin-top:20px;">
+      <h4>📌 Wichtig</h4>
+      <ul>
+        <li>Max. 3 m Länge ohne Belüftung (DN 40-50)</li>
+        <li>Rückstausicherung bei Kellern unter Rückstauebene</li>
+        <li>Fettabscheider in gewerblichen Küchen</li>
+      </ul>
+    </div>
+  </div>
+</div>

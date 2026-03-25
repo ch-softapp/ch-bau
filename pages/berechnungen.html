@@ -1,0 +1,249 @@
+<!-- Berechnungen Page -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'ohm')">Ohm</button>
+    <button class="tab" onclick="switchTab(this, 'strom')">Strom</button>
+    <button class="tab" onclick="switchTab(this, 'leitung')">Querschnitt</button>
+    <button class="tab" onclick="switchTab(this, 'leistung')">Leistung</button>
+    <button class="tab" onclick="switchTab(this, 'spannungsfall')">Δu</button>
+  </div>
+
+  <!-- Ohmsches Gesetz -->
+  <div id="ohm" class="tab-content active">
+    <h2>Ohmsches Gesetz</h2>
+    <p style="margin-bottom:20px;color:#6b7280">U = R × I | R = U / I | I = U / R</p>
+    
+    <div class="form-group">
+      <label>Was berechnen?</label>
+      <select id="ohm-calc-type" onchange="updateOhmFields()">
+        <option value="voltage">Spannung (U)</option>
+        <option value="current">Stromstärke (I)</option>
+        <option value="resistance">Widerstand (R)</option>
+        <option value="power">Leistung (P)</option>
+      </select>
+    </div>
+    
+    <div id="ohm-inputs"></div>
+    
+    <button class="btn" onclick="calculateOhm()">Berechnen</button>
+    <div id="ohm-result"></div>
+  </div>
+
+  <!-- Strom/Ampere Berechnung -->
+  <div id="strom" class="tab-content">
+    <h2>Stromstärke berechnen</h2>
+    <p style="margin-bottom:20px;color:#6b7280">I = P / U (DC) | I = P / (U × cos φ) (AC)</p>
+    
+    <div class="form-group">
+      <label>Netz / Spannung</label>
+      <select id="amp-netz" onchange="updateAmpFields()">
+        <option value="12-dc">12 V DC (Kleinspannung)</option>
+        <option value="24-dc">24 V DC (Steuerung, Solar)</option>
+        <option value="48-dc">48 V DC (Telekom, USV)</option>
+        <option value="230-ac1" selected>230 V AC 1~ (Haushalt)</option>
+        <option value="400-ac3">400 V AC 3~ (Drehstrom)</option>
+        <option value="690-ac3">690 V AC 3~ (Industrie)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Leistung P</label>
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="amp-leistung" placeholder="z.B. 5" style="flex:1">
+        <select id="amp-einheit" style="width:80px">
+          <option value="1000">kW</option>
+          <option value="1">W</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group" id="amp-cosphi-group">
+      <label>cos φ (Leistungsfaktor)</label>
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="amp-cosphi" value="0.85" min="0.1" max="1" step="0.01" style="flex:1">
+        <select id="amp-cosphi-preset" onchange="document.getElementById('amp-cosphi').value=this.value" style="width:140px">
+          <option value="">Voreinstellung...</option>
+          <option value="1.0">1,0 Heizung</option>
+          <option value="0.95">0,95 LED</option>
+          <option value="0.9">0,9 Motor komp.</option>
+          <option value="0.85">0,85 Motor</option>
+          <option value="0.8">0,8 Motor alt</option>
+          <option value="0.7">0,7 Schweißen</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-group" id="amp-eta-group">
+      <label>Wirkungsgrad η (optional)</label>
+      <div style="display:flex;gap:10px;">
+        <input type="number" id="amp-eta" value="1.0" min="0.5" max="1" step="0.01" style="flex:1">
+        <select id="amp-eta-preset" onchange="document.getElementById('amp-eta').value=this.value" style="width:140px">
+          <option value="">Voreinstellung...</option>
+          <option value="1.0">100% Direkt</option>
+          <option value="0.95">95% Gut</option>
+          <option value="0.9">90% Standard</option>
+          <option value="0.85">85% Alt</option>
+        </select>
+      </div>
+    </div>
+    
+    <button class="btn" onclick="calculateAmpere()">Berechnen</button>
+    <div id="amp-result"></div>
+    
+    <div class="info-box" style="margin-top:20px">
+      <h4>📌 Typische Leistungen</h4>
+      <table class="data-table">
+        <tr><td>Wasserkocher</td><td>2.000 - 3.000 W</td></tr>
+        <tr><td>Backofen</td><td>2.000 - 4.000 W</td></tr>
+        <tr><td>Herd (4 Platten)</td><td>7.000 - 11.000 W</td></tr>
+        <tr><td>Durchlauferhitzer</td><td>18.000 - 27.000 W</td></tr>
+        <tr><td>Wärmepumpe</td><td>2.000 - 6.000 W</td></tr>
+        <tr><td>E-Auto Wallbox</td><td>3.700 - 22.000 W</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Leitungsquerschnitt -->
+  <div id="leitung" class="tab-content">
+    <h2>Leitungsquerschnitt</h2>
+    <p style="margin-bottom:20px;color:#6b7280">Nach DIN VDE 0298-4</p>
+    
+    <div class="form-group">
+      <label>Stromart</label>
+      <select id="leitung-art">
+        <option value="ac1">Wechselstrom 1~ (230V)</option>
+        <option value="ac3">Drehstrom 3~ (400V)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Betriebsstrom (A)</label>
+      <input type="number" id="leitung-strom" placeholder="z.B. 16">
+    </div>
+    
+    <div class="form-group">
+      <label>Leitungslänge (m)</label>
+      <input type="number" id="leitung-laenge" placeholder="z.B. 25">
+    </div>
+    
+    <div class="form-group">
+      <label>Verlegeart</label>
+      <select id="leitung-verlegeart">
+        <option value="b1">B1 - Wärmegedämmt</option>
+        <option value="b2">B2 - Im Rohr</option>
+        <option value="c" selected>C - Auf Wand</option>
+        <option value="e">E - Frei in Luft</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Material</label>
+      <select id="leitung-material">
+        <option value="cu">Kupfer (κ=56)</option>
+        <option value="al">Aluminium (κ=35)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Max. Spannungsfall</label>
+      <select id="leitung-spannungsfall">
+        <option value="3" selected>3%</option>
+        <option value="1">1%</option>
+        <option value="4">4%</option>
+        <option value="5">5%</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>cos φ (Leistungsfaktor)</label>
+      <select id="leitung-cosphi">
+        <option value="1.0">1,0 - Heizung, Beleuchtung</option>
+        <option value="0.95">0,95 - LED, moderne Motoren</option>
+        <option value="0.9">0,9 - Motoren kompensiert</option>
+        <option value="0.85" selected>0,85 - Motoren Standard</option>
+        <option value="0.8">0,8 - Motoren alt</option>
+        <option value="0.7">0,7 - Schweißen</option>
+      </select>
+    </div>
+    
+    <button class="btn" onclick="calculateCableSize()">Berechnen</button>
+    <div id="leitung-result"></div>
+  </div>
+
+  <!-- Leistung -->
+  <div id="leistung" class="tab-content">
+    <h2>Leistungsberechnung</h2>
+    
+    <div class="form-group">
+      <label>Stromart</label>
+      <select id="leistung-art" onchange="updateLeistungFields()">
+        <option value="dc">Gleichstrom (DC)</option>
+        <option value="ac1">Wechselstrom 1~ (AC)</option>
+        <option value="ac3">Drehstrom 3~ (AC)</option>
+      </select>
+    </div>
+    
+    <div id="leistung-inputs"></div>
+    
+    <button class="btn" onclick="calculatePower()">Berechnen</button>
+    <div id="leistung-result"></div>
+  </div>
+
+  <!-- Spannungsfall -->
+  <div id="spannungsfall" class="tab-content">
+    <h2>Spannungsfall</h2>
+    <p style="margin-bottom:20px;color:#6b7280">Nach DIN VDE 0100-520</p>
+    
+    <div class="form-group">
+      <label>Stromart</label>
+      <select id="sf-art">
+        <option value="ac1">Wechselstrom 1~ (230V)</option>
+        <option value="ac3">Drehstrom 3~ (400V)</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Leitungslänge (m)</label>
+      <input type="number" id="sf-laenge" placeholder="z.B. 50">
+    </div>
+    
+    <div class="form-group">
+      <label>Querschnitt (mm²)</label>
+      <select id="sf-querschnitt">
+        <option value="1.5">1,5</option>
+        <option value="2.5" selected>2,5</option>
+        <option value="4">4</option>
+        <option value="6">6</option>
+        <option value="10">10</option>
+        <option value="16">16</option>
+        <option value="25">25</option>
+        <option value="35">35</option>
+        <option value="50">50</option>
+        <option value="70">70</option>
+        <option value="95">95</option>
+        <option value="120">120</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>Stromstärke (A)</label>
+      <input type="number" id="sf-strom" placeholder="z.B. 16">
+    </div>
+    
+    <div class="form-group">
+      <label>Material</label>
+      <select id="sf-material">
+        <option value="cu">Kupfer</option>
+        <option value="al">Aluminium</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>cos φ</label>
+      <input type="number" id="sf-cosphi" value="1" step="0.01" min="0.7" max="1">
+    </div>
+    
+    <button class="btn" onclick="calculateVoltageDrop()">Berechnen</button>
+    <div id="sf-result"></div>
+  </div>
+</div>

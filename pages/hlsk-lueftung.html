@@ -1,0 +1,61 @@
+<!-- HLSK Lüftung -->
+<h2>💨 Lüftungsberechnung</h2>
+<p style="margin-bottom:20px;color:#6b7280">Nach DIN 1946-6</p>
+
+<div class="form-group">
+  <label>Raumvolumen (m³)</label>
+  <input type="number" id="lueft-volumen" placeholder="z.B. 50">
+</div>
+
+<div class="form-group">
+  <label>Luftwechselrate (1/h)</label>
+  <select id="lueft-wechsel">
+    <option value="0.5" selected>0,5 /h (Wohnräume Standard)</option>
+    <option value="1.0">1,0 /h (Küche, Bad)</option>
+    <option value="2.0">2,0 /h (Feuchträume intensiv)</option>
+    <option value="4.0">4,0 /h (Gewerbe/Labor)</option>
+  </select>
+</div>
+
+<div class="form-group">
+  <label>Anzahl Personen (optional)</label>
+  <input type="number" id="lueft-personen" placeholder="z.B. 4" value="0">
+</div>
+
+<button class="btn" onclick="calculateLueftung()">Berechnen</button>
+<div id="lueft-result"></div>
+
+<h3 style="margin-top:30px;">Mindest-Luftvolumenströme</h3>
+<table class="data-table">
+  <thead><tr><th>Raum</th><th>Abluft m³/h</th><th>Hinweis</th></tr></thead>
+  <tbody>
+    <tr><td>Küche</td><td>60</td><td>Min. 40, mit Dunstabzug mehr</td></tr>
+    <tr><td>Bad mit WC</td><td>60</td><td>Min. 40</td></tr>
+    <tr><td>WC separat</td><td>30</td><td>Min. 20</td></tr>
+    <tr><td>Hauswirtschaft</td><td>30</td><td>Min. 20</td></tr>
+    <tr><td>Wohnraum</td><td>30/Person</td><td>0,5 Luftwechsel/h</td></tr>
+    <tr><td>Schlafzimmer</td><td>30/Person</td><td>0,5 Luftwechsel/h</td></tr>
+  </tbody>
+</table>
+
+<h3 style="margin-top:25px;">Kanalquerschnitte</h3>
+<table class="data-table">
+  <thead><tr><th>Volumenstrom</th><th>Ø rund</th><th>Rechteck</th></tr></thead>
+  <tbody>
+    <tr><td>50 m³/h</td><td>Ø 80 mm</td><td>100×50 mm</td></tr>
+    <tr><td>100 m³/h</td><td>Ø 100 mm</td><td>150×75 mm</td></tr>
+    <tr><td>150 m³/h</td><td>Ø 125 mm</td><td>200×100 mm</td></tr>
+    <tr><td>200 m³/h</td><td>Ø 150 mm</td><td>250×100 mm</td></tr>
+    <tr><td>300 m³/h</td><td>Ø 160 mm</td><td>300×125 mm</td></tr>
+    <tr><td>500 m³/h</td><td>Ø 200 mm</td><td>400×150 mm</td></tr>
+  </tbody>
+</table>
+
+<div class="info-box" style="margin-top:20px;">
+  <h4>📌 Max. Geschwindigkeiten</h4>
+  <ul>
+    <li><strong>Hauptkanal:</strong> 4-6 m/s</li>
+    <li><strong>Abzweige:</strong> 3-4 m/s</li>
+    <li><strong>Auslässe:</strong> 2-3 m/s</li>
+  </ul>
+</div>

@@ -1,0 +1,120 @@
+<!-- Praxis - Tabellen für die Baustelle -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this, 'tab-drehmoment')">Drehmoment</button>
+    <button class="tab" onclick="switchTab(this, 'tab-biege')">Biegeradien</button>
+    <button class="tab" onclick="switchTab(this, 'tab-kabel')">Kabeldaten</button>
+  </div>
+
+  <!-- DREHMOMENTE -->
+  <div id="tab-drehmoment" class="tab-content active">
+    <h2>Anzugsmomente</h2>
+    
+    <h3>Kabelschuhe & Klemmen</h3>
+    <table class="data-table">
+      <thead><tr><th>Gewinde</th><th>Min Nm</th><th>Max Nm</th></tr></thead>
+      <tbody>
+        <tr><td>M3</td><td>0,5</td><td>0,8</td></tr>
+        <tr><td>M4</td><td>1,2</td><td>1,8</td></tr>
+        <tr><td>M5</td><td>2,5</td><td>3,5</td></tr>
+        <tr><td>M6</td><td>4,0</td><td>6,0</td></tr>
+        <tr><td>M8</td><td>8,0</td><td>12,0</td></tr>
+        <tr><td>M10</td><td>16</td><td>24</td></tr>
+        <tr><td>M12</td><td>28</td><td>42</td></tr>
+      </tbody>
+    </table>
+    
+    <h3>LSS & Reihenklemmen</h3>
+    <table class="data-table">
+      <thead><tr><th>Hersteller/Typ</th><th>Nm</th></tr></thead>
+      <tbody>
+        <tr><td>ABB S200</td><td>2,8</td></tr>
+        <tr><td>Siemens 5SY</td><td>2,5</td></tr>
+        <tr><td>Hager MBN/MCN</td><td>2,0</td></tr>
+        <tr><td>Eaton PL7</td><td>2,0</td></tr>
+        <tr><td>Schneider iC60</td><td>2,5</td></tr>
+        <tr><td>Wago 221</td><td>0,4</td></tr>
+        <tr><td>Phoenix UTTB</td><td>0,5-0,6</td></tr>
+      </tbody>
+    </table>
+    
+    <h3>CEE-Stecker/Kupplungen</h3>
+    <table class="data-table">
+      <thead><tr><th>Größe</th><th>Nm</th></tr></thead>
+      <tbody>
+        <tr><td>16A</td><td>0,8 - 1,0</td></tr>
+        <tr><td>32A</td><td>1,2 - 1,5</td></tr>
+        <tr><td>63A</td><td>2,0 - 2,5</td></tr>
+        <tr><td>125A</td><td>3,0 - 4,0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BIEGERADIEN -->
+  <div id="tab-biege" class="tab-content">
+    <h2>Mindest-Biegeradien</h2>
+    
+    <table class="data-table">
+      <thead><tr><th>Kabeltyp</th><th>Faktor</th><th>Beispiel Ø15mm</th></tr></thead>
+      <tbody>
+        <tr><td>NYM-J</td><td>4 × D</td><td>60 mm</td></tr>
+        <tr><td>NYY-J</td><td>4 × D</td><td>60 mm</td></tr>
+        <tr><td>H07RN-F (Gummi)</td><td>6 × D</td><td>90 mm</td></tr>
+        <tr><td>H07V-K (flexibel)</td><td>3 × D</td><td>45 mm</td></tr>
+        <tr><td>H05VV-F</td><td>5 × D</td><td>75 mm</td></tr>
+        <tr><td>Cat.5/6/7</td><td>4 × D</td><td>~24 mm</td></tr>
+        <tr><td>LWL Singlemode</td><td>10 × D</td><td>~30 mm</td></tr>
+        <tr><td>LWL Multimode</td><td>15 × D</td><td>~45 mm</td></tr>
+      </tbody>
+    </table>
+    
+    <div class="info-box">
+      <h4>⚠️ Bei Kälte unter 5°C</h4>
+      <p>Biegeradien um mindestens 50% vergrößern! Kabel vor Verlegung aufwärmen lassen.</p>
+    </div>
+    
+    <div class="info-box">
+      <h4>📌 Faustregel</h4>
+      <p>Im Zweifel: <strong>6 × Außendurchmesser</strong> als sicherer Mindestradius.</p>
+    </div>
+  </div>
+
+  <!-- KABELDATEN -->
+  <div id="tab-kabel" class="tab-content">
+    <h2>Kabel-Außendurchmesser</h2>
+    
+    <h3>NYM-J (ca. Werte)</h3>
+    <table class="data-table">
+      <thead><tr><th>Typ</th><th>Ø mm</th><th>kg/100m</th></tr></thead>
+      <tbody>
+        <tr><td>3×1,5</td><td>9,5</td><td>14</td></tr>
+        <tr><td>3×2,5</td><td>11</td><td>20</td></tr>
+        <tr><td>5×1,5</td><td>11</td><td>20</td></tr>
+        <tr><td>5×2,5</td><td>13</td><td>30</td></tr>
+        <tr><td>5×4</td><td>15</td><td>45</td></tr>
+        <tr><td>5×6</td><td>17</td><td>62</td></tr>
+        <tr><td>5×10</td><td>20</td><td>100</td></tr>
+        <tr><td>5×16</td><td>24</td><td>155</td></tr>
+      </tbody>
+    </table>
+    
+    <h3>NYY-J 5-adrig (ca. Werte)</h3>
+    <table class="data-table">
+      <thead><tr><th>Typ</th><th>Ø mm</th><th>kg/100m</th></tr></thead>
+      <tbody>
+        <tr><td>5×1,5</td><td>14</td><td>17</td></tr>
+        <tr><td>5×2,5</td><td>16</td><td>24</td></tr>
+        <tr><td>5×4</td><td>18</td><td>33</td></tr>
+        <tr><td>5×6</td><td>20</td><td>45</td></tr>
+        <tr><td>5×10</td><td>24</td><td>69</td></tr>
+        <tr><td>5×16</td><td>28</td><td>103</td></tr>
+        <tr><td>5×25</td><td>33</td><td>156</td></tr>
+        <tr><td>5×35</td><td>37</td><td>213</td></tr>
+        <tr><td>5×50</td><td>42</td><td>292</td></tr>
+        <tr><td>5×70</td><td>48</td><td>403</td></tr>
+        <tr><td>5×95</td><td>54</td><td>543</td></tr>
+        <tr><td>5×120</td><td>60</td><td>685</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
