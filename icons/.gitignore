@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1e40af"/>
+  <!-- Lightning bolt -->
+  <path d="M320 60 L200 230 L260 230 L192 452 L360 220 L290 220 L340 60 Z" fill="#ffd700" stroke="#b8860b" stroke-width="4"/>
+  <!-- Inner highlight -->
+  <path d="M310 80 L210 230 L260 230 L205 420 L340 230 L290 230 L330 80 Z" fill="#ffed4a" opacity="0.5"/>
+</svg>
